@@ -1,0 +1,32 @@
+# I/O
+input_filename: "test_data/contrived_MGRA.csv"
+output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
+
+# Filtering
+target_vacancy_rate: 0.06
+non_residential_target_vacancy_rate: 0.1 # from SLC Model
+minimum_redevelopment_age: 20
+
+#simulation
+simulation_years: 5
+simulation_begin: 2020
+
+# Sizes - all sizes in square feet
+single_family_minimum_unit_size: 800 # from SLC Model
+multi_family_minimum_unit_size: 800 # from SLC Model
+
+residential_square_feet_per_job: 400 # from SLC Model
+non_residential_square_feet_per_job: 600 # from SLC Model
+industrial_square_feet_per_job: 648 # from SLC Model
+commercial_square_feet_per_job: 650 # from SLC Model
+office_square_feet_per_job: 462 # from SLC Model
+
+# Demand
+new_units_industrial: 1
+new_units_office: 1
+new_units_commercial: 1
+
+new_units_single_family: 2
+new_units_multi_family: 2
+
+debug: 0
