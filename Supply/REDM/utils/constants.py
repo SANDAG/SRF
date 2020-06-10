@@ -4,8 +4,8 @@ eg.
 CONSTANT = 'SANDAG_column_name' # metadata
 """
 
-MGRA =                                      'mgra' # Series 13 MGRA
-LUZ =                                       'luz' # Zone for urban modeling
+MGRA =                                      'MGRA' # Series 13 MGRA
+LUZ =                                       'LUZ' # Zone for urban modeling
 POPULATION =                                'pop' # Total population
 HOUSEHOLD_POPULATION =                      'hhp' # Household population
 EMPLOYED_RESIDENTS =                        'er' # Employed residents

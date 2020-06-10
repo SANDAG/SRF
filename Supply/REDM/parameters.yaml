@@ -1,5 +1,5 @@
 # I/O
-input_filename: "data/mgra2012.csv"
+input_filename: "data/SRF_Input_Base_V1_060820.csv"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # Filtering

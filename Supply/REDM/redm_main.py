@@ -53,14 +53,11 @@ def run(mgra_dataframe):
 
 if __name__ == "__main__":
     # load parameters
-    config.parameters = load_parameters('test_parameters.yaml')
-
-    # re-enable normal parameters once full dataset is available
-    # args = get_args()
-    # if args.test:
-    #     config.parameters = load_parameters('test_parameters.yaml')
-    # else:
-    #     config.parameters = load_parameters('parameters.yaml')
+    args = get_args()
+    if args.test:
+        config.parameters = load_parameters('test_parameters.yaml')
+    else:
+        config.parameters = load_parameters('parameters.yaml')
 
     if config.parameters is not None:
         output_dir = config.parameters['output_directory']

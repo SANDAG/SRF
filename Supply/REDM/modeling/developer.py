@@ -1,6 +1,7 @@
 import utils.config as config
 from utils.converter import square_feet_to_acres
-from utils.constants import MGRA, DEVELOPED_ACRES, VACANT_ACRES, HOUSING_UNITS, \
+from utils.constants import MGRA, HOUSING_UNITS, \
+    DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS, \
     SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
     MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
@@ -91,6 +92,7 @@ def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
 def develop_product_type(mgras, filtered, product_type, progress):
     if progress is not None:
         progress.set_description('developing {}'.format(product_type))
+
     new_units_to_build, acreage_per_unit = parameters_for_product_type(
         product_type)
     product_type_developed_key, product_type_vacant_key = \
@@ -123,10 +125,12 @@ def develop_product_type(mgras, filtered, product_type, progress):
 
         if product_type == SINGLE_FAMILY:
             mgras = update_housing(
-                mgras, selected_ID, buildable_count, SINGLE_FAMILY_HOUSING_UNITS)
+                mgras, selected_ID, buildable_count,
+                SINGLE_FAMILY_HOUSING_UNITS)
         elif product_type == MULTI_FAMILY:
             mgras = update_housing(
-                mgras, selected_ID, buildable_count, MULTI_FAMILY_HOUSING_UNITS)
+                mgras, selected_ID, buildable_count,
+                MULTI_FAMILY_HOUSING_UNITS)
 
         # Add any further updates to the mgra here
 
@@ -140,14 +144,13 @@ def develop(mgras, filtered, progress=None):
     Arguments
         mgras:
             A pandas dataframe of mgra's that will be updated with new values
-            based on demand
+            based on demand inputs found in parameters.yaml
         filtered:
             contains a selection of all MGRA's available to develop
     Returns:
         a pandas dataframe with selected MGRA's updated
     """
 
-    # TODO account for redevelopment?
     product_types = [SINGLE_FAMILY, MULTI_FAMILY,
                      COMMERCIAL, OFFICE, INDUSTRIAL]
     for product_type in product_types:

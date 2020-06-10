@@ -1,6 +1,6 @@
 # Folder Structure
 * `data`
-    * `mgra2012.csv` - _base year data_ - _match the parameter in parameters.yaml_
+    * `SRF_Input_Base_V1_060820.csv` - _base year data_ - _match the parameter in parameters.yaml_
 
 ## Planned MGRA Columns and descriptions
 
