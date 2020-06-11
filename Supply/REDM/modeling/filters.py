@@ -53,6 +53,8 @@ def max_new_units_to_meet_vacancy(mgra, total_units_column,
 #                                  < minimumRevenue].index
 #     parcels_dataframe = parcels_dataframe.drop(indexLoc)
 #     return parcels_dataframe
+def filter_by_profitability(mgra_dataframe, product_type):
+    pass
 
 # Brainstorming reference
 # def filter_redevelopment(parcels_dataframe, forecast_year, min_age):
