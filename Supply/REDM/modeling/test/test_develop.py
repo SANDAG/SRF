@@ -2,7 +2,7 @@ import unittest
 
 import pandas
 
-from modeling.developer import develop, update_housing
+from modeling.develop import develop, update_housing
 from utils.interface import load_parameters
 import utils.config as config
 from utils.constants import MGRA, HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS, \
@@ -14,7 +14,7 @@ from utils.constants import MGRA, HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS, \
     DEVELOPED_ACRES, VACANT_ACRES
 
 
-class TestDeveloper(unittest.TestCase):
+class TestDevelop(unittest.TestCase):
     def setUp(self):
         config.parameters = load_parameters('test_parameters.yaml')
         self.assertIsNotNone(config.parameters)

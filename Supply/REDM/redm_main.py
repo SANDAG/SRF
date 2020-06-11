@@ -1,21 +1,10 @@
 import pandas
-from utils.interface import \
-    load_parameters, empty_folder, save_to_file, get_args
-from utils.analysis import analyze_mgra
-from modeling.developer import develop
-from modeling.filter import filter_mgras
-import utils.config as config
 from tqdm import tqdm
 
-
-def step(mgras, progress):
-    """
-    develop enough land to meet demand for this year.
-    """
-    progress.set_description('filtering')
-    filtered = filter_mgras(mgras)
-    progress.update()
-    return develop(mgras, filtered, progress)
+from utils.interface import \
+    load_parameters, empty_folder, save_to_file, get_args
+from modeling.develop import develop
+import utils.config as config
 
 
 def run(mgra_dataframe):
@@ -28,7 +17,7 @@ def run(mgra_dataframe):
         print('input frame description')
         analyze_mgra(mgra_dataframe, output_dir)
     # the number of tqdm progress bar steps per simulation year
-    checkpoints = 8
+    checkpoints = 7
     progress = tqdm(desc='progress', total=simulation_years *
                     checkpoints, position=0)
     for i in range(simulation_years):
@@ -37,7 +26,11 @@ def run(mgra_dataframe):
         if debug:
             print('simulating year {} ({})'.format(i + 1, forecast_year))
 
-        mgra_dataframe, progress = step(mgra_dataframe, progress)
+        # develop enough land to meet demand for this year.
+        mgra_dataframe, progress = develop(mgra_dataframe, progress)
+        if mgra_dataframe is None:
+            print('program terminated, {} years were completed'.format(i))
+            return
         progress.update()
         if debug:
             print('updated frame:')

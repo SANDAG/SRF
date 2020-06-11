@@ -4,6 +4,7 @@ output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL 
 
 # Filtering
 target_vacancy_rate: 0.06
+
 non_residential_target_vacancy_rate: 0.1 # from SLC Model
 minimum_redevelopment_age: 20
 

@@ -2,14 +2,14 @@ import unittest
 
 import pandas
 
-from modeling.filter import max_new_units_to_meet_vacancy, filter_by_vacancy
+from modeling.filters import max_new_units_to_meet_vacancy, filter_by_vacancy
 # filter_by_profitability, filter_by_vacancy, \
 # filter_redevelopment
 from utils.constants import SINGLE_FAMILY_HOUSING_UNITS, \
     SINGLE_FAMILY_HOUSEHOLDS
 
 
-class TestFilter(unittest.TestCase):
+class TestFilters(unittest.TestCase):
     def setUp(self):
         self.mgras = pandas.read_csv('test_data/contrived_MGRA.csv')
         self.max_vacancy = 0.1
@@ -22,13 +22,25 @@ class TestFilter(unittest.TestCase):
             SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS,
             self.max_vacancy
         )
-        self.assertEqual(-6, new_units.iloc[0])
+        self.assertEqual(new_units.iloc[0], -6)
+        self.assertGreater(new_units.iloc[1], 0)
 
     def test_filter_vacancy(self):
 
         filtered, _ = filter_by_vacancy(
-            self.mgras, SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS, self.max_vacancy)
+            self.mgras, SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS,
+            self.max_vacancy
+        )
         self.assertLess(len(filtered), len(self.mgras))
+        self.assertEqual(len(filtered), 1)
+
+        high_vacancy = .3
+        filtered, _ = filter_by_vacancy(
+            self.mgras,
+            SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS,
+            high_vacancy
+        )
+        self.assertEqual(3, len(filtered))
 
         # def test_filter_profitability(self):
         #     parcels = pandas.read_csv('test_data/mock_parcels.csv')

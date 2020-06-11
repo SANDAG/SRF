@@ -2,12 +2,15 @@ import utils.config as config
 from utils.converter import square_feet_to_acres
 from utils.constants import MGRA, HOUSING_UNITS, \
     DEVELOPED_ACRES, VACANT_ACRES, \
-    SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS, \
+    SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS, \
+    MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS, \
     SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
     MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
     OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, \
     COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, \
     INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES
+
+from modeling.filters import filter_product_type, filter_by_vacancy
 
 # product types - must match data labels
 SINGLE_FAMILY = 'single_family'
@@ -49,38 +52,42 @@ def parameters_for_product_type(product_type):
 
 def constants_for_product_type(product_type):
     if product_type == OFFICE:
-        return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES
+        return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, None, None
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES
+        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, None, None
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES
+        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES, None, None
     elif product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES
+        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
+            SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS
     elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES
+        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
+            MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS
 
 
 def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
                      area_per_unit, max_units):
     # determine how many units to build
 
-    # this placeholder allows for building 90% of the vacant space
-    # available_units = mgra[product_type_vacant_key].values.item() * \
-    #     0.9 // area_per_unit
+    # this placeholder allows for building 95% of the vacant space
+    available_units = mgra[product_type_vacant_key].values.item() * \
+        0.95 // area_per_unit
 
+    print('available units from column {}: {}'.format(
+        product_type_vacant_key, available_units))
     # alternatively, build up to 90% of developed + vacant
     # 90% being a placeholder for how dense of construction would be profitable
-    developed_space = mgra[product_type_developed_key].values.item()
+    # developed_space = mgra[product_type_developed_key].values.item()
 
-    total_space = developed_space + mgra[product_type_vacant_key]
-    profitable_space = 0.9 * total_space.values.item()
-    if profitable_space > developed_space:
-        available_area = profitable_space - developed_space
-        available_units = available_area // area_per_unit
-    else:
-        # there isn't any profitable space, but let's just build one unit
-        # anyway
-        available_units = 1
+    # total_space = developed_space + mgra[product_type_vacant_key]
+    # profitable_space = 0.9 * total_space.values.item()
+    # if profitable_space > developed_space:
+    #     available_area = profitable_space - developed_space
+    #     available_units = available_area // area_per_unit
+    # else:
+    #     # there isn't any profitable space, but let's just build one unit
+    #     # anyway
+    #     available_units = 1
 
     # if more than max, return max
     if available_units > max_units:
@@ -89,26 +96,42 @@ def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
         return available_units
 
 
-def develop_product_type(mgras, filtered, product_type, progress):
+def develop_product_type(mgras, product_type, progress):
     if progress is not None:
         progress.set_description('developing {}'.format(product_type))
 
     new_units_to_build, acreage_per_unit = parameters_for_product_type(
         product_type)
-    product_type_developed_key, product_type_vacant_key = \
-        constants_for_product_type(product_type)
+
+    product_type_developed_key, product_type_vacant_key, \
+        total_units_key, occupied_units_key = constants_for_product_type(
+            product_type)
 
     built_units = 0
     while built_units < new_units_to_build:
 
-        # TODO select mgras that have enough acreage per unit for development
+        # TODO select mgras that have enough acreage vacant for development
         # to be profitable
-        mgras_of_type = filtered[filtered[product_type_vacant_key]
-                                 > acreage_per_unit * 1.2]
 
+        # filter for MGRA's that have vacant space available for more units
+        filtered = filter_product_type(
+            mgras, product_type_vacant_key, acreage_per_unit)
+        print(len(filtered))
+        # waiting on non-residential occupancy data
+        if total_units_key is not None and occupied_units_key is not None:
+            filtered, _ = filter_by_vacancy(
+                filtered, total_units_key, occupied_units_key)
+            print(len(filtered))
+        if len(filtered) < 1:
+            print(
+                'out of useable mgras for product type {}'.format(product_type)
+            )
+            print('evaluate filtering methods and demand parameters')
+            print('exiting')
+            return None, progress
         # TODO: add weighting (use sample(weights=))
         # (profitability, proximity to developed mgra's, vacancy)
-        selected_row = mgras_of_type.sample(n=1)
+        selected_row = filtered.sample(n=1)
         selected_ID = selected_row[MGRA].iloc[0]
         max_units = new_units_to_build - built_units
         buildable_count = profitable_units(
@@ -123,6 +146,7 @@ def develop_product_type(mgras, filtered, product_type, progress):
                                product_type_developed_key,
                                product_type_vacant_key)
 
+        # update housing if needed
         if product_type == SINGLE_FAMILY:
             mgras = update_housing(
                 mgras, selected_ID, buildable_count,
@@ -139,7 +163,7 @@ def develop_product_type(mgras, filtered, product_type, progress):
     return mgras, progress
 
 
-def develop(mgras, filtered, progress=None):
+def develop(mgras, progress=None):
     """
     Arguments
         mgras:
@@ -155,8 +179,11 @@ def develop(mgras, filtered, progress=None):
                      COMMERCIAL, OFFICE, INDUSTRIAL]
     for product_type in product_types:
         mgras, progress = develop_product_type(
-            mgras, filtered, product_type, progress)
+            mgras, product_type, progress)
+        if mgras is None:
+            return mgras, progress
 
+    # tests don't use a progress bar
     if progress is not None:
         return mgras, progress
     else:
