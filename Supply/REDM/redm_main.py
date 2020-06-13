@@ -3,19 +3,18 @@ from tqdm import tqdm
 
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, get_args
-from modeling.develop import develop
 import utils.config as config
+
+from modeling.develop import develop
+from modeling.filters import filter_all
 
 
 def run(mgra_dataframe):
     output_dir = config.parameters['output_directory']
     simulation_years = config.parameters['simulation_years']
     simulation_begin = config.parameters['simulation_begin']
-    debug = config.parameters['debug']
+    # debug = config.parameters['debug']
 
-    if debug:
-        print('input frame description')
-        analyze_mgra(mgra_dataframe, output_dir)
     # the number of tqdm progress bar steps per simulation year
     checkpoints = 7
     progress = tqdm(desc='progress', total=simulation_years *
@@ -23,18 +22,17 @@ def run(mgra_dataframe):
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
         progress.set_description('starting year {}'.format(i+1))
-        if debug:
-            print('simulating year {} ({})'.format(i + 1, forecast_year))
 
+        # drop unusable mgras
+        filtered = filter_all(mgra_dataframe)
+        print("MGRA's under consideration: {}/{}".format(len(filtered),
+                                                         len(mgra_dataframe)))
         # develop enough land to meet demand for this year.
         mgra_dataframe, progress = develop(mgra_dataframe, progress)
         if mgra_dataframe is None:
             print('program terminated, {} years were completed'.format(i))
             return
         progress.update()
-        if debug:
-            print('updated frame:')
-            analyze_mgra(mgra_dataframe, output_dir)
 
         progress.set_description('saving year {}'.format(i+1))
         save_to_file(mgra_dataframe, output_dir, 'year{}_{}.csv'.format(
@@ -60,6 +58,5 @@ if __name__ == "__main__":
         mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
 
         run(mgra_dataframe)
-
     else:
         print('could not load parameters, exiting')

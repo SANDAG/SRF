@@ -1,7 +1,25 @@
 from numpy import floor
-import pandas
 
 import utils.config as config
+
+from utils.constants import LAND_COST_PER_ACRE, VACANT_ACRES, \
+    SINGLE_FAMILY_RENT, MULTI_FAMILY_RENT, INDUSTRIAL_RENT, \
+    OFFICE_RENT, COMMERCIAL_RENT, OFFICE, COMMERCIAL, INDUSTRIAL, \
+    SINGLE_FAMILY, MULTI_FAMILY, CONSTRUCTION_COST_POSTFIX
+
+from utils.converter import x_per_acre_to_x_per_square_foot
+
+
+def filter_all(mgra_dataframe):
+    '''
+    performs any filtering that applies to all product types;
+    eg. filter_vacant_land removes MGRA's with no land available to build on
+    '''
+    return filter_vacant_land(mgra_dataframe)
+
+
+def filter_vacant_land(mgra_dataframe):
+    return mgra_dataframe[mgra_dataframe[VACANT_ACRES] > 0]
 
 
 def filter_product_type(mgra, product_type_vacant_key, acreage_per_unit):
@@ -9,10 +27,10 @@ def filter_product_type(mgra, product_type_vacant_key, acreage_per_unit):
     return mgra[mgra[product_type_vacant_key] > acreage_per_unit * 1.2]
 
 
-def filter_by_vacancy(mgra_dataframe,
-                      total_units_column, occupied_units_column):
-
-    target_vacancy_rate = config.parameters['target_vacancy_rate']
+def filter_by_vacancy(mgra_dataframe, total_units_column,
+                      occupied_units_column, target_vacancy_rate=None):
+    if target_vacancy_rate is None:
+        target_vacancy_rate = config.parameters['target_vacancy_rate']
 
     max_new_units = max_new_units_to_meet_vacancy(
         mgra_dataframe, total_units_column, occupied_units_column,
@@ -23,6 +41,7 @@ def filter_by_vacancy(mgra_dataframe,
     filtered = mgra_dataframe[max_new_units > 0]
 
     # also return max_new_units to use for weighting
+    # TODO: remove rows from max_new_units to be the same size as filtered
     return filtered, max_new_units
 
 
@@ -40,26 +59,40 @@ def max_new_units_to_meet_vacancy(mgra, total_units_column,
     return max_new_units
 
 
-# early brainstorming reference
-# def filter_by_profitability(parcels_dataframe):
-#     costLand = parcels_dataframe.land_cost
-#     costConstruction = parcels_dataframe.construction_cost
-#     costRedevelopment = parcels_dataframe.redevelopment_cost
-#     profitMultiplier = 0.25
-#     minimumRevenue = ((costConstruction + costLand + costRedevelopment) *
-#                       profitMultiplier) + (costConstruction + costLand +
-#                                            costRedevelopment)
-#     indexLoc = parcels_dataframe[parcels_dataframe['expected_revenue']
-#                                  < minimumRevenue].index
-#     parcels_dataframe = parcels_dataframe.drop(indexLoc)
-#     return parcels_dataframe
-def filter_by_profitability(mgra_dataframe, product_type):
-    pass
+def get_construction_cost(product_type):
+    return config.parameters[product_type + CONSTRUCTION_COST_POSTFIX]
 
-# Brainstorming reference
-# def filter_redevelopment(parcels_dataframe, forecast_year, min_age):
-#     target_year = (forecast_year - min_age)
-#     indexParcels = parcels_dataframe[parcels_dataframe['year_built']
-#                                      >= target_year].index
-#     parcels_dataframe = parcels_dataframe.drop(indexParcels)
-#     return parcels_dataframe
+
+def profitability_constants(product_type):
+    '''
+        Returns the column label for rents/prices and the construction cost
+        parameter for the product type argument
+    '''
+    construction_cost = get_construction_cost(product_type)
+    if product_type == SINGLE_FAMILY:
+        return SINGLE_FAMILY_RENT, construction_cost
+    elif product_type == MULTI_FAMILY:
+        return MULTI_FAMILY_RENT, construction_cost
+    elif product_type == OFFICE:
+        return OFFICE_RENT, construction_cost
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_RENT, construction_cost
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_RENT, construction_cost
+
+
+def filter_by_profitability(mgra_dataframe, product_type):
+    price_column, construction_cost = profitability_constants(product_type)
+    land_cost_per_acre = mgra_dataframe[LAND_COST_PER_ACRE]
+    profit_multiplier = config.parameters['profit_multiplier']
+    land_cost_per_square_foot = x_per_acre_to_x_per_square_foot(
+        land_cost_per_acre)
+    minimum_revenue = (construction_cost +
+                       land_cost_per_square_foot) * profit_multiplier
+    profit = mgra_dataframe[price_column] - \
+        (construction_cost + land_cost_per_square_foot)
+    print(profit)
+    return mgra_dataframe[minimum_revenue <= mgra_dataframe[price_column]]
+
+
+# possible redev filter

@@ -3,7 +3,7 @@ import os
 import pandas
 import sys
 
-from constants import VACANT_ACRES
+from utils.constants import VACANT_ACRES
 
 
 def plot_total_acres(mgra_dataframe, output_dir):
@@ -63,7 +63,6 @@ def sum_column(filename, column_name):
 
 
 # TODO: plot new units
-
 def count_new_units(before, after, product_type):
     """
     returns: series with the amount of new units of that product type

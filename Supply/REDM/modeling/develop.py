@@ -1,6 +1,7 @@
 import utils.config as config
 from utils.converter import square_feet_to_acres
 from utils.constants import MGRA, HOUSING_UNITS, \
+    OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS, \
     MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS, \
@@ -10,15 +11,8 @@ from utils.constants import MGRA, HOUSING_UNITS, \
     COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, \
     INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES
 
-from modeling.filters import filter_product_type, filter_by_vacancy
-
-# product types - must match data labels
-SINGLE_FAMILY = 'single_family'
-MULTI_FAMILY = 'multi_family'
-
-INDUSTRIAL = 'industrial'
-COMMERCIAL = 'commercial'
-OFFICE = 'office'
+from modeling.filters import filter_product_type, filter_by_vacancy, \
+    filter_by_profitability
 
 
 def update_acreage(
@@ -47,7 +41,7 @@ def parameters_for_product_type(product_type):
         floor_space = square_feet_to_acres(
             config.parameters[product_type + '_square_feet_per_job']
         )
-    return config.parameters['new_units_' + product_type], floor_space
+    return config.parameters[product_type + '_units_per_year'], floor_space
 
 
 def constants_for_product_type(product_type):
@@ -75,21 +69,8 @@ def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
 
     print('available units from column {}: {}'.format(
         product_type_vacant_key, available_units))
-    # alternatively, build up to 90% of developed + vacant
-    # 90% being a placeholder for how dense of construction would be profitable
-    # developed_space = mgra[product_type_developed_key].values.item()
 
-    # total_space = developed_space + mgra[product_type_vacant_key]
-    # profitable_space = 0.9 * total_space.values.item()
-    # if profitable_space > developed_space:
-    #     available_area = profitable_space - developed_space
-    #     available_units = available_area // area_per_unit
-    # else:
-    #     # there isn't any profitable space, but let's just build one unit
-    #     # anyway
-    #     available_units = 1
-
-    # if more than max, return max
+    # only build up to maximum units
     if available_units > max_units:
         return max_units
     else:
@@ -118,13 +99,15 @@ def develop_product_type(mgras, product_type, progress):
             mgras, product_type_vacant_key, acreage_per_unit)
         print(len(filtered))
         # waiting on non-residential occupancy data
-        if total_units_key is not None and occupied_units_key is not None:
-            filtered, _ = filter_by_vacancy(
-                filtered, total_units_key, occupied_units_key)
-            print(len(filtered))
+        # if total_units_key is not None and occupied_units_key is not None:
+        #     filtered, _ = filter_by_vacancy(
+        #         filtered, total_units_key, occupied_units_key)
+        #     print(len(filtered))
+        filtered = filter_by_profitability(filtered, product_type)
+        print('MGRA\'s after profitability filter: {}'.format(len(filtered)))
         if len(filtered) < 1:
             print(
-                'out of useable mgras for product type {}'.format(product_type)
+                'out of usable mgras for product type {}'.format(product_type)
             )
             print('evaluate filtering methods and demand parameters')
             print('exiting')
@@ -133,6 +116,7 @@ def develop_product_type(mgras, product_type, progress):
         # (profitability, proximity to developed mgra's, vacancy)
         selected_row = filtered.sample(n=1)
         selected_ID = selected_row[MGRA].iloc[0]
+        print('MGRA: {}'.format(selected_ID))
         max_units = new_units_to_build - built_units
         buildable_count = profitable_units(
             selected_row, product_type_developed_key,
@@ -169,8 +153,6 @@ def develop(mgras, progress=None):
         mgras:
             A pandas dataframe of mgra's that will be updated with new values
             based on demand inputs found in parameters.yaml
-        filtered:
-            contains a selection of all MGRA's available to develop
     Returns:
         a pandas dataframe with selected MGRA's updated
     """

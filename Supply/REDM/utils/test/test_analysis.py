@@ -7,7 +7,7 @@ from utils.constants import SINGLE_FAMILY_HOUSING_UNITS
 
 class TestAnalysis(unittest.TestCase):
     def setUp(self):
-        # FIXME: depends on other tests working correctly
+        # FIXME: depends on test_redm_main working correctly
         self.before = pandas.read_csv('test_data/output/year1_2021.csv')
         self.after = pandas.read_csv('test_data/output/year2_2022.csv')
 

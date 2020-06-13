@@ -1,12 +1,12 @@
 # I/O
-input_filename: "data/SRF_Input_Base_V1_060820.csv"
+input_filename: "data/SRF_Input_Base_V3.csv"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # Filtering
 target_vacancy_rate: 0.06
-
 non_residential_target_vacancy_rate: 0.1 # from SLC Model
 minimum_redevelopment_age: 20
+profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 
 # Simulation
 simulation_years: 5
@@ -25,18 +25,18 @@ office_square_feet_per_job: 462 # from SLC Model
 # Construction Cost/Square Foot by product type
 # Proposed by SANDAG based on this source: https://ccorpinsights.com/costs-per-square-foot/
 office_construction_cost: 379.5
-retail_construction_cost: 228.5
+commercial_construction_cost: 228.5
 industrial_construction_cost: 261.5
 multi_family_construction_cost: 192.5
 single_family_construction_cost: 388
 
 # Demand
-new_units_industrial: 4000
-new_units_office: 4000
-new_units_commercial: 4000
+industrial_units_per_year: 4000
+office_units_per_year: 4000
+commercial_units_per_year: 4000
 
-new_units_single_family: 5000
-new_units_multi_family: 5000
+single_family_units_per_year: 5000
+multi_family_units_per_year: 5000
 
 # 1 for printing frames
 debug: 0
