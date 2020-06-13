@@ -1,4 +1,4 @@
-from numpy import floor
+from numpy import floor, where
 
 import utils.config as config
 
@@ -56,6 +56,9 @@ def max_new_units_to_meet_vacancy(mgra, total_units_column,
     )
     max_new_units = max_units - mgra[total_units_column]
 
+    # check edge case; if there are few units built (< 50),
+    # we should build even when it causes a high vacancy rate
+    max_new_units = where(mgra[total_units_column] < 50, 50, max_new_units)
     return max_new_units
 
 

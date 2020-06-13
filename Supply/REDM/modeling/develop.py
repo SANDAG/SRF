@@ -91,20 +91,20 @@ def develop_product_type(mgras, product_type, progress):
     built_units = 0
     while built_units < new_units_to_build:
 
-        # TODO select mgras that have enough acreage vacant for development
-        # to be profitable
-
         # filter for MGRA's that have vacant space available for more units
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
         print(len(filtered))
+
         # waiting on non-residential occupancy data
-        # if total_units_key is not None and occupied_units_key is not None:
-        #     filtered, _ = filter_by_vacancy(
-        #         filtered, total_units_key, occupied_units_key)
-        #     print(len(filtered))
-        filtered = filter_by_profitability(filtered, product_type)
-        print('MGRA\'s after profitability filter: {}'.format(len(filtered)))
+        if total_units_key is not None and occupied_units_key is not None:
+            filtered, _ = filter_by_vacancy(
+                filtered, total_units_key, occupied_units_key)
+            print('MGRA\'s after vacancy filter: {}'.format(len(filtered)))
+
+        # filtered = filter_by_profitability(filtered, product_type)
+        #print('MGRA\'s after profitability filter: {}'.format(len(filtered)))
+
         if len(filtered) < 1:
             print(
                 'out of usable mgras for product type {}'.format(product_type)
