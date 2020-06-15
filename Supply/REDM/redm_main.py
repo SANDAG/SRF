@@ -1,12 +1,13 @@
 import pandas
 from tqdm import tqdm
+import logging
 
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, get_args
 import utils.config as config
 
 from modeling.develop import develop
-# from modeling.filters import filter_all
+from modeling.filters import filter_all
 
 
 def run(mgra_dataframe):
@@ -24,9 +25,12 @@ def run(mgra_dataframe):
         progress.set_description('starting year {}'.format(i+1))
 
         # drop unusable mgras
-        # filtered = filter_all(mgra_dataframe)
-        # # print("MGRA's under consideration: {}/{}".format(len(filtered),
-        # #                                         len(mgra_dataframe)))
+        filtered = filter_all(mgra_dataframe)
+        logging.info('MGRA\'s under consideration (with land available): '
+                     '{}/{}'.format(
+                         len(filtered),
+                         len(mgra_dataframe))
+                     )
         # develop enough land to meet demand for this year.
         mgra_dataframe, progress = develop(mgra_dataframe, progress)
         if mgra_dataframe is None:
@@ -51,12 +55,14 @@ if __name__ == "__main__":
         config.parameters = load_parameters('parameters.yaml')
 
     if config.parameters is not None:
+        # prep output directory
         output_dir = config.parameters['output_directory']
         empty_folder(output_dir)
         save_to_file(config.parameters, output_dir, 'parameters.txt')
+        if config.parameters['debug']:
+            logging.basicConfig(level=logging.DEBUG)
 
         mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
-
         run(mgra_dataframe)
     else:
         print('could not load parameters, exiting')

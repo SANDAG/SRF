@@ -1,11 +1,11 @@
+import logging
+
 import utils.config as config
 from utils.converter import square_feet_to_acres
-
 from utils.constants import development_constants, MGRA, HOUSING_UNITS, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
-
 from modeling.filters import filter_product_type, filter_by_vacancy
 
 
@@ -42,12 +42,11 @@ def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
                      area_per_unit, max_units):
     # determine how many units to build
 
+    # TODO: use profitability and vacancy filter values to determine
+    # the number of units to build.
     # this placeholder allows for building 95% of the vacant space
     available_units = mgra[product_type_vacant_key].values.item() * \
         0.95 // area_per_unit
-
-    # print('available units from column {}: {}'.format(
-    # product_type_vacant_key, available_units))
 
     # only build up to maximum units
     if available_units > max_units:
@@ -70,20 +69,22 @@ def develop_product_type(mgras, product_type, progress):
     built_units = 0
     while built_units < new_units_to_build:
 
-        # filter for MGRA's that have vacant space available for more units
+        # filter for MGRA's that have vacant land available for more units
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
-        # print(len(filtered))
-
+        available_count = len(filtered)
         # waiting on non-residential occupancy data
         if total_units_key is not None and occupied_units_key is not None:
             filtered, _ = filter_by_vacancy(
                 filtered, total_units_key, occupied_units_key)
-            # print('MGRA\'s after vacancy filter: {}'.format(len(filtered)))
-
+        non_vacant_count = len(filtered)
         # filtered = filter_by_profitability(filtered, product_type)
-        # print('MGRA\'s after profitability filter: {}'.format(len(filtered)))
-
+        profitable_count = len(filtered)
+        logging.debug(
+            'filtered to {} profitable / {} non-vacant / {}'.format(
+                profitable_count, non_vacant_count, available_count
+            ))
+        logging.debug('MGRA\'s with space available')
         if len(filtered) < 1:
             print(
                 'out of usable mgras for product type {}'.format(product_type)
@@ -95,7 +96,6 @@ def develop_product_type(mgras, product_type, progress):
         # (profitability, proximity to developed mgra's, vacancy)
         selected_row = filtered.sample(n=1)
         selected_ID = selected_row[MGRA].iloc[0]
-        # print('MGRA: {}'.format(selected_ID))
         max_units = new_units_to_build - built_units
         buildable_count = profitable_units(
             selected_row, product_type_developed_key,
@@ -103,13 +103,16 @@ def develop_product_type(mgras, product_type, progress):
         )
 
         built_units += buildable_count
-        # print(buildable_count)
+
+        logging.debug('building {} units on MGRA #{}'.format(
+            buildable_count, selected_ID))
+
         mgras = update_acreage(mgras, selected_ID,
                                acreage_per_unit * buildable_count,
                                product_type_developed_key,
                                product_type_vacant_key)
 
-        # update housing if needed
+        # TODO: also update non-residential units when available
         if product_type == SINGLE_FAMILY:
             mgras = update_housing(
                 mgras, selected_ID, buildable_count,
@@ -118,8 +121,6 @@ def develop_product_type(mgras, product_type, progress):
             mgras = update_housing(
                 mgras, selected_ID, buildable_count,
                 MULTI_FAMILY_HOUSING_UNITS)
-
-        # Add any further updates to the mgra here
 
     if progress is not None:
         progress.update()

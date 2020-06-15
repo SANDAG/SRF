@@ -1,3 +1,4 @@
+import logging
 import numpy
 
 import utils.config as config
@@ -70,7 +71,7 @@ def filter_by_profitability(mgra_dataframe, product_type):
                        land_cost_per_square_foot) * profit_multiplier
     profit = mgra_dataframe[price_column] - \
         (construction_cost + land_cost_per_square_foot)
-    print(profit)
+    logging.debug(profit)
     return mgra_dataframe[minimum_revenue <= mgra_dataframe[price_column]]
 
 

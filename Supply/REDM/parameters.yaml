@@ -38,5 +38,5 @@ commercial_units_per_year: 4000
 single_family_units_per_year: 5000
 multi_family_units_per_year: 5000
 
-# 1 for printing frames
+# set to 1 for verbose output
 debug: 0
