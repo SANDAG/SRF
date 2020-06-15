@@ -14,7 +14,6 @@ def run(mgra_dataframe):
     output_dir = config.parameters['output_directory']
     simulation_years = config.parameters['simulation_years']
     simulation_begin = config.parameters['simulation_begin']
-    # debug = config.parameters['debug']
 
     # the number of tqdm progress bar steps per simulation year
     checkpoints = 7
@@ -59,9 +58,10 @@ if __name__ == "__main__":
         output_dir = config.parameters['output_directory']
         empty_folder(output_dir)
         save_to_file(config.parameters, output_dir, 'parameters.txt')
+        # configure logging level
         if config.parameters['debug']:
             logging.basicConfig(level=logging.DEBUG)
-
+        # load dataframe
         mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
         run(mgra_dataframe)
     else:
