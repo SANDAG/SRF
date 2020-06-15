@@ -6,7 +6,7 @@ from utils.interface import \
 import utils.config as config
 
 from modeling.develop import develop
-from modeling.filters import filter_all
+# from modeling.filters import filter_all
 
 
 def run(mgra_dataframe):
@@ -24,9 +24,9 @@ def run(mgra_dataframe):
         progress.set_description('starting year {}'.format(i+1))
 
         # drop unusable mgras
-        filtered = filter_all(mgra_dataframe)
-        print("MGRA's under consideration: {}/{}".format(len(filtered),
-                                                         len(mgra_dataframe)))
+        # filtered = filter_all(mgra_dataframe)
+        # # print("MGRA's under consideration: {}/{}".format(len(filtered),
+        # #                                         len(mgra_dataframe)))
         # develop enough land to meet demand for this year.
         mgra_dataframe, progress = develop(mgra_dataframe, progress)
         if mgra_dataframe is None:

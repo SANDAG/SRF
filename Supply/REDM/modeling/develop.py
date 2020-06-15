@@ -67,8 +67,8 @@ def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
     available_units = mgra[product_type_vacant_key].values.item() * \
         0.95 // area_per_unit
 
-    print('available units from column {}: {}'.format(
-        product_type_vacant_key, available_units))
+    # print('available units from column {}: {}'.format(
+    # product_type_vacant_key, available_units))
 
     # only build up to maximum units
     if available_units > max_units:
@@ -94,16 +94,16 @@ def develop_product_type(mgras, product_type, progress):
         # filter for MGRA's that have vacant space available for more units
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
-        print(len(filtered))
+        # print(len(filtered))
 
         # waiting on non-residential occupancy data
         if total_units_key is not None and occupied_units_key is not None:
             filtered, _ = filter_by_vacancy(
                 filtered, total_units_key, occupied_units_key)
-            print('MGRA\'s after vacancy filter: {}'.format(len(filtered)))
+            # print('MGRA\'s after vacancy filter: {}'.format(len(filtered)))
 
         # filtered = filter_by_profitability(filtered, product_type)
-        #print('MGRA\'s after profitability filter: {}'.format(len(filtered)))
+        # print('MGRA\'s after profitability filter: {}'.format(len(filtered)))
 
         if len(filtered) < 1:
             print(
@@ -116,7 +116,7 @@ def develop_product_type(mgras, product_type, progress):
         # (profitability, proximity to developed mgra's, vacancy)
         selected_row = filtered.sample(n=1)
         selected_ID = selected_row[MGRA].iloc[0]
-        print('MGRA: {}'.format(selected_ID))
+        # print('MGRA: {}'.format(selected_ID))
         max_units = new_units_to_build - built_units
         buildable_count = profitable_units(
             selected_row, product_type_developed_key,
