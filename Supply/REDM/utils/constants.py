@@ -216,3 +216,36 @@ MINIMUM_UNIT_SIZE_POSTFIX = '_minimum_unit_size'
 JOB_AREA_POSTFIX = '_square_feet_per_job'
 UNITS_PER_YEAR_POSTFIX = '_units_per_year'
 CONSTRUCTION_COST_POSTFIX = '_construction_cost'
+
+
+# TODO: add occupancy rate data for non-residential when available
+def development_constants(product_type):
+    if product_type == OFFICE:
+        return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, None, None
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, None, None
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES, None, None
+    elif product_type == SINGLE_FAMILY:
+        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
+            SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS
+    elif product_type == MULTI_FAMILY:
+        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
+            MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS
+
+
+def product_type_price(product_type):
+    '''
+        Returns the column label for rents/prices
+        for the product type argument
+    '''
+    if product_type == SINGLE_FAMILY:
+        return SINGLE_FAMILY_RENT
+    elif product_type == MULTI_FAMILY:
+        return MULTI_FAMILY_RENT
+    elif product_type == OFFICE:
+        return OFFICE_RENT
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_RENT
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_RENT

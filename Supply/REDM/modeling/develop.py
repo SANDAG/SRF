@@ -1,18 +1,12 @@
 import utils.config as config
 from utils.converter import square_feet_to_acres
-from utils.constants import MGRA, HOUSING_UNITS, \
+
+from utils.constants import development_constants, MGRA, HOUSING_UNITS, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
-    SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS, \
-    MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS, \
-    SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
-    MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
-    OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, \
-    COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, \
-    INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES
+    SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
 
-from modeling.filters import filter_product_type, filter_by_vacancy, \
-    filter_by_profitability
+from modeling.filters import filter_product_type, filter_by_vacancy
 
 
 def update_acreage(
@@ -44,21 +38,6 @@ def parameters_for_product_type(product_type):
     return config.parameters[product_type + '_units_per_year'], floor_space
 
 
-def constants_for_product_type(product_type):
-    if product_type == OFFICE:
-        return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, None, None
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, None, None
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES, None, None
-    elif product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
-            SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
-            MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS
-
-
 def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
                      area_per_unit, max_units):
     # determine how many units to build
@@ -85,7 +64,7 @@ def develop_product_type(mgras, product_type, progress):
         product_type)
 
     product_type_developed_key, product_type_vacant_key, \
-        total_units_key, occupied_units_key = constants_for_product_type(
+        total_units_key, occupied_units_key = development_constants(
             product_type)
 
     built_units = 0

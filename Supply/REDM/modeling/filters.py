@@ -2,10 +2,8 @@ import numpy
 
 import utils.config as config
 
-from utils.constants import LAND_COST_PER_ACRE, VACANT_ACRES, \
-    SINGLE_FAMILY_RENT, MULTI_FAMILY_RENT, INDUSTRIAL_RENT, \
-    OFFICE_RENT, COMMERCIAL_RENT, OFFICE, COMMERCIAL, INDUSTRIAL, \
-    SINGLE_FAMILY, MULTI_FAMILY, CONSTRUCTION_COST_POSTFIX
+from utils.constants import product_type_price, LAND_COST_PER_ACRE, \
+    VACANT_ACRES, CONSTRUCTION_COST_POSTFIX
 
 from utils.converter import x_per_acre_to_x_per_square_foot
 
@@ -60,30 +58,10 @@ def filter_by_vacancy(mgra_dataframe, total_units_column,
     return filtered, max_new_units
 
 
-def get_construction_cost(product_type):
-    return config.parameters[product_type + CONSTRUCTION_COST_POSTFIX]
-
-
-def profitability_constants(product_type):
-    '''
-        Returns the column label for rents/prices and the construction cost
-        parameter for the product type argument
-    '''
-    construction_cost = get_construction_cost(product_type)
-    if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_RENT, construction_cost
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_RENT, construction_cost
-    elif product_type == OFFICE:
-        return OFFICE_RENT, construction_cost
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_RENT, construction_cost
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_RENT, construction_cost
-
-
 def filter_by_profitability(mgra_dataframe, product_type):
-    price_column, construction_cost = profitability_constants(product_type)
+    construction_cost = config.parameters[product_type +
+                                          CONSTRUCTION_COST_POSTFIX]
+    price_column = product_type_price(product_type)
     land_cost_per_acre = mgra_dataframe[LAND_COST_PER_ACRE]
     profit_multiplier = config.parameters['profit_multiplier']
     land_cost_per_square_foot = x_per_acre_to_x_per_square_foot(
