@@ -218,8 +218,12 @@ UNITS_PER_YEAR_POSTFIX = '_units_per_year'
 CONSTRUCTION_COST_POSTFIX = '_construction_cost'
 
 
-# TODO: add occupancy rate data for non-residential when available
+# TODO: add total units and occupied units data for non-residential when available
 def development_constants(product_type):
+    '''
+        Returns developed land, vacant land, total units, and occupied units
+        column labels for each product type
+    '''
     if product_type == OFFICE:
         return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, None, None
     elif product_type == COMMERCIAL:

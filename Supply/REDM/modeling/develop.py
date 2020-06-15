@@ -9,6 +9,22 @@ from utils.constants import development_constants, MGRA, HOUSING_UNITS, \
 from modeling.filters import filter_product_type, filter_by_vacancy
 
 
+def update_mgra(mgras, selected_ID, acreage_per_unit,
+                product_type_developed_land, product_type_vacant_land,
+                new_units, product_type_units):
+    mgras = update_acreage(mgras, selected_ID,
+                           acreage_per_unit * new_units,
+                           product_type_developed_land,
+                           product_type_vacant_land)
+    # TODO: also update non-residential units once data is available
+    if product_type_units == SINGLE_FAMILY_HOUSING_UNITS or \
+            product_type_units == MULTI_FAMILY_HOUSING_UNITS:
+        mgras = update_housing(
+            mgras, selected_ID, new_units,
+            product_type_units)
+    return mgras
+
+
 def update_acreage(
     mgras, selected_ID, new_acreage,
     product_type_developed_key, product_type_vacant_key
@@ -28,6 +44,7 @@ def update_housing(mgras, selected_ID, new_units, product_type_units):
 
 
 def parameters_for_product_type(product_type):
+    # FIXME: this is goofy
     if product_type.__contains__('family'):
         floor_space = square_feet_to_acres(
             config.parameters[product_type + '_minimum_unit_size'])
@@ -68,12 +85,12 @@ def develop_product_type(mgras, product_type, progress):
 
     built_units = 0
     while built_units < new_units_to_build:
-
         # filter for MGRA's that have vacant land available for more units
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
         available_count = len(filtered)
-        # waiting on non-residential occupancy data
+        # FIXME: remove check once on non-residential occupancy data is
+        # available
         if total_units_key is not None and occupied_units_key is not None:
             filtered, _ = filter_by_vacancy(
                 filtered, total_units_key, occupied_units_key)
@@ -107,20 +124,11 @@ def develop_product_type(mgras, product_type, progress):
         logging.debug('building {} units on MGRA #{}'.format(
             buildable_count, selected_ID))
 
-        mgras = update_acreage(mgras, selected_ID,
-                               acreage_per_unit * buildable_count,
-                               product_type_developed_key,
-                               product_type_vacant_key)
-
-        # TODO: also update non-residential units when available
-        if product_type == SINGLE_FAMILY:
-            mgras = update_housing(
-                mgras, selected_ID, buildable_count,
-                SINGLE_FAMILY_HOUSING_UNITS)
-        elif product_type == MULTI_FAMILY:
-            mgras = update_housing(
-                mgras, selected_ID, buildable_count,
-                MULTI_FAMILY_HOUSING_UNITS)
+        # develop buildable_count units by updating the MGRA in the dataframe
+        mgras = update_mgra(mgras, selected_ID, acreage_per_unit,
+                            product_type_developed_key,
+                            product_type_vacant_key, buildable_count,
+                            total_units_key)
 
     if progress is not None:
         progress.update()
