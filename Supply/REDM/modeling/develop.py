@@ -99,7 +99,7 @@ def develop_product_type(mgras, product_type, progress):
         vacancy_caps = None
         if total_units_key is not None and occupied_units_key is not None:
             filtered, vacancy_caps = filter_by_vacancy(
-                filtered, total_units_key, occupied_units_key)
+                filtered, product_type, total_units_key, occupied_units_key)
         non_vacant_count = len(filtered)
         filtered, _ = filter_by_profitability(filtered, product_type)
         profitable_count = len(filtered)

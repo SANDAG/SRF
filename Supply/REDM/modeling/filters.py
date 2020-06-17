@@ -29,10 +29,11 @@ def filter_product_type(mgra, product_type_vacant_key, acreage_per_unit):
     return mgra[mgra[product_type_vacant_key] > acreage_per_unit * 1.2]
 
 
-def filter_by_vacancy(mgra_dataframe, total_units_column,
+def filter_by_vacancy(mgra_dataframe, product_type, total_units_column,
                       occupied_units_column, target_vacancy_rate=None):
     if target_vacancy_rate is None:
-        target_vacancy_rate = config.parameters['target_vacancy_rate']
+        target_vacancy_rate = config.parameters[product_type +
+                                                '_target_vacancy_rate']
 
     # maximum new units can be below zero if mgra is already over target
     # vacancy rate since vacancy = (total_units - occupied_units) / total_units
