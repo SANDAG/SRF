@@ -13,6 +13,11 @@ amortization_years: 40
 simulation_years: 5
 simulation_begin: 2020
 
+# Development
+# an arbitrary value representing the maximum number of units that should be added to an MGRA at a time
+# note that most single family housing subdivisions are usually around 20 units or so
+largest_development_size: 100
+
 # Sizes - all sizes in square feet
 single_family_minimum_unit_size: 800 # from SLC Model
 multi_family_minimum_unit_size: 800 # from SLC Model

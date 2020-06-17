@@ -56,21 +56,23 @@ def parameters_for_product_type(product_type):
     return config.parameters[product_type + '_units_per_year'], floor_space
 
 
-def profitable_units(mgra, product_type_developed_key, product_type_vacant_key,
-                     area_per_unit, max_units):
-    # determine how many units to build
-
-    # TODO: use profitability and vacancy filter values to determine
-    # the number of units to build.
+def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
+                    area_per_unit, max_units, vacancy_caps):
+    # determine max units to build
+    if vacancy_caps is not None:
+        vacancy_cap = vacancy_caps[mgra.index]
+    else:
+        vacancy_cap = max_units
+    # TODO: also use profitability filter value for this mgra to determine
+    # the number of profitable units to build.
     # this placeholder allows for building 95% of the vacant space
-    available_units = mgra[product_type_vacant_key].values.item() * \
+    available_units_by_land = mgra[product_type_vacant_key].values.item() * \
         0.95 // area_per_unit
 
-    # only build up to maximum units
-    if available_units > max_units:
-        return max_units
-    else:
-        return available_units
+    # this is a sanity check, no development should be larger than this number
+    largest_development = config.parameters['largest_development_size']
+    return int(min(max_units, largest_development,
+                   vacancy_cap, available_units_by_land))
 
 
 def develop_product_type(mgras, product_type, progress):
@@ -86,46 +88,49 @@ def develop_product_type(mgras, product_type, progress):
 
     built_units = 0
     while built_units < new_units_to_build:
+        max_units = new_units_to_build - built_units
+        # Filter
         # filter for MGRA's that have vacant land available for more units
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
         available_count = len(filtered)
-
         # FIXME: remove check once non-residential occupancy data is
         # available
+        vacancy_caps = None
         if total_units_key is not None and occupied_units_key is not None:
-            filtered, _ = filter_by_vacancy(
+            filtered, vacancy_caps = filter_by_vacancy(
                 filtered, total_units_key, occupied_units_key)
         non_vacant_count = len(filtered)
-
         filtered, _ = filter_by_profitability(filtered, product_type)
         profitable_count = len(filtered)
-
         logging.debug(
             'filtered to {} profitable / {} non-vacant / {}'.format(
                 profitable_count, non_vacant_count, available_count
             ) + ' MGRA\'s with space available')
+
         if len(filtered) < 1:
-            print(
-                'out of usable mgras for product type {}'.format(product_type)
-            )
-            print('evaluate filtering methods and demand parameters')
-            print('exiting')
+            print('out of usable mgras for product type {}'.format(
+                product_type))
+            print('evaluate filtering methods\nexiting')
             return None, progress
+        # reset the index to simplify comparisons with weighting arrays
+        # output mgras dataframe is updated using mgra_id's instead of indices
+        filtered = filtered.reset_index()
+
+        # Sample
         # TODO: add weighting (use sample(weights=))
         # (profitability, proximity to developed mgra's, vacancy)
         selected_row = filtered.sample(n=1)
         selected_ID = selected_row[MGRA].iloc[0]
-        max_units = new_units_to_build - built_units
-        buildable_count = profitable_units(
-            selected_row, product_type_developed_key,
-            product_type_vacant_key, acreage_per_unit, max_units
-        )
 
+        buildable_count = buildable_units(
+            selected_row, product_type_developed_key,
+            product_type_vacant_key, acreage_per_unit, max_units, vacancy_caps
+        )
         built_units += buildable_count
 
-        logging.debug('building {} units on MGRA #{}'.format(
-            buildable_count, selected_ID))
+        logging.debug('building {} {} units on MGRA #{}'.format(
+            buildable_count, product_type, selected_ID))
 
         # develop buildable_count units by updating the MGRA in the dataframe
         mgras = update_mgra(mgras, selected_ID, acreage_per_unit,
