@@ -6,7 +6,8 @@ from utils.constants import development_constants, MGRA, HOUSING_UNITS, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
-from modeling.filters import filter_product_type, filter_by_vacancy
+from modeling.filters import filter_product_type, filter_by_vacancy, \
+    filter_by_profitability
 
 
 def update_mgra(mgras, selected_ID, acreage_per_unit,
@@ -89,19 +90,21 @@ def develop_product_type(mgras, product_type, progress):
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
         available_count = len(filtered)
-        # FIXME: remove check once on non-residential occupancy data is
+
+        # FIXME: remove check once non-residential occupancy data is
         # available
         if total_units_key is not None and occupied_units_key is not None:
             filtered, _ = filter_by_vacancy(
                 filtered, total_units_key, occupied_units_key)
         non_vacant_count = len(filtered)
-        # filtered = filter_by_profitability(filtered, product_type)
+
+        filtered, _ = filter_by_profitability(filtered, product_type)
         profitable_count = len(filtered)
+
         logging.debug(
             'filtered to {} profitable / {} non-vacant / {}'.format(
                 profitable_count, non_vacant_count, available_count
-            ))
-        logging.debug('MGRA\'s with space available')
+            ) + ' MGRA\'s with space available')
         if len(filtered) < 1:
             print(
                 'out of usable mgras for product type {}'.format(product_type)
@@ -144,7 +147,6 @@ def develop(mgras, progress=None):
     Returns:
         a pandas dataframe with selected MGRA's updated
     """
-
     product_types = [SINGLE_FAMILY, MULTI_FAMILY,
                      COMMERCIAL, OFFICE, INDUSTRIAL]
     for product_type in product_types:

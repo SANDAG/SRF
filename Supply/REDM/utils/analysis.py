@@ -62,6 +62,10 @@ def sum_column(filename, column_name):
     )
 
 
+def count_zeros(column):
+    return column.isin([0]).sum()
+
+
 # TODO: plot new units
 def count_new_units(before, after, product_type):
     """
@@ -94,7 +98,8 @@ def run():
         if len(sys.argv) == 5:
             check_vacancy_rates(sys.argv[2], sys.argv[3], sys.argv[4])
         else:
-            print('usage: vacancy filename total_units_column occupied_units_column')
+            print('usage: vacancy filename total_units_column '
+                  'occupied_units_column')
     else:
         print_usage()
 

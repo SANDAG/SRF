@@ -8,6 +8,9 @@ from utils.constants import product_type_price, LAND_COST_PER_ACRE, \
 
 from utils.converter import x_per_acre_to_x_per_square_foot
 
+from utils.interface import save_to_file
+from utils.analysis import count_zeros
+
 
 def filter_all(mgra_dataframe):
     '''
@@ -59,20 +62,44 @@ def filter_by_vacancy(mgra_dataframe, total_units_column,
     return filtered, max_new_units
 
 
+def profitable(revenue, price):
+    truth_values = numpy.where(revenue <= price, True, False)
+    # pass even with no price data
+    truth_values = numpy.where(price == 0, True, truth_values)
+    return truth_values
+
+
 def filter_by_profitability(mgra_dataframe, product_type):
+    # find total expected costs
     construction_cost = config.parameters[product_type +
                                           CONSTRUCTION_COST_POSTFIX]
-    price_column = product_type_price(product_type)
     land_cost_per_acre = mgra_dataframe[LAND_COST_PER_ACRE]
-    profit_multiplier = config.parameters['profit_multiplier']
     land_cost_per_square_foot = x_per_acre_to_x_per_square_foot(
         land_cost_per_acre)
-    minimum_revenue = (construction_cost +
-                       land_cost_per_square_foot) * profit_multiplier
-    profit = mgra_dataframe[price_column] - \
-        (construction_cost + land_cost_per_square_foot)
-    logging.debug(profit)
-    return mgra_dataframe[minimum_revenue <= mgra_dataframe[price_column]]
+    expected_costs = construction_cost + land_cost_per_square_foot
+    # find minimum returns for viable MGRA's
+    profit_multiplier = config.parameters['profit_multiplier']
+    minimum_revenue = expected_costs * profit_multiplier
+    years = config.parameters['amortization_years']
+    amortized_minimum = minimum_revenue / \
+        years
+    amortized_costs = expected_costs / years
+
+    revenue = mgra_dataframe[product_type_price(product_type)]
+
+    # debug info
+    # uncomment to save frame to file
+    # save_to_file(revenue, 'test_data/output', 'revenue ' + product_type)
+    logging.debug(
+        'rows with missing data: {}/{}'.format(
+            count_zeros(revenue), len(revenue))
+    )
+    profit = revenue - amortized_costs
+    logging.debug('mean profit: {}%'.format(profit.mean()))
+
+    return mgra_dataframe[profitable(
+        amortized_minimum, revenue
+    )], profit
 
 
 # possible redev filter
