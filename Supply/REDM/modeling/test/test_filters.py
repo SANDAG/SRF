@@ -5,7 +5,7 @@ import numpy
 
 from modeling.filters import filter_by_vacancy
 
-from utils.constants import SINGLE_FAMILY_HOUSING_UNITS, \
+from utils.constants import SINGLE_FAMILY, SINGLE_FAMILY_HOUSING_UNITS, \
     SINGLE_FAMILY_HOUSEHOLDS
 
 
@@ -19,8 +19,8 @@ class TestFilters(unittest.TestCase):
     def test_filter_vacancy(self):
 
         filtered, max_new_units = filter_by_vacancy(
-            self.mgras, SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS,
-            self.max_vacancy
+            self.mgras, SINGLE_FAMILY, SINGLE_FAMILY_HOUSING_UNITS,
+            SINGLE_FAMILY_HOUSEHOLDS, self.max_vacancy
         )
         self.assertEqual(len(filtered), len(max_new_units))
         self.assertLess(len(filtered), len(self.mgras))
@@ -38,7 +38,7 @@ class TestFilters(unittest.TestCase):
         high_vacancy = .3
         previous_size = len(filtered)
         filtered, _ = filter_by_vacancy(
-            self.mgras,
+            self.mgras, SINGLE_FAMILY,
             SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS,
             high_vacancy
         )
