@@ -2,12 +2,31 @@ import logging
 
 import utils.config as config
 from utils.converter import square_feet_to_acres
-from utils.constants import development_constants, MGRA, HOUSING_UNITS, \
-    OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
-    DEVELOPED_ACRES, VACANT_ACRES, \
+from utils.constants import development_constants, \
+    non_residential_vacant_units, MGRA, HOUSING_UNITS, OFFICE, COMMERCIAL, \
+    INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
+
 from modeling.filters import filter_product_type, filter_by_vacancy, \
     filter_by_profitability
+
+
+def update_acreage(mgras, selected_ID, new_acreage,
+                   product_type_developed_key, product_type_vacant_key):
+    mgras.loc[mgras[MGRA] == selected_ID, [
+        product_type_developed_key, DEVELOPED_ACRES]] += new_acreage
+    mgras.loc[mgras[MGRA] == selected_ID, [
+        product_type_vacant_key, VACANT_ACRES]] -= new_acreage
+    return mgras
+
+
+def add_to_columns(mgras, selected_ID, value, columns):
+    '''
+        columns: list of column labels
+        value: number to add to the current values of columns
+    '''
+    mgras.loc[mgras[MGRA] == selected_ID, columns] += value
+    return mgras
 
 
 def update_mgra(mgras, selected_ID, acreage_per_unit,
@@ -17,31 +36,16 @@ def update_mgra(mgras, selected_ID, acreage_per_unit,
                            acreage_per_unit * new_units,
                            product_type_developed_land,
                            product_type_vacant_land)
-    # TODO: also update non-residential units once data is available
+    columns_needing_new_units = [product_type_units]
+
     if product_type_units == SINGLE_FAMILY_HOUSING_UNITS or \
             product_type_units == MULTI_FAMILY_HOUSING_UNITS:
-        mgras = update_housing(
-            mgras, selected_ID, new_units,
-            product_type_units)
-    return mgras
-
-
-def update_acreage(
-    mgras, selected_ID, new_acreage,
-    product_type_developed_key, product_type_vacant_key
-):
-    # TODO: ensure that no other acreage updates are needed
-    mgras.loc[mgras[MGRA] == selected_ID, [
-        product_type_developed_key, DEVELOPED_ACRES]] += new_acreage
-    mgras.loc[mgras[MGRA] == selected_ID, [
-        product_type_vacant_key, VACANT_ACRES]] -= new_acreage
-    return mgras
-
-
-def update_housing(mgras, selected_ID, new_units, product_type_units):
-    mgras.loc[mgras[MGRA] == selected_ID, [
-        HOUSING_UNITS, product_type_units]] += new_units
-    return mgras
+        columns_needing_new_units.append(HOUSING_UNITS)
+    else:
+        columns_needing_new_units.append(
+            non_residential_vacant_units(product_type_units))
+    return add_to_columns(mgras, selected_ID, new_units,
+                          columns_needing_new_units)
 
 
 def parameters_for_product_type(product_type):
@@ -59,13 +63,12 @@ def parameters_for_product_type(product_type):
 def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
                     area_per_unit, max_units, vacancy_caps):
     # determine max units to build
-    if vacancy_caps is not None:
-        vacancy_cap = vacancy_caps[mgra.index]
-    else:
-        vacancy_cap = max_units
+    vacancy_cap = vacancy_caps[mgra.index]
+
     # TODO: also use profitability filter value for this mgra to determine
     # the number of profitable units to build.
-    # this placeholder allows for building 95% of the vacant space
+
+    # only build up to 95% of the vacant space
     available_units_by_land = mgra[product_type_vacant_key].values.item() * \
         0.95 // area_per_unit
 
@@ -89,20 +92,20 @@ def develop_product_type(mgras, product_type, progress):
     built_units = 0
     while built_units < new_units_to_build:
         max_units = new_units_to_build - built_units
+
         # Filter
         # filter for MGRA's that have vacant land available for more units
         filtered = filter_product_type(
             mgras, product_type_vacant_key, acreage_per_unit)
         available_count = len(filtered)
-        # FIXME: remove check once non-residential occupancy data is
-        # available
-        vacancy_caps = None
-        if total_units_key is not None and occupied_units_key is not None:
-            filtered, vacancy_caps = filter_by_vacancy(
-                filtered, product_type, total_units_key, occupied_units_key)
+
+        filtered, vacancy_caps = filter_by_vacancy(
+            filtered, product_type, total_units_key, occupied_units_key)
         non_vacant_count = len(filtered)
+
         filtered, _ = filter_by_profitability(filtered, product_type)
         profitable_count = len(filtered)
+
         logging.debug(
             'filtered to {} profitable / {} non-vacant / {}'.format(
                 profitable_count, non_vacant_count, available_count
@@ -119,7 +122,7 @@ def develop_product_type(mgras, product_type, progress):
 
         # Sample
         # TODO: add weighting (use sample(weights=))
-        # (profitability, proximity to developed mgra's, vacancy)
+        # (profitability, vacancy, other geographic weights)
         selected_row = filtered.sample(n=1)
         selected_ID = selected_row[MGRA].iloc[0]
 

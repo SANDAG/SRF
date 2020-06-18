@@ -2,7 +2,7 @@ import unittest
 
 import pandas
 
-from modeling.develop import develop, update_housing
+from modeling.develop import develop, add_to_columns
 from utils.interface import load_parameters
 import utils.config as config
 from utils.constants import MGRA, HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS, \
@@ -20,16 +20,16 @@ class TestDevelop(unittest.TestCase):
         self.assertIsNotNone(config.parameters)
         self.test_frame = pandas.read_csv('test_data/random_MGRA.csv')
 
-    def test_update_housing(self):
+    def test_add_to_columns(self):
         total_housing_before = self.test_frame[HOUSING_UNITS].sum()
         single_family_units_before = \
             self.test_frame[SINGLE_FAMILY_HOUSING_UNITS].sum()
 
         mgra_id = self.test_frame.sample()[MGRA].iloc[0]
         units = 1
-        self.test_frame = update_housing(
+        self.test_frame = add_to_columns(
             self.test_frame, mgra_id, units,
-            SINGLE_FAMILY_HOUSING_UNITS
+            [HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS]
         )
 
         self.assertGreater(
@@ -41,7 +41,6 @@ class TestDevelop(unittest.TestCase):
         )
 
     def test_develop_overall(self):
-
         total_developed_before = self.test_frame[DEVELOPED_ACRES].sum()
         total_vacant_before = self.test_frame[VACANT_ACRES].sum()
 
