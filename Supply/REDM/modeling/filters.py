@@ -47,7 +47,7 @@ def filter_by_vacancy(mgra_dataframe, product_type, total_units_column,
 
     # check edge case; if there are few units built (< 50),
     # we should build even when it causes a high vacancy rate
-    # FIXME: this allows for up to 99 units to be built before any are occupied
+    # TODO: this allows for up to 99 units to be built before any are occupied
     max_new_units = numpy.where(
         mgra_dataframe[total_units_column] < 50, 50, max_new_units)
 
