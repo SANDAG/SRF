@@ -1,9 +1,9 @@
 # Folder Structure
 * `data`
-    * `mgra2012.csv` - _base year data_ - _match the parameter in parameters.yaml_
+    * `input_data_filename.csv` - _base year data_ - _match the parameter in parameters.yaml_
 
 ## Planned MGRA Columns and descriptions
-
+### needs to be updated with V4 metadata
 Column_Name	Description
 
 mgra	Series 13 MGRA
