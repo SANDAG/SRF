@@ -2,12 +2,12 @@ import pandas
 from tqdm import tqdm
 import logging
 
+from modeling.develop import develop
+from modeling.filters import filter_all
+
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, get_args
 import utils.config as config
-
-from modeling.develop import develop
-from modeling.filters import filter_all
 
 
 def run(mgra_dataframe):

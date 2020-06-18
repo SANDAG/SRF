@@ -8,7 +8,6 @@ from utils.constants import product_type_price, LAND_COST_PER_ACRE, \
 
 from utils.converter import x_per_acre_to_x_per_square_foot
 
-from utils.interface import save_to_file
 from utils.analysis import count_zeros
 
 

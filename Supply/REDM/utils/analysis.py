@@ -3,14 +3,25 @@ import os
 import pandas
 import sys
 
-from utils.constants import VACANT_ACRES
+from utils.constants import VACANT_ACRES, MGRA
+
+
+def plot_column(column, output_dir='data/output', image_name='plot.png'):
+    column.plot(x=column.index, y=column.values)
+    plt.savefig(os.path.join(output_dir, image_name))
+    plt.close()
 
 
 def plot_total_acres(mgra_dataframe, output_dir):
-    mgra_dataframe.plot.scatter(x='mgra_ID', y='total_acres')
-    plt.savefig(
-        os.path.join(output_dir, 'plot.png'))
+    mgra_dataframe.plot.scatter(x=MGRA, y='total_acres')
+    plt.savefig(os.path.join(output_dir, 'plot.png'))
     plt.close()
+
+
+def plot_nonzero(filename, column_name):
+    frame = pandas.read_csv(filename)
+    column = frame[column_name]
+    plot_column(column[column != 0])
 
 
 def analyze_mgra(filename, output_dir):
@@ -78,32 +89,39 @@ def count_new_units(before, after, product_type):
 
 def print_usage():
     print('useful sanity checks and quick data evaluation')
-    print('usage: summarize ; sum ... ; vacancy...')
+    print('usage:\nsummarize\nsum ...\nvacancy ...\ncolplot ...')
 
 
 def run():
-    if sys.argv[1] == 'summarize':
-        if len(sys.argv) == 3:
-            analyze_mgra(sys.argv[2], None)
-        elif len(sys.argv) == 4:
-            analyze_mgra(sys.argv[2], sys.argv[3])
+    args = sys.argv
+    if args[1] == 'summarize':
+        if len(args) == 3:
+            analyze_mgra(args[2], None)
+        elif len(args) == 4:
+            analyze_mgra(args[2], args[3])
         else:
             print('usage: summarize filename')
-    elif sys.argv[1] == 'sum':
-        if len(sys.argv) == 4:
-            sum_column(sys.argv[2], sys.argv[3])
+    elif args[1] == 'sum':
+        if len(args) == 4:
+            sum_column(args[2], args[3])
         else:
             print('usage: sum data/mgra.csv column_name')
-    elif sys.argv[1] == 'vacancy':
-        if len(sys.argv) == 5:
-            check_vacancy_rates(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif args[1] == 'vacancy':
+        if len(args) == 5:
+            check_vacancy_rates(args[2], args[3], args[4])
         else:
             print('usage: vacancy filename total_units_column '
                   'occupied_units_column')
+    elif args[1] == 'colplot':
+        if len(args) == 4:
+            plot_nonzero(args[2], args[3])
+        else:
+            print('usage: colplot filename column_name')
     else:
         print_usage()
 
 
+# run as module: path/to/REDM $ python -m utils.analysis ...
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         run()
