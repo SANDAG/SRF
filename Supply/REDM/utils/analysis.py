@@ -3,7 +3,7 @@ import os
 import pandas
 import sys
 
-from utils.constants import VACANT_ACRES, MGRA
+from utils.constants import VACANT_ACRES, MGRA, product_type_unit_size_labels
 
 
 def plot_column(column, output_dir='data/output', image_name='plot.png'):
@@ -87,9 +87,22 @@ def count_new_units(before, after, product_type):
     return new_construction
 
 
+def average_unit_square_footage(filename, product_type):
+    frame = pandas.read_csv(filename)
+    total_sqft, total_units = product_type_unit_size_labels(product_type)
+    print(total_sqft, total_units)
+    # drop zeros
+    frame = frame.loc[frame[total_sqft] != 0]
+    frame = frame.loc[frame[total_units] != 0]
+    result = (frame[total_sqft] / frame[total_units]).mean()
+    print('{} average square footage per unit = {}'.format(
+        product_type, result))
+
+
 def print_usage():
     print('useful sanity checks and quick data evaluation')
-    print('usage:\nsummarize\nsum ...\nvacancy ...\ncolplot ...')
+    print('usage:\nsummarize\nsum ...\nvacancy ...\ncolplot ...',
+          '\nunit_size ...')
 
 
 def run():
@@ -117,6 +130,11 @@ def run():
             plot_nonzero(args[2], args[3])
         else:
             print('usage: colplot filename column_name')
+    elif args[1] == 'unit_sqft':
+        if len(args) == 4:
+            average_unit_square_footage(args[2], args[3])
+        else:
+            print('usage: unit_sqft filename product_type')
     else:
         print_usage()
 

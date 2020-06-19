@@ -97,9 +97,7 @@ def filter_by_profitability(mgra_dataframe, product_type):
     profit = revenue - amortized_costs
     logging.debug('mean profit: {}%'.format(profit.mean()))
 
-    return mgra_dataframe[profitable(
-        amortized_minimum, revenue
-    )], profit
+    return mgra_dataframe[profitable(amortized_minimum, revenue)], profit
 
 
 # possible redev filter
