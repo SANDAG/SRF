@@ -14,7 +14,7 @@ profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
 
 #simulation
-simulation_years: 5
+simulation_years: 2
 simulation_begin: 2020
 
 # Development
@@ -32,6 +32,12 @@ industrial_square_feet_per_job: 648 # from SLC Model
 commercial_square_feet_per_job: 650 # from SLC Model
 office_square_feet_per_job: 462 # from SLC Model
 
+office_average_sqft_per_unit: 38540.55
+commercial_average_sqft_per_unit: 31537.58
+industrial_average_sqft_per_unit: 34311.21
+multi_family_average_sqft_per_unit: 2246.69
+single_family_average_sqft_per_unit: 2157.18
+
 # Construction Cost/Square Foot by product type
 # Proposed by SANDAG based on this source: https://ccorpinsights.com/costs-per-square-foot/
 office_construction_cost: 379.5
@@ -41,11 +47,11 @@ multi_family_construction_cost: 192.5
 single_family_construction_cost: 388
 
 # Demand
-industrial_units_per_year: 5
-office_units_per_year: 5
-commercial_units_per_year: 5
+industrial_units_per_year: 10
+office_units_per_year: 10
+commercial_units_per_year: 10
 
-single_family_units_per_year: 5
-multi_family_units_per_year: 5
+single_family_units_per_year: 10
+multi_family_units_per_year: 10
 
 debug: 1

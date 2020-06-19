@@ -3,7 +3,8 @@ import os
 import pandas
 import sys
 
-from utils.constants import VACANT_ACRES, MGRA, product_type_unit_size_labels
+from utils.constants import VACANT_ACRES, MGRA, \
+    product_type_unit_size_labels, non_residential_jobs_per_unit_labels
 
 
 def plot_column(column, output_dir='data/output', image_name='plot.png'):
@@ -87,22 +88,31 @@ def count_new_units(before, after, product_type):
     return new_construction
 
 
+def average_x_per_y(frame, x, y, product_type):
+    # drop zeros
+    frame = frame.loc[frame[x] != 0]
+    frame = frame.loc[frame[y] != 0]
+    result = (frame[x] / frame[y]).mean()
+    print('{} average {} per {} = {}'.format(
+        product_type, x, y, result))
+
+
 def average_unit_square_footage(filename, product_type):
     frame = pandas.read_csv(filename)
     total_sqft, total_units = product_type_unit_size_labels(product_type)
-    print(total_sqft, total_units)
-    # drop zeros
-    frame = frame.loc[frame[total_sqft] != 0]
-    frame = frame.loc[frame[total_units] != 0]
-    result = (frame[total_sqft] / frame[total_units]).mean()
-    print('{} average square footage per unit = {}'.format(
-        product_type, result))
+    average_x_per_y(frame, total_sqft, total_units, product_type)
+
+
+def average_jobs_per_unit(filename, product_type):
+    frame = pandas.read_csv(filename)
+    jobs, units = non_residential_jobs_per_unit_labels(product_type)
+    average_x_per_y(frame, jobs, units, product_type)
 
 
 def print_usage():
     print('useful sanity checks and quick data evaluation')
     print('usage:\nsummarize\nsum ...\nvacancy ...\ncolplot ...',
-          '\nunit_size ...')
+          '\nunit_size ...\njobs_per_unit')
 
 
 def run():
@@ -135,6 +145,11 @@ def run():
             average_unit_square_footage(args[2], args[3])
         else:
             print('usage: unit_sqft filename product_type')
+    elif args[1] == 'jobs_per_unit':
+        if len(args) == 4:
+            average_jobs_per_unit(args[2], args[3])
+        else:
+            print('usage: jobs_per_unit filename product_type')
     else:
         print_usage()
 

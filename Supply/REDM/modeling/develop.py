@@ -1,14 +1,15 @@
+from modeling.filters import filter_product_type, filter_by_vacancy, \
+    filter_by_profitability
 import logging
 
 import utils.config as config
 from utils.converter import square_feet_to_acres
 from utils.constants import development_constants, \
-    non_residential_vacant_units, MGRA, HOUSING_UNITS, OFFICE, COMMERCIAL, \
-    INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, DEVELOPED_ACRES, VACANT_ACRES, \
+    non_residential_vacant_units, MGRA, HOUSING_UNITS, \
+    AVERAGE_UNIT_SQFT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
+    OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
+    DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
-
-from modeling.filters import filter_product_type, filter_by_vacancy, \
-    filter_by_profitability
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -49,15 +50,10 @@ def update_mgra(mgras, selected_ID, acreage_per_unit,
 
 
 def parameters_for_product_type(product_type):
-    # FIXME: this is goofy
-    if product_type.__contains__('family'):
-        floor_space = square_feet_to_acres(
-            config.parameters[product_type + '_minimum_unit_size'])
-    else:
-        floor_space = square_feet_to_acres(
-            config.parameters[product_type + '_square_feet_per_job']
-        )
-    return config.parameters[product_type + '_units_per_year'], floor_space
+    floor_space = square_feet_to_acres(
+        config.parameters[product_type + AVERAGE_UNIT_SQFT_POSTFIX])
+    return config.parameters[product_type + UNITS_PER_YEAR_POSTFIX], \
+        floor_space
 
 
 def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,

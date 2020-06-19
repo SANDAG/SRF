@@ -14,7 +14,7 @@ profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
 
 # Simulation
-simulation_years: 2
+simulation_years: 1
 simulation_begin: 2020
 
 # Development
@@ -47,12 +47,14 @@ multi_family_construction_cost: 192.5
 single_family_construction_cost: 388
 
 # Demand
-industrial_units_per_year: 4000
-office_units_per_year: 4000
-commercial_units_per_year: 4000
-
-single_family_units_per_year: 5000
-multi_family_units_per_year: 5000
+# derived from total jobs * growth of 0.96% per year: 2384 office, 5372 commercial, 3256 industrial new jobs per year
+# / average jobs per unit from input data: 177 office, 142 commercial, and 248 industrial
+office_units_per_year: 14
+commercial_units_per_year: 38
+industrial_units_per_year: 13
+# from population projection of ~ 30,000 per year
+single_family_units_per_year: 5300
+multi_family_units_per_year: 5300
 
 # set to 1 for verbose output
-debug: 0
+debug: 1

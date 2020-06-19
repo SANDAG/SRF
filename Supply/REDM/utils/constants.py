@@ -70,6 +70,11 @@ FINANCE_INSURANCE_REAL_ESTATE_EMPLOYMENT = 'emp_fire'
 SERVICES_EMPLOYMENT = 'emp_serv'  # Employment in Services
 GOVERNMENT_EMPLOYMENT = 'emp_gov'  # Employment in Government
 SELF_EMPLOYMENT = 'emp_sedw'  # Number of self-employed persons
+
+OFFICE_EMPLOYMENT = 'emp_office'
+INDUSTRIAL_EMPLOYMENT = 'emp_indus_'
+COMMERCIAL_EMPLOYMENT = 'emp_comm_l'
+
 INCOME_1 = 'i1'  # Number of households with income less than $15,000
 INCOME_2 = 'i2'  # Number of households with income $15,000-$29,999
 INCOME_3 = 'i3'  # Number of households with income $30,000-$44,999
@@ -263,6 +268,7 @@ MINIMUM_UNIT_SIZE_POSTFIX = '_minimum_unit_size'
 JOB_AREA_POSTFIX = '_square_feet_per_job'
 UNITS_PER_YEAR_POSTFIX = '_units_per_year'
 CONSTRUCTION_COST_POSTFIX = '_construction_cost'
+AVERAGE_UNIT_SQFT_POSTFIX = '_average_sqft_per_unit'
 
 
 def development_constants(product_type):
@@ -319,6 +325,19 @@ def product_type_unit_size_labels(product_type):
         return INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, INDUSTRIAL_UNITS
     elif product_type == COMMERCIAL:
         return COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_UNITS
+
+
+def non_residential_jobs_per_unit_labels(product_type):
+    '''
+        Returns the column label for total jobs
+        and total unit count for the product type argument
+    '''
+    if product_type == OFFICE:
+        return OFFICE_EMPLOYMENT, OFFICE_UNITS
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_EMPLOYMENT, INDUSTRIAL_UNITS
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_EMPLOYMENT, COMMERCIAL_UNITS
 
 
 def non_residential_vacant_units(product_type_unit_key):
