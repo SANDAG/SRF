@@ -52,9 +52,9 @@ single_family_construction_cost: 388
 office_units_per_year: 14
 commercial_units_per_year: 38
 industrial_units_per_year: 13
-# from population projection of ~ 30,000 per year
-single_family_units_per_year: 5300
-multi_family_units_per_year: 5300
+# from population projection of ~ 30,000 per year (62.6% single family)
+single_family_units_per_year: 6636
+multi_family_units_per_year: 3965
 
 # set to 1 for verbose output
 debug: 1
