@@ -52,6 +52,7 @@ def update_mgra(mgras, selected_ID, acreage_per_unit,
 def parameters_for_product_type(product_type):
     floor_space = square_feet_to_acres(
         config.parameters[product_type + AVERAGE_UNIT_SQFT_POSTFIX])
+    # land_use =
     return config.parameters[product_type + UNITS_PER_YEAR_POSTFIX], \
         floor_space
 

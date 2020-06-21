@@ -340,6 +340,23 @@ def non_residential_jobs_per_unit_labels(product_type):
         return COMMERCIAL_EMPLOYMENT, COMMERCIAL_UNITS
 
 
+def land_per_unit_labels(product_type):
+    '''
+        Returns the column label for developed acres
+        and total unit count for the product type argument
+    '''
+    if product_type == SINGLE_FAMILY:
+        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_HOUSING_UNITS
+    elif product_type == MULTI_FAMILY:
+        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_HOUSING_UNITS
+    elif product_type == OFFICE:
+        return OFFICE_DEVELOPED_ACRES, OFFICE_UNITS
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_UNITS
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_UNITS
+
+
 def non_residential_vacant_units(product_type_unit_key):
     if product_type_unit_key == OFFICE_UNITS:
         return OFFICE_VACANT_UNITS
