@@ -14,7 +14,7 @@ profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
 
 # Simulation
-simulation_years: 1
+simulation_years: 2
 simulation_begin: 2020
 
 # Development
@@ -57,4 +57,4 @@ single_family_units_per_year: 6636
 multi_family_units_per_year: 3965
 
 # set to 1 for verbose output
-debug: 1
+debug: 0
