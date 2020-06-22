@@ -57,8 +57,6 @@ def filter_by_vacancy(mgra_dataframe, product_type, total_units_column,
     # also return max_new_units to use for weighting, but we need to remove
     # the low values as well to keep the return structures the same size
     max_new_units = numpy.delete(max_new_units, numpy.where(max_new_units < 1))
-
-    # TODO: remove rows from max_new_units to be the same size as filtered
     return filtered, max_new_units
 
 

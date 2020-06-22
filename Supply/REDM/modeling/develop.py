@@ -99,7 +99,7 @@ def develop_product_type(mgras, product_type, progress):
             filtered, product_type, total_units_key, occupied_units_key)
         non_vacant_count = len(filtered)
 
-        filtered, _ = filter_by_profitability(filtered, product_type)
+        # filtered, _ = filter_by_profitability(filtered, product_type)
         profitable_count = len(filtered)
 
         logging.debug(
@@ -119,7 +119,9 @@ def develop_product_type(mgras, product_type, progress):
         # Sample
         # TODO: add weighting (use sample(weights=))
         # (profitability, vacancy, other geographic weights)
-        selected_row = filtered.sample(n=1)
+        print(len(filtered))
+        print(len(vacancy_caps))
+        selected_row = filtered.sample(n=1, weights=vacancy_caps)
         selected_ID = selected_row[MGRA].iloc[0]
 
         buildable_count = buildable_units(
