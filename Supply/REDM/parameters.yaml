@@ -27,12 +27,14 @@ largest_development_size: 100
 single_family_minimum_unit_size: 800 # from SLC Model
 multi_family_minimum_unit_size: 800 # from SLC Model
 
+# average result of total square footage columns / total units columns
 office_average_sqft_per_unit: 38540.55
 commercial_average_sqft_per_unit: 31537.58
 industrial_average_sqft_per_unit: 34311.21
 multi_family_average_sqft_per_unit: 2246.69
 single_family_average_sqft_per_unit: 2157.18
 
+# average result of total land acres columns / total units columns
 office_average_land_acres_per_unit: 2.6181432
 commercial_average_land_acres_per_unit: 4.9830753
 industrial_average_land_acres_per_unit: 12.878534
