@@ -1,0 +1,12 @@
+/**
+ * @page solver Solver
+ * 
+ * The purpose of the Solver is to act as a bridge between the main 
+ * algorithm, and the selected algebra library.
+ * 
+ * Solver is divided in:
+ * - @subpage data
+ * - @subpage math
+ * - @subpage matrix
+ * 
+ */
