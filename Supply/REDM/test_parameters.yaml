@@ -48,6 +48,11 @@ industrial_construction_cost: 261.5
 multi_family_construction_cost: 192.5
 single_family_construction_cost: 388
 
+# Supplementary non-residential price data ($/sqft)
+industrial_average_price: 311.72
+office_average_price: 450.81
+commercial_average_price: 611.55
+
 # Demand
 industrial_units_per_year: 2
 office_units_per_year: 2
