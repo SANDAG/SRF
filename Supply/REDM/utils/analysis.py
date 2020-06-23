@@ -4,7 +4,8 @@ import pandas
 import sys
 
 from utils.constants import VACANT_ACRES, MGRA, \
-    product_type_unit_size_labels, non_residential_jobs_per_unit_labels
+    product_type_unit_size_labels, non_residential_jobs_per_unit_labels, \
+    land_per_unit_labels
 
 
 def plot_column(column, output_dir='data/output', image_name='plot.png'):
@@ -88,7 +89,8 @@ def count_new_units(before, after, product_type):
     return new_construction
 
 
-def average_x_per_y(frame, x, y, product_type):
+def average_x_per_y(filename, x, y, product_type):
+    frame = pandas.read_csv(filename)
     # drop zeros
     frame = frame.loc[frame[x] != 0]
     frame = frame.loc[frame[y] != 0]
@@ -98,24 +100,29 @@ def average_x_per_y(frame, x, y, product_type):
 
 
 def average_unit_square_footage(filename, product_type):
-    frame = pandas.read_csv(filename)
     total_sqft, total_units = product_type_unit_size_labels(product_type)
-    average_x_per_y(frame, total_sqft, total_units, product_type)
+    average_x_per_y(filename, total_sqft, total_units, product_type)
 
 
 def average_jobs_per_unit(filename, product_type):
-    frame = pandas.read_csv(filename)
     jobs, units = non_residential_jobs_per_unit_labels(product_type)
-    average_x_per_y(frame, jobs, units, product_type)
+    average_x_per_y(filename, jobs, units, product_type)
+
+
+def average_land_per_unit(filename, product_type):
+    developed_area, units = land_per_unit_labels(product_type)
+    average_x_per_y(filename, developed_area, units, product_type)
 
 
 def print_usage():
     print('useful sanity checks and quick data evaluation')
     print('usage:\nsummarize\nsum ...\nvacancy ...\ncolplot ...',
-          '\nunit_size ...\njobs_per_unit')
+          '\nunit_size ...\njobs_per_unit ...\nland_per_unit ...')
 
 
 def run():
+    # TODO: This is janky, find a better way to build analysis tools
+    # at least use argparse
     args = sys.argv
     if args[1] == 'summarize':
         if len(args) == 3:
@@ -150,6 +157,11 @@ def run():
             average_jobs_per_unit(args[2], args[3])
         else:
             print('usage: jobs_per_unit filename product_type')
+    elif args[1] == 'land_per_unit':
+        if len(args) == 4:
+            average_land_per_unit(args[2], args[3])
+        else:
+            print('usage: land_per_unit filename product_type')
     else:
         print_usage()
 
