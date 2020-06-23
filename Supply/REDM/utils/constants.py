@@ -381,4 +381,4 @@ def non_residential_vacant_units(product_type_unit_key):
     elif product_type_unit_key == INDUSTRIAL_UNITS:
         return INDUSTRIAL_VACANT_UNITS
     elif product_type_unit_key == COMMERCIAL_UNITS:
-        return INDUSTRIAL_VACANT_UNITS
+        return COMMERCIAL_VACANT_UNITS

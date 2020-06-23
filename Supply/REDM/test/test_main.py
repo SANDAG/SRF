@@ -1,6 +1,7 @@
 import unittest
 import os
 import pandas
+import logging
 
 from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE, \
@@ -12,7 +13,8 @@ from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
     COMMERCIAL_UNITS, COMMERCIAL_TOTAL_SQUARE_FOOTAGE, \
     SINGLE_FAMILY_VACANT_ACRES, MULTI_FAMILY_VACANT_ACRES, \
     OFFICE_VACANT_ACRES, INDUSTRIAL_VACANT_ACRES, COMMERCIAL_VACANT_ACRES, \
-    VACANT_ACRES
+    VACANT_ACRES, HOUSING_UNITS, OFFICE_VACANT_UNITS, \
+    INDUSTRIAL_VACANT_UNITS, COMMERCIAL_VACANT_UNITS
 
 COMMANDLINE_INPUT = 'python redm_main.py -t'
 
@@ -36,6 +38,7 @@ class TestMain(unittest.TestCase):
             self.fail("could not read files, \'{}\' likely failed".format(
                 COMMANDLINE_INPUT))
 
+        logging.info('ensuring that columns increased')
         increasing_columns = [DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES,
                               SINGLE_FAMILY_HOUSING_UNITS,
                               SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE,
@@ -47,14 +50,20 @@ class TestMain(unittest.TestCase):
                               INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_UNITS,
                               INDUSTRIAL_TOTAL_SQUARE_FOOTAGE,
                               COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_UNITS,
-                              COMMERCIAL_TOTAL_SQUARE_FOOTAGE]
+                              COMMERCIAL_TOTAL_SQUARE_FOOTAGE, HOUSING_UNITS,
+                              OFFICE_VACANT_UNITS, INDUSTRIAL_VACANT_UNITS,
+                              COMMERCIAL_VACANT_UNITS]
         for column in increasing_columns:
+            logging.info(column)
             self.assertGreater(
                 frame_after[column].sum(),
                 frame_before[column].sum())
+
+        logging.info('ensuring that columns decreased')
         decreasing_columns = [VACANT_ACRES, SINGLE_FAMILY_VACANT_ACRES,
                               MULTI_FAMILY_VACANT_ACRES, OFFICE_VACANT_ACRES,
                               INDUSTRIAL_VACANT_ACRES, COMMERCIAL_VACANT_ACRES]
         for column in decreasing_columns:
+            logging.info(column)
             self.assertLess(frame_after[column].sum(),
                             frame_before[column].sum())
