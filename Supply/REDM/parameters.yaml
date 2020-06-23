@@ -65,4 +65,4 @@ single_family_units_per_year: 6636
 multi_family_units_per_year: 3965
 
 # set to 1 for verbose output
-debug: 0
+debug: 1
