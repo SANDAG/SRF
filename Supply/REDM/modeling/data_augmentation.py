@@ -1,28 +1,34 @@
 import numpy as np
 
-from utils.interface import save_to_file
-from utils.constants import OFFICE_PRICE, COMMERCIAL_PRICE, INDUSTRIAL_PRICE
+from utils.constants import OFFICE_PRICE, COMMERCIAL_PRICE, INDUSTRIAL_PRICE, \
+    SINGLE_FAMILY_PRICE, MULTI_FAMILY_PRICE
 import utils.config as config
 
 
+def fill_in_price_data(dataframe):
+    dataframe = replace_zeros_with_sliding_average(
+        dataframe, SINGLE_FAMILY_PRICE)
+    dataframe = replace_zeros_with_sliding_average(
+        dataframe, MULTI_FAMILY_PRICE)
+    return dataframe
+
+
 def replace_zeros_with_sliding_average(dataframe, column_name, window_size=25):
-    save_to_file(dataframe[column_name],
-                 'data/output', 'prev_prices.csv')
     # TODO: only work with applicable mgras instead of the whole file
 
-    # replace zeros with nans so they can be ignored, then replaced by
+    # replace zeros with nans so they can be replaced by
     # rolling window
     dataframe[column_name] = dataframe[column_name].replace(
         {0: np.nan})
-    save_to_file(dataframe[column_name],
-                 'data/output', 'nan_prices.csv')
-    # FIXME: averaging everything instead of just nans.
-    dataframe[column_name].update(
-        dataframe[column_name].rolling(
-            window_size, center=True, min_periods=3).mean()
-    )
-    save_to_file(dataframe[column_name],
-                 'data/output', 'new_prices.csv')
+
+    dataframe[column_name] = dataframe[column_name].fillna(
+        dataframe[column_name].rolling(75, min_periods=1).mean())
+    # if there weren't any values to average nearby, it should be just as
+    # accurate to fill with the average across the entire column.
+    dataframe[column_name] = dataframe[column_name].fillna(
+        dataframe[column_name].mean())
+
+    return dataframe
 
 
 def add_non_residential_average_prices(dataframe):
@@ -34,5 +40,4 @@ def add_non_residential_average_prices(dataframe):
         config.parameters['commercial_average_price']
     dataframe.loc[dataframe[INDUSTRIAL_PRICE] == 0, INDUSTRIAL_PRICE] = \
         config.parameters['industrial_average_price']
-    save_to_file(dataframe, 'data/output', 'new_non_res_prices.csv')
     return dataframe
