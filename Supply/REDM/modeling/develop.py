@@ -3,10 +3,10 @@ from modeling.filters import filter_product_type, filter_by_vacancy, \
 import logging
 
 import utils.config as config
-from utils.converter import square_feet_to_acres
 from utils.constants import development_constants, \
-    non_residential_vacant_units, MGRA, HOUSING_UNITS, \
-    AVERAGE_UNIT_SQFT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
+    product_type_square_footage, non_residential_vacant_units, MGRA, \
+    HOUSING_UNITS, AVERAGE_UNIT_SQFT_POSTFIX, \
+    AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
@@ -30,30 +30,34 @@ def add_to_columns(mgras, selected_ID, value, columns):
     return mgras
 
 
-def update_mgra(mgras, selected_ID, acreage_per_unit,
+def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
                 product_type_developed_land, product_type_vacant_land,
-                new_units, product_type_units):
+                new_units, product_type_units, product_type):
+    # update acreages
     mgras = update_acreage(mgras, selected_ID,
                            acreage_per_unit * new_units,
                            product_type_developed_land,
                            product_type_vacant_land)
+    # update unit counts
     columns_needing_new_units = [product_type_units]
-
     if product_type_units == SINGLE_FAMILY_HOUSING_UNITS or \
             product_type_units == MULTI_FAMILY_HOUSING_UNITS:
         columns_needing_new_units.append(HOUSING_UNITS)
     else:
         columns_needing_new_units.append(
             non_residential_vacant_units(product_type_units))
-    return add_to_columns(mgras, selected_ID, new_units,
-                          columns_needing_new_units)
+    mgras = add_to_columns(mgras, selected_ID, new_units,
+                           columns_needing_new_units)
+    # update square footages
+    return add_to_columns(mgras, selected_ID, new_units * acreage_per_unit,
+                          product_type_square_footage(product_type))
 
 
 def parameters_for_product_type(product_type):
-    floor_space = square_feet_to_acres(
-        config.parameters[product_type + AVERAGE_UNIT_SQFT_POSTFIX])
     return config.parameters[product_type + UNITS_PER_YEAR_POSTFIX], \
-        floor_space
+        config.parameters[product_type + AVERAGE_UNIT_SQFT_POSTFIX], \
+        config.parameters[product_type +
+                          AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX]
 
 
 def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
@@ -78,8 +82,8 @@ def develop_product_type(mgras, product_type, progress):
     if progress is not None:
         progress.set_description('developing {}'.format(product_type))
 
-    new_units_to_build, acreage_per_unit = parameters_for_product_type(
-        product_type)
+    new_units_to_build, square_feet_per_unit, acreage_per_unit = \
+        parameters_for_product_type(product_type)
 
     product_type_developed_key, product_type_vacant_key, \
         total_units_key, occupied_units_key = development_constants(
@@ -134,10 +138,10 @@ def develop_product_type(mgras, product_type, progress):
             buildable_count, product_type, selected_ID))
 
         # develop buildable_count units by updating the MGRA in the dataframe
-        mgras = update_mgra(mgras, selected_ID, acreage_per_unit,
-                            product_type_developed_key,
+        mgras = update_mgra(mgras, selected_ID, square_feet_per_unit,
+                            acreage_per_unit, product_type_developed_key,
                             product_type_vacant_key, buildable_count,
-                            total_units_key)
+                            total_units_key, product_type)
 
     if progress is not None:
         progress.update()

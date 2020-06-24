@@ -219,14 +219,15 @@ LAND_COST_PER_ACRE = 'Land_Cost'  # cost of land per acre
 # OFFICE_CONSTRUCTION_COST = 'cost_cons_office'
 
 # price/rent cost per square foot for single family dwelling
-SINGLE_FAMILY_RENT = 'Price_SF'
+SINGLE_FAMILY_PRICE = 'Price_SF'
 # price/rent cost per square foot for multi family dwelling
-MULTI_FAMILY_RENT = 'Price_MF'
+MULTI_FAMILY_PRICE = 'Price_MF'
 # price/rent cost per square foot for commercial/retail building
-COMMERCIAL_RENT = 'Ret_Cost'
+COMMERCIAL_PRICE = 'Ret_Cost'
 # price/rent cost per square foot for industrial building
-INDUSTRIAL_RENT = 'Ind_Cost'
-OFFICE_RENT = 'Ofc_Cost'  # price/rent cost per square foot for office building
+INDUSTRIAL_PRICE = 'Ind_Cost'
+# price/rent cost per square foot for office building
+OFFICE_PRICE = 'Ofc_Cost'
 DEV_1 = 'dev1'  # acres assigned with development code 1
 DEV_2 = 'dev2'  # acres assigned with development code 2
 DEV_3 = 'dev3'  # acres assigned with development code 3
@@ -269,6 +270,7 @@ JOB_AREA_POSTFIX = '_square_feet_per_job'
 UNITS_PER_YEAR_POSTFIX = '_units_per_year'
 CONSTRUCTION_COST_POSTFIX = '_construction_cost'
 AVERAGE_UNIT_SQFT_POSTFIX = '_average_sqft_per_unit'
+AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX = '_average_land_acres_per_unit'
 
 
 def development_constants(product_type):
@@ -299,15 +301,32 @@ def product_type_price(product_type):
         for the product type argument
     '''
     if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_RENT
+        return SINGLE_FAMILY_PRICE
     elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_RENT
+        return MULTI_FAMILY_PRICE
     elif product_type == OFFICE:
-        return OFFICE_RENT
+        return OFFICE_PRICE
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_RENT
+        return INDUSTRIAL_PRICE
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_RENT
+        return COMMERCIAL_PRICE
+
+
+def product_type_square_footage(product_type):
+    '''
+        Returns the column label for total square footages
+        for the product type argument
+    '''
+    if product_type == SINGLE_FAMILY:
+        return SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE
+    elif product_type == MULTI_FAMILY:
+        return MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE
+    elif product_type == OFFICE:
+        return OFFICE_TOTAL_SQUARE_FOOTAGE
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_TOTAL_SQUARE_FOOTAGE
 
 
 def product_type_unit_size_labels(product_type):
@@ -340,10 +359,27 @@ def non_residential_jobs_per_unit_labels(product_type):
         return COMMERCIAL_EMPLOYMENT, COMMERCIAL_UNITS
 
 
+def land_per_unit_labels(product_type):
+    '''
+        Returns the column label for developed acres
+        and total unit count for the product type argument
+    '''
+    if product_type == SINGLE_FAMILY:
+        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_HOUSING_UNITS
+    elif product_type == MULTI_FAMILY:
+        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_HOUSING_UNITS
+    elif product_type == OFFICE:
+        return OFFICE_DEVELOPED_ACRES, OFFICE_UNITS
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_UNITS
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_UNITS
+
+
 def non_residential_vacant_units(product_type_unit_key):
     if product_type_unit_key == OFFICE_UNITS:
         return OFFICE_VACANT_UNITS
     elif product_type_unit_key == INDUSTRIAL_UNITS:
         return INDUSTRIAL_VACANT_UNITS
     elif product_type_unit_key == COMMERCIAL_UNITS:
-        return INDUSTRIAL_VACANT_UNITS
+        return COMMERCIAL_VACANT_UNITS
