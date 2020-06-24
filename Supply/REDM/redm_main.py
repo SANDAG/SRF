@@ -14,13 +14,15 @@ def run(mgra_dataframe):
     simulation_years = config.parameters['simulation_years']
     simulation_begin = config.parameters['simulation_begin']
 
-    # the number of tqdm progress bar steps per simulation year
-    checkpoints = 7
+    steps_per_year = 7
     progress = tqdm(desc='progress', total=simulation_years *
-                    checkpoints, position=0)
+                    steps_per_year + 1, position=0)
 
+    # Preprocess
+    progress.set_description('preprocessing')
     mgra_dataframe = fill_in_price_data(mgra_dataframe)
     save_to_file(mgra_dataframe, output_dir, 'preprocessed.csv')
+    progress.update()
 
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1

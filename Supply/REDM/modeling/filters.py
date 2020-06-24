@@ -4,11 +4,12 @@ import numpy
 import utils.config as config
 
 from utils.constants import product_type_price, LAND_COST_PER_ACRE, \
-    VACANT_ACRES, CONSTRUCTION_COST_POSTFIX, OFFICE, COMMERCIAL, INDUSTRIAL
+    VACANT_ACRES, CONSTRUCTION_COST_POSTFIX, OFFICE, COMMERCIAL, INDUSTRIAL, \
+    MAX_VACANT_UNITS_POSTFIX
 
 from utils.converter import x_per_acre_to_x_per_square_foot
 
-from utils.analysis import count_zeros
+# from utils.analysis import count_zeros
 
 
 def filter_all(mgra_dataframe):
@@ -44,19 +45,21 @@ def filter_by_vacancy(mgra_dataframe, product_type, total_units_column,
     )
     max_new_units = max_units - mgra_dataframe[total_units_column]
 
-    # check edge case; if there are few units built (< 50),
-    # we should build even when it causes a high vacancy rate
-    # TODO: this allows for up to 99 units to be built before any are occupied
-    max_new_units = numpy.where(
-        mgra_dataframe[total_units_column] < 50, 50, max_new_units)
+    # check edge case; if there are few units built (eg. < 50 for single
+    # family) we should build even when it causes a high vacancy rate
+    max_vacant_units = config.parameters[product_type +
+                                         MAX_VACANT_UNITS_POSTFIX]
+    # this allows for up to max_vacant_units*2 - 1 units to be built before any
+    # are occupied
+    max_new_units[mgra_dataframe[total_units_column]
+                  < max_vacant_units] = max_vacant_units
 
     # return the MGRA's that can add more than 0 units to meet
     # the target vacancy rate
     filtered = mgra_dataframe[max_new_units > 0]
-
-    # also return max_new_units to use for weighting, but we need to remove
-    # the low values as well to keep the return structures the same size
-    max_new_units = numpy.delete(max_new_units, numpy.where(max_new_units < 1))
+    # also return max_new_units to use for weighting, but also remove
+    # the low values to keep the frame and weighting series the same size
+    max_new_units = max_new_units[max_new_units > 0]
     return filtered, max_new_units
 
 

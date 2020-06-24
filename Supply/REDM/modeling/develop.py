@@ -63,7 +63,7 @@ def parameters_for_product_type(product_type):
 def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
                     area_per_unit, max_units, vacancy_caps):
     # determine max units to build
-    vacancy_cap = vacancy_caps[mgra.index]
+    vacancy_cap = vacancy_caps.loc[mgra.index].values.item()
 
     # TODO: also use profitability filter value for this mgra to determine
     # the number of profitable units to build.
@@ -116,15 +116,14 @@ def develop_product_type(mgras, product_type, progress):
                 product_type))
             print('evaluate filtering methods\nexiting')
             return None, progress
+
         # reset the index to simplify comparisons with weighting arrays
         # output mgras dataframe is updated using mgra_id's instead of indices
-        filtered = filtered.reset_index()
+        # filtered = filtered.reset_index()
 
         # Sample
         # TODO: add weighting (use sample(weights=))
         # (profitability, vacancy, other geographic weights)
-        print(len(filtered))
-        print(len(vacancy_caps))
         selected_row = filtered.sample(n=1, weights=vacancy_caps)
         selected_ID = selected_row[MGRA].iloc[0]
 
