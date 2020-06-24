@@ -11,7 +11,7 @@ office_target_vacancy_rate: 0.06
 non_residential_target_vacancy_rate: 0.1 # from SLC Model
 minimum_redevelopment_age: 20
 profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
-amortization_years: 20
+amortization_years: 10
 
 # Simulation
 simulation_years: 2
@@ -22,15 +22,24 @@ simulation_begin: 2020
 # note that most single family housing subdivisions are usually around 20 units or so
 largest_development_size: 100
 
-# Sizes - all sizes in square feet
+# Sizes
+# square feet
 single_family_minimum_unit_size: 800 # from SLC Model
 multi_family_minimum_unit_size: 800 # from SLC Model
 
-residential_square_feet_per_job: 400 # from SLC Model
-non_residential_square_feet_per_job: 600 # from SLC Model
-industrial_square_feet_per_job: 648 # from SLC Model
-commercial_square_feet_per_job: 650 # from SLC Model
-office_square_feet_per_job: 462 # from SLC Model
+# average result of total square footage columns / total units columns
+office_average_sqft_per_unit: 38540.55
+commercial_average_sqft_per_unit: 31537.58
+industrial_average_sqft_per_unit: 34311.21
+multi_family_average_sqft_per_unit: 2246.69
+single_family_average_sqft_per_unit: 2157.18
+
+# average result of total land acres columns / total units columns
+office_average_land_acres_per_unit: 2.6181432
+commercial_average_land_acres_per_unit: 4.9830753
+industrial_average_land_acres_per_unit: 12.878534
+multi_family_average_land_acres_per_unit: 0.038312574
+single_family_average_land_acres_per_unit: 0.2559981
 
 # Construction Cost/Square Foot by product type
 # Proposed by SANDAG based on this source: https://ccorpinsights.com/costs-per-square-foot/
@@ -40,13 +49,20 @@ industrial_construction_cost: 261.5
 multi_family_construction_cost: 192.5
 single_family_construction_cost: 388
 
-# Demand
-industrial_units_per_year: 4000
-office_units_per_year: 4000
-commercial_units_per_year: 4000
+# Supplementary non-residential price data ($/sqft)
+industrial_average_price: 311.72
+office_average_price: 450.81
+commercial_average_price: 611.55
 
-single_family_units_per_year: 5000
-multi_family_units_per_year: 5000
+# Demand
+# derived from total jobs * growth of 0.96% per year: 2384 office, 5372 commercial, 3256 industrial new jobs per year
+# / average jobs per unit from input data: 177 office, 142 commercial, and 248 industrial
+office_units_per_year: 14
+commercial_units_per_year: 38
+industrial_units_per_year: 13
+# from population projection of ~ 30,000 per year (62.6% single family)
+single_family_units_per_year: 6636
+multi_family_units_per_year: 3965
 
 # set to 1 for verbose output
 debug: 0

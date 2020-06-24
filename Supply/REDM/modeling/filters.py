@@ -4,11 +4,10 @@ import numpy
 import utils.config as config
 
 from utils.constants import product_type_price, LAND_COST_PER_ACRE, \
-    VACANT_ACRES, CONSTRUCTION_COST_POSTFIX
+    VACANT_ACRES, CONSTRUCTION_COST_POSTFIX, OFFICE, COMMERCIAL, INDUSTRIAL
 
 from utils.converter import x_per_acre_to_x_per_square_foot
 
-from utils.interface import save_to_file
 from utils.analysis import count_zeros
 
 
@@ -78,6 +77,7 @@ def filter_by_profitability(mgra_dataframe, product_type):
     land_cost_per_square_foot = x_per_acre_to_x_per_square_foot(
         land_cost_per_acre)
     expected_costs = construction_cost + land_cost_per_square_foot
+
     # find minimum returns for viable MGRA's
     profit_multiplier = config.parameters['profit_multiplier']
     minimum_revenue = expected_costs * profit_multiplier
@@ -86,21 +86,25 @@ def filter_by_profitability(mgra_dataframe, product_type):
         years
     amortized_costs = expected_costs / years
 
-    revenue = mgra_dataframe[product_type_price(product_type)]
+    # find expected revenue
+    if product_type == OFFICE or product_type == COMMERCIAL or \
+            product_type == INDUSTRIAL:
+        revenue = config.parameters[product_type + '_average_price']
+    else:
+        revenue = mgra_dataframe[product_type_price(product_type)]
 
     # debug info
     # uncomment to save frame to file
     # save_to_file(revenue, 'test_data/output', 'revenue ' + product_type)
-    logging.debug(
-        'rows with missing data: {}/{}'.format(
-            count_zeros(revenue), len(revenue))
-    )
-    profit = revenue - amortized_costs
-    logging.debug('mean profit: {}%'.format(profit.mean()))
+    # logging.debug(
+    #     'rows with missing data: {}/{}'.format(
+    #         count_zeros(revenue), len(revenue))
+    # )
 
-    return mgra_dataframe[profitable(
-        amortized_minimum, revenue
-    )], profit
+    profit = revenue - amortized_costs
+    logging.debug('mean profit: {}'.format(profit.mean()))
+
+    return mgra_dataframe[profitable(amortized_minimum, revenue)], profit
 
 
 # possible redev filter

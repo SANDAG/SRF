@@ -2,12 +2,11 @@ import pandas
 from tqdm import tqdm
 import logging
 
+from modeling.develop import develop
+from modeling.data_augmentation import fill_in_price_data
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, get_args
 import utils.config as config
-
-from modeling.develop import develop
-from modeling.filters import filter_all
 
 
 def run(mgra_dataframe):
@@ -19,17 +18,14 @@ def run(mgra_dataframe):
     checkpoints = 7
     progress = tqdm(desc='progress', total=simulation_years *
                     checkpoints, position=0)
+
+    mgra_dataframe = fill_in_price_data(mgra_dataframe)
+    save_to_file(mgra_dataframe, output_dir, 'preprocessed.csv')
+
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
         progress.set_description('starting year {}'.format(i+1))
 
-        # drop unusable mgras
-        filtered = filter_all(mgra_dataframe)
-        logging.info('MGRA\'s under consideration (with land available): '
-                     '{}/{}'.format(
-                         len(filtered),
-                         len(mgra_dataframe))
-                     )
         # develop enough land to meet demand for this year.
         mgra_dataframe, progress = develop(mgra_dataframe, progress)
         if mgra_dataframe is None:
