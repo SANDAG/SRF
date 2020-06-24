@@ -20,6 +20,8 @@ def run(mgra_dataframe):
                     checkpoints, position=0)
 
     mgra_dataframe = fill_in_price_data(mgra_dataframe)
+    save_to_file(mgra_dataframe, output_dir, 'preprocessed.csv')
+
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
         progress.set_description('starting year {}'.format(i+1))
