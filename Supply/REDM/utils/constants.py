@@ -219,14 +219,15 @@ LAND_COST_PER_ACRE = 'Land_Cost'  # cost of land per acre
 # OFFICE_CONSTRUCTION_COST = 'cost_cons_office'
 
 # price/rent cost per square foot for single family dwelling
-SINGLE_FAMILY_RENT = 'Price_SF'
+SINGLE_FAMILY_PRICE = 'Price_SF'
 # price/rent cost per square foot for multi family dwelling
-MULTI_FAMILY_RENT = 'Price_MF'
+MULTI_FAMILY_PRICE = 'Price_MF'
 # price/rent cost per square foot for commercial/retail building
-COMMERCIAL_RENT = 'Ret_Cost'
+COMMERCIAL_PRICE = 'Ret_Cost'
 # price/rent cost per square foot for industrial building
-INDUSTRIAL_RENT = 'Ind_Cost'
-OFFICE_RENT = 'Ofc_Cost'  # price/rent cost per square foot for office building
+INDUSTRIAL_PRICE = 'Ind_Cost'
+# price/rent cost per square foot for office building
+OFFICE_PRICE = 'Ofc_Cost'
 DEV_1 = 'dev1'  # acres assigned with development code 1
 DEV_2 = 'dev2'  # acres assigned with development code 2
 DEV_3 = 'dev3'  # acres assigned with development code 3
@@ -300,15 +301,15 @@ def product_type_price(product_type):
         for the product type argument
     '''
     if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_RENT
+        return SINGLE_FAMILY_PRICE
     elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_RENT
+        return MULTI_FAMILY_PRICE
     elif product_type == OFFICE:
-        return OFFICE_RENT
+        return OFFICE_PRICE
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_RENT
+        return INDUSTRIAL_PRICE
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_RENT
+        return COMMERCIAL_PRICE
 
 
 def product_type_square_footage(product_type):

@@ -11,7 +11,7 @@ office_target_vacancy_rate: 0.06
 non_residential_target_vacancy_rate: 0.1 # from SLC Model
 minimum_redevelopment_age: 20
 profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
-amortization_years: 20
+amortization_years: 10
 
 # Simulation
 simulation_years: 2
@@ -48,6 +48,11 @@ commercial_construction_cost: 228.5
 industrial_construction_cost: 261.5
 multi_family_construction_cost: 192.5
 single_family_construction_cost: 388
+
+# Supplementary non-residential price data ($/sqft)
+industrial_average_price: 311.72
+office_average_price: 450.81
+commercial_average_price: 611.55
 
 # Demand
 # derived from total jobs * growth of 0.96% per year: 2384 office, 5372 commercial, 3256 industrial new jobs per year
