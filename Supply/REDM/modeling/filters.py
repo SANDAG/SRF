@@ -63,14 +63,14 @@ def filter_by_vacancy(mgra_dataframe, product_type, total_units_column,
     return filtered, max_new_units
 
 
-def profitable(revenue, price):
-    truth_values = numpy.where(revenue <= price, True, False)
-    # pass even with no price data
-    truth_values = numpy.where(price == 0, True, truth_values)
-    return truth_values
+# def profitable(revenue, price):
+#     truth_values = numpy.where(revenue <= price, True, False)
+#     # pass even with no price data
+#     truth_values = numpy.where(price == 0, True, truth_values)
+#     return truth_values
 
 
-def filter_by_profitability(mgra_dataframe, product_type):
+def filter_by_profitability(mgra_dataframe, product_type, vacancy_caps):
     # find total expected costs
     construction_cost = config.parameters[product_type +
                                           CONSTRUCTION_COST_POSTFIX]
@@ -104,8 +104,11 @@ def filter_by_profitability(mgra_dataframe, product_type):
 
     profit = revenue - amortized_costs
     logging.debug('mean profit: {}'.format(profit.mean()))
-
-    return mgra_dataframe[profitable(amortized_minimum, revenue)], profit
+    profitability_criteria = (revenue >= amortized_minimum) | (revenue == 0)
+    mgra_dataframe = mgra_dataframe[profitability_criteria]
+    vacany_caps = vacancy_caps[profitability_criteria]
+    profit = profit[profitability_criteria]
+    return mgra_dataframe, vacany_caps, profit
 
 
 # possible redev filter
