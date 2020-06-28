@@ -89,7 +89,7 @@ def count_new_units(before, after, product_type):
     return new_construction
 
 
-def average_x_per_y(filename, x, y, product_type):
+def average_x_per_y(filename, x, y, product_type=''):
     frame = pandas.read_csv(filename)
     # drop zeros
     frame = frame.loc[frame[x] != 0]
@@ -117,12 +117,13 @@ def average_land_per_unit(filename, product_type):
 def print_usage():
     print('useful sanity checks and quick data evaluation')
     print('usage:\nsummarize\nsum ...\nvacancy ...\ncolplot ...',
-          '\nunit_size ...\njobs_per_unit ...\nland_per_unit ...')
+          '\nunit_size ...\njobs_per_unit ...\nland_per_unit ...',
+          '\nx_per_y ...')
 
 
 def run():
-    # TODO: This is janky, find a better way to build analysis tools
-    # at least use argparse
+    # TODO: This is lame, find a better way to build
+    # a commandline toolkit. At least use argparse
     args = sys.argv
     if args[1] == 'summarize':
         if len(args) == 3:
@@ -162,6 +163,11 @@ def run():
             average_land_per_unit(args[2], args[3])
         else:
             print('usage: land_per_unit filename product_type')
+    elif args[1] == 'x_per_y':
+        if len(args) == 5:
+            average_x_per_y(args[2], args[3], args[4])
+        else:
+            print('usage: x_per_y filename col_x col_y')
     else:
         print_usage()
 
