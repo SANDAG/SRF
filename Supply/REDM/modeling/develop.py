@@ -9,7 +9,8 @@ from utils.constants import development_constants, \
     AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
-    SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS
+    SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS, \
+    JOB_SPACES_PER_BUILDING_POSTFIX
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -23,8 +24,8 @@ def update_acreage(mgras, selected_ID, new_acreage,
 
 def add_to_columns(mgras, selected_ID, value, columns):
     '''
-        columns: list of column labels
         value: number to add to the current values of columns
+        columns: list of column labels
     '''
     mgras.loc[mgras[MGRA] == selected_ID, columns] += value
     return mgras
@@ -44,8 +45,11 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
             product_type_units == MULTI_FAMILY_HOUSING_UNITS:
         columns_needing_new_units.append(HOUSING_UNITS)
     else:
-        columns_needing_new_units.append(
-            non_residential_vacant_units(product_type_units))
+        job_spaces = new_units * \
+            config.parameters[product_type + JOB_SPACES_PER_BUILDING_POSTFIX]
+        mgras = add_to_columns(mgras, selected_ID, job_spaces,
+                               non_residential_vacant_units(product_type_units)
+                               )
     mgras = add_to_columns(mgras, selected_ID, new_units,
                            columns_needing_new_units)
     # update square footages
@@ -65,8 +69,8 @@ def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
     # determine max units to build
     vacancy_cap = vacancy_caps[mgra.index]
 
-    # TODO: also use profitability filter value for this mgra to determine
-    # the number of profitable units to build.
+    # TODO: also use profitability filter value for this mgra
+    # to determine the number of profitable units to build.
 
     # only build up to 95% of the vacant space
     available_units_by_land = mgra[product_type_vacant_key].values.item() * \

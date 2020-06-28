@@ -271,6 +271,7 @@ UNITS_PER_YEAR_POSTFIX = '_units_per_year'
 CONSTRUCTION_COST_POSTFIX = '_construction_cost'
 AVERAGE_UNIT_SQFT_POSTFIX = '_average_sqft_per_unit'
 AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX = '_average_land_acres_per_unit'
+JOB_SPACES_PER_BUILDING_POSTFIX = '_job_spaces_per_building'
 
 
 def development_constants(product_type):
