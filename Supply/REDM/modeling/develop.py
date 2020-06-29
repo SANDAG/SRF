@@ -124,9 +124,9 @@ def develop_product_type(mgras, product_type, progress):
             return None, progress
 
         # Sample
-        vacancy_weights = normalize(vacancy_caps)
+        # vacancy_weights = normalize(vacancy_caps)
         # profit_weights = normalize(profits)
-        selected_row = filtered.sample(n=1, weights=vacancy_weights)
+        selected_row = filtered.sample(n=1, weights=vacancy_caps)
         selected_ID = selected_row[MGRA].iloc[0]
 
         buildable_count = buildable_units(
