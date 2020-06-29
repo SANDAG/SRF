@@ -2,13 +2,20 @@
 input_filename: "data/SRF_Input_Base_V4.csv"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
-# Filtering
+# Vacancy
 single_family_target_vacancy_rate: 0.06 # all vacancy rates in %
 multi_family_target_vacancy_rate: 0.06
 industrial_target_vacancy_rate: 0.06
 commercial_target_vacancy_rate: 0.06
 office_target_vacancy_rate: 0.06
-non_residential_target_vacancy_rate: 0.1 # from SLC Model
+# used to allow for new developments
+single_family_max_vacant_units: 30
+multi_family_max_vacant_units: 50
+industrial_max_vacant_units: 2
+commercial_max_vacant_units: 3
+office_max_vacant_units: 2
+
+# Profitability
 minimum_redevelopment_age: 20
 profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 10

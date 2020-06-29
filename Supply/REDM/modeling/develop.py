@@ -67,7 +67,7 @@ def parameters_for_product_type(product_type):
 def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
                     area_per_unit, max_units, vacancy_caps):
     # determine max units to build
-    vacancy_cap = vacancy_caps[mgra.index]
+    vacancy_cap = vacancy_caps.loc[mgra.index].values.item()
 
     # TODO: also use profitability filter value for this mgra
     # to determine the number of profitable units to build.
@@ -80,6 +80,11 @@ def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
     largest_development = config.parameters['largest_development_size']
     return int(min(max_units, largest_development,
                    vacancy_cap, available_units_by_land))
+
+
+def normalize(dataframe):
+    # also works with pandas Series
+    return (dataframe - dataframe.min()) / (dataframe.max() - dataframe.min())
 
 
 def develop_product_type(mgras, product_type, progress):
@@ -107,7 +112,8 @@ def develop_product_type(mgras, product_type, progress):
             filtered, product_type, total_units_key, occupied_units_key)
         non_vacant_count = len(filtered)
 
-        filtered, _ = filter_by_profitability(filtered, product_type)
+        filtered, vacancy_caps, profits = filter_by_profitability(
+            filtered, product_type, vacancy_caps)
         profitable_count = len(filtered)
 
         logging.debug(
@@ -120,14 +126,11 @@ def develop_product_type(mgras, product_type, progress):
                 product_type))
             print('evaluate filtering methods\nexiting')
             return None, progress
-        # reset the index to simplify comparisons with weighting arrays
-        # output mgras dataframe is updated using mgra_id's instead of indices
-        filtered = filtered.reset_index()
 
         # Sample
-        # TODO: add weighting (use sample(weights=))
-        # (profitability, vacancy, other geographic weights)
-        selected_row = filtered.sample(n=1)
+        # vacancy_weights = normalize(vacancy_caps)
+        # profit_weights = normalize(profits)
+        selected_row = filtered.sample(n=1, weights=vacancy_caps)
         selected_ID = selected_row[MGRA].iloc[0]
 
         buildable_count = buildable_units(

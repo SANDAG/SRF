@@ -1,10 +1,7 @@
 import unittest
-
 import pandas
-import numpy
 
 from modeling.filters import filter_by_vacancy
-
 from utils.constants import SINGLE_FAMILY, SINGLE_FAMILY_HOUSING_UNITS, \
     SINGLE_FAMILY_HOUSEHOLDS
 
@@ -24,15 +21,6 @@ class TestFilters(unittest.TestCase):
         )
         self.assertEqual(len(filtered), len(max_new_units))
         self.assertLess(len(filtered), len(self.mgras))
-
-        # check that the filtering method added extra units for the MGRAS that
-        # didn't have very many
-        expected_new_developments = len(numpy.delete(
-            max_new_units, numpy.where(max_new_units != 50)))
-        self.assertEqual(
-            len(self.mgras[self.mgras[SINGLE_FAMILY_HOUSING_UNITS] < 50]),
-            expected_new_developments
-        )
 
         # check that less MGRA's are filtered for a very high rate
         high_vacancy = .3
