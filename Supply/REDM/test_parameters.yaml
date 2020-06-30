@@ -22,7 +22,7 @@ amortization_years: 10
 
 #simulation
 simulation_years: 2
-simulation_begin: 2020
+simulation_begin: 2012
 
 # Development
 # an arbitrary value representing the maximum number of units that should be added to an MGRA at a time
