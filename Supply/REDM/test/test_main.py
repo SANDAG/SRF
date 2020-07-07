@@ -22,8 +22,8 @@ COMMANDLINE_INPUT = 'python redm_main.py -t'
 class TestMain(unittest.TestCase):
 
     def setUp(self):
-        self.expected_file_1 = 'test_data/output/year1_2021.csv'
-        self.expected_file_2 = 'test_data/output/year2_2022.csv'
+        self.expected_file_1 = 'test_data/output/year1_2013.csv'
+        self.expected_file_2 = 'test_data/output/year2_2014.csv'
         return
 
     def test_redm_main(self):

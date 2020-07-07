@@ -45,7 +45,8 @@ def empty_folder(folder):
 
 def save_to_file(printable, output_directory, filename):
     filepath = os.path.join(output_directory, filename)
+    # use pandas to_csv function if available
     if hasattr(printable, 'to_csv'):
-        printable.to_csv(filepath)
+        printable.to_csv(filepath, index=False)
     else:
         print(printable, file=open(filepath, 'w'), end='')
