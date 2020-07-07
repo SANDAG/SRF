@@ -3,7 +3,6 @@ from tqdm import tqdm
 import logging
 
 from modeling.develop import develop
-from modeling.data_augmentation import fill_in_price_data
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, get_args
 import utils.config as config
@@ -16,13 +15,7 @@ def run(mgra_dataframe):
 
     steps_per_year = 7
     progress = tqdm(desc='progress', total=simulation_years *
-                    steps_per_year + 1, position=0)
-
-    # Preprocess
-    progress.set_description('preprocessing')
-    mgra_dataframe = fill_in_price_data(mgra_dataframe)
-    save_to_file(mgra_dataframe, output_dir, 'preprocessed.csv')
-    progress.update()
+                    steps_per_year, position=0)
 
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1

@@ -75,16 +75,6 @@ OFFICE_EMPLOYMENT = 'emp_office'
 INDUSTRIAL_EMPLOYMENT = 'emp_indus_'
 COMMERCIAL_EMPLOYMENT = 'emp_comm_l'
 OTHER_EMPLOYMENT = 'emp_other_'
-INCOME_1 = 'i1'  # Number of households with income less than $15,000
-INCOME_2 = 'i2'  # Number of households with income $15,000-$29,999
-INCOME_3 = 'i3'  # Number of households with income $30,000-$44,999
-INCOME_4 = 'i4'  # Number of households with income $45,000-$59,999
-INCOME_5 = 'i5'  # Number of households with income $60,000-$74,999
-INCOME_6 = 'i6'  # Number of households with income $75,000-$99,999
-INCOME_7 = 'i7'  # Number of households with income $100,000-$124,999
-INCOME_8 = 'i8'  # Number of households with income $125,000-$149,999
-INCOME_9 = 'i9'  # Number of households with income $150,000-$199,999
-INCOME_10 = 'i10'  # Number of households with income $200,000 or more
 # acres developed as spaced rural residential; lot sizes of one acre or more
 RURAL_DEVELOPED_ACRES = 'dev_ldsf'
 # acres developed as single family residential; detached housing units on lots
@@ -140,59 +130,48 @@ SCHOOLS_VACANT_ACRES = 'vac_schools'  # undeveloped acres planned for schools
 ROADS_VACANT_ACRES = 'vac_roads'
 # acres developed as single family residential, planned for redevelopment as
 # multiple family residential
-SINGE_FAMILY_MULTI_FAMILY_REDEVELOPMENT_ACRES = 'redev_sf_mf'
+SINGLE_FAMILY_MULTI_FAMILY_REDEVELOPMENT_ACRES = 'redev_sf_m'
 # acres developed as single family residential, planned for redevelopment as
 # employment use
-SINGE_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_sf_emp'
+SINGLE_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_sf_e'
 # acres developed as multiple family residential, planned for redevelopment as
 # employment use
-MULTI_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_mf_emp'
+MULTI_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_mf_e'
 # acres developed as mobile home parks, planned for redevelopment as single
 # family residential
-MOBILE_HOME_SINGLE_FAMILY_REDEVELOPMENT_ACRES = 'redev_mh_sf'
+MOBILE_HOME_SINGLE_FAMILY_REDEVELOPMENT_ACRES = 'redev_mh_s'
 # acres developed as mobile home parks, planned for redevelopment as multiple
 # family residential
-MOBILE_HOME_MULTI_FAMILY_REDEVELOPMENT_ACRES = 'redev_mh_mf'
+MOBILE_HOME_MULTI_FAMILY_REDEVELOPMENT_ACRES = 'redev_mh_m'
 # acres developed as mobile home parks, planned for redevelopment as
 # employment use
-MOBILE_HOME_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_mh_emp'
-# acres developed as agricultural, extractive industry,
-# or junkyard/dumps/landfills planned for redevelopment as spaced
-# rural residential
-AGRICULTURE_RURAL_REDEVELOPMENT_ACRES = 'redev_ag_ldsf'
+MOBILE_HOME_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_mh_e'
 # acres developed as agricultural, extractive industry,
 # or junkyard/dumps/landfills planned for redevelopment as
 # single family residential
-AGRICULTURE_SINGLE_FAMILY_REDEVELOPMENT_ACRES = 'redev_ag_sf'
+AGRICULTURE_SINGLE_FAMILY_REDEVELOPMENT_ACRES = 'redev_ag_s'
 # acres developed as agricultural, extractive industry, or
 # junkyard/dumps/landfills planned for redevelopment as
 # multiple family residential
-AGRICULTURE_MULTI_FAMILY_REDEVELOPMENT_ACRES = 'redev_ag_mf'
+AGRICULTURE_MULTI_FAMILY_REDEVELOPMENT_ACRES = 'redev_ag_m'
 # acres developed as agricultural, extractive industry,
 # or junkyard/dumps/landfills planned for redevelopment as industrial,
 # wholesale trade, airport, rail station, communications and utilities,
 # center city parking, park and ride lots, other transportation,
-AGRICULTURE_INDUSTRIAL_REDEVELOPMENT_ACRES = 'redev_ag_indus'
+AGRICULTURE_INDUSTRIAL_REDEVELOPMENT_ACRES = 'redev_ag_i'
 # acres developed as agricultural, extractive industry, or
 # junkyard/dumps/landfills planned for redevelopment as retail trade,
 # hotels/motels/resorts, public services, hospitals, or commercial recreation
-AGRICULTURE_COMMERCIAL_REDEVELOPMENT_ACRES = 'redev_ag_comm'
+AGRICULTURE_COMMERCIAL_REDEVELOPMENT_ACRES = 'redev_ag_c'
 # acres developed as agricultural, extractive industry, or
 # junkyard/dumps/landfills planned for redevelopment as offices
-AGRICULTURE_OFFICE_REDEVELOPMENT_ACRES = 'redev_ag_office'
-# acres developed as agricultural, extractive industry, or
-# junkyard/dumps/landfills planned for redevelopment as schools
-AGRICULTURE_SCHOOLS_REDEVELOPMENT_ACRES = 'redev_ag_schools'
-# acres developed as agricultural, extractive industry, or
-# junkyard/dumps/landfills planned for redevelopment as freeways,
-# railroads, or surface streets
-AGRICULTURE_ROADS_REDEVELOPMENT_ACRES = 'redev_ag_roads'
+AGRICULTURE_OFFICE_REDEVELOPMENT_ACRES = 'redev_ag_o'
 # acres developed as employment use, planned for redevelopment as
 # residential
-EMPLOYMENT_RESIDENTIAL_REDEVELOPMENT_ACRES = 'redev_emp_res'
+EMPLOYMENT_RESIDENTIAL_REDEVELOPMENT_ACRES = 'redev_emp1'
 # acres developed as employment use, planned for redevelopment as a
 # different category of employment use
-EMPLOYMENT_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_emp_emp'
+EMPLOYMENT_EMPLOYMENT_REDEVELOPMENT_ACRES = 'redev_emp_'
 # developed acres planned for single family residential infill
 SINGLE_FAMILY_INFILL_ACRES = 'infill_sf'
 # developed acres planned for multiple family residential infill
@@ -207,17 +186,6 @@ VACANT_ACRES = 'vac'  # total vacant acres
 UNUSABLE_ACRES = 'unusable'
 LAND_COST_PER_ACRE = 'Land_Cost'  # cost of land per acre
 
-# # cost of construction per square foot for single family dwelling
-# SINGLE_FAMILY_CONSTRUCTION_COST = 'cost_cons_sf'
-# # cost of construction per square foot for multi family dwelling
-# MULTI_FAMILY_CONSTRUCTION_COST = 'cost_cons_mf'
-# # cost of construction per square foot for commercial/retail development
-# COMMERCIAL_CONSTRUCTION_COST = 'cost_cons_comm'
-# # cost of construction per square foot for industrial development
-# INDUSTRIAL_CONSTRUCTION_COST = 'cost_cons_indus'
-# # cost of construction per square foot for office development
-# OFFICE_CONSTRUCTION_COST = 'cost_cons_office'
-
 # price/rent cost per square foot for single family dwelling
 SINGLE_FAMILY_PRICE = 'Price_SF'
 # price/rent cost per square foot for multi family dwelling
@@ -228,30 +196,15 @@ COMMERCIAL_PRICE = 'Ret_Cost'
 INDUSTRIAL_PRICE = 'Ind_Cost'
 # price/rent cost per square foot for office building
 OFFICE_PRICE = 'Ofc_Cost'
-DEV_1 = 'dev1'  # acres assigned with development code 1
-DEV_2 = 'dev2'  # acres assigned with development code 2
-DEV_3 = 'dev3'  # acres assigned with development code 3
-DEV_4 = 'dev4'  # acres assigned with development code 4
-DEV_5 = 'dev5'  # acres assigned with development code 5
-DEV_6 = 'dev6'  # acres assigned with development code 6
-DEV_7 = 'dev7'  # acres assigned with development code 7
-DEV_8 = 'dev8'  # acres assigned with development code 8
-DEV_9 = 'dev9'  # acres assigned with development code 9
-DEV_10 = 'dev10'  # acres assigned with development code 10
-DEV_11 = 'dev11'  # acres assigned with development code 11
-DEV_12 = 'dev12'  # acres assigned with development code 12
-DEV_13 = 'dev13'  # acres assigned with development code 13
-DEV_14 = 'dev14'  # acres assigned with development code 14
-DEV_15 = 'dev15'  # acres assigned with development code 15
-DEV_16 = 'dev16'  # acres assigned with development code 16
-DWELLING_UNITS_PER_ACRE = 'dua'  # dwelling units per acre
-HOUSING_CAPACITY = 'cap_hs'  # housing stock (dwelling unit) capacity
+
+DWELLING_UNITS_PER_ACRE = 'DUA'  # dwelling units per acre
+HOUSING_CAPACITY = 'Cap_HS'  # housing stock (dwelling unit) capacity
 # housing stock (dwelling unit) capacity - single-family
-SINGLE_FAMILY_HOUSING_CAPACITY = 'cap_hs_sf'
+SINGLE_FAMILY_HOUSING_CAPACITY = 'Cap_HS_SF'
 # housing stock (dwelling unit) capacity - multi-family
-MULTI_FAMILY_HOUSING_CAPACITY = 'cap_hs_mf'
+MULTI_FAMILY_HOUSING_CAPACITY = 'Cap_HS_MF'
 # housing stock (dwelling unit) capacity - mobile homes
-MOBILE_HOME_HOUSING_CAPACITY = 'cap_hs_mh'
+MOBILE_HOME_HOUSING_CAPACITY = 'Cap_HS_MH'
 CIVILIAN_EMPLOYMENT_CAPACITY = 'cap_emp_civ'  # civilian employment capacity
 SQFT_AREA = 'Shape_Area'
 
@@ -294,7 +247,22 @@ REDM_IO_COLUMNS = [
     MULTI_FAMILY_HOUSING_CAPACITY, INDUSTRIAL_UNITS,
     INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_UNITS,
     COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_UNITS, OFFICE_VACANT_UNITS,
-    INDUSTRIAL_VACANT_UNITS, COMMERCIAL_VACANT_UNITS
+    INDUSTRIAL_VACANT_UNITS, COMMERCIAL_VACANT_UNITS, OFFICE_OCCUPIED_UNITS,
+    COMMERCIAL_OCCUPIED_UNITS, INDUSTRIAL_OCCUPIED_UNITS,
+    AGRICULTURE_COMMERCIAL_REDEVELOPMENT_ACRES,
+    AGRICULTURE_INDUSTRIAL_REDEVELOPMENT_ACRES,
+    AGRICULTURE_MULTI_FAMILY_REDEVELOPMENT_ACRES,
+    AGRICULTURE_OFFICE_REDEVELOPMENT_ACRES,
+    AGRICULTURE_SINGLE_FAMILY_REDEVELOPMENT_ACRES,
+    EMPLOYMENT_EMPLOYMENT_REDEVELOPMENT_ACRES,
+    EMPLOYMENT_RESIDENTIAL_REDEVELOPMENT_ACRES,
+    MOBILE_HOME_EMPLOYMENT_REDEVELOPMENT_ACRES,
+    MOBILE_HOME_MULTI_FAMILY_REDEVELOPMENT_ACRES,
+    MOBILE_HOME_SINGLE_FAMILY_REDEVELOPMENT_ACRES,
+    MULTI_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES,
+    SINGLE_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES,
+    SINGLE_FAMILY_MULTI_FAMILY_REDEVELOPMENT_ACRES, EMPLOYMENT_INFILL_ACRES,
+    MULTI_FAMILY_INFILL_ACRES, SINGLE_FAMILY_INFILL_ACRES
 ]
 
 # Parameter labels
@@ -316,6 +284,17 @@ AVERAGE_UNIT_SQFT_POSTFIX = '_average_sqft_per_unit'
 AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX = '_average_land_acres_per_unit'
 JOB_SPACES_PER_BUILDING_POSTFIX = '_job_spaces_per_building'
 MAX_VACANT_UNITS_POSTFIX = '_max_vacant_units'
+
+# collections
+OFFICE_LABELS = [
+    OFFICE, OFFICE_EMPLOYMENT, OFFICE_DEVELOPED_ACRES, OFFICE_FAR,
+    OFFICE_JOB_AREA, OFFICE_MEAN_PRICE, OFFICE_OCCUPIED_UNITS,
+    OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_UNITS, OFFICE_VACANT_UNITS
+]
+
+PRODUCT_TYPES = [
+    SINGLE_FAMILY, MULTI_FAMILY, INDUSTRIAL, COMMERCIAL, OFFICE
+]
 
 
 def development_constants(product_type):
@@ -346,15 +325,15 @@ def product_type_price(product_type):
         for the product type argument
     '''
     if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_PRICE
+        return SINGLE_FAMILY_MEAN_PRICE
     elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_PRICE
+        return MULTI_FAMILY_MEAN_PRICE
     elif product_type == OFFICE:
-        return OFFICE_PRICE
+        return OFFICE_MEAN_PRICE
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_PRICE
+        return INDUSTRIAL_MEAN_PRICE
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_PRICE
+        return COMMERCIAL_MEAN_PRICE
 
 
 def product_type_square_footage(product_type):
