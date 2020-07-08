@@ -4,7 +4,7 @@ import logging
 
 import utils.config as config
 from utils.constants import MGRA, \
-    HOUSING_UNITS, AVERAGE_UNIT_SQFT_POSTFIX, \
+    HOUSING_UNITS, TOTAL_JOB_SPACES, AVERAGE_UNIT_SQFT_POSTFIX, \
     AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
@@ -46,10 +46,10 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
         new_job_spaces = new_units * \
             config.parameters[product_type_labels.product_type +
                               JOB_SPACES_PER_BUILDING_POSTFIX]
-        job_spaces_label = product_type_labels.total_units
-        mgras = add_to_columns(mgras, selected_ID, new_job_spaces,
-                               job_spaces_label
-                               )
+        mgras = add_to_columns(
+            mgras, selected_ID, new_job_spaces,
+            [product_type_labels.total_units, TOTAL_JOB_SPACES]
+        )
     mgras = add_to_columns(mgras, selected_ID, new_units,
                            columns_needing_new_units)
     # update square footages

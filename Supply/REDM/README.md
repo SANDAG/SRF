@@ -33,7 +33,7 @@ We will use pyinstaller to create distributable software, the dist files will wo
 
 ## Interface
 
-REDM accepts a .csv file and expects the following columns:
+REDM accepts a .csv file and expects the following data on each MGRA:
 
 ### Input and Output Columns
 
@@ -44,6 +44,7 @@ REDM will look for these columns and update them during program execution
 - hs | Housing units
 - hs_sf | Single-family housing units
 - hs_mf | Multiple-family housing units
+- job_spaces | total job spaces
 - office_js | office total job spaces
 - comm_js | commercial total job spaces
 - indus_js | industrial total job spaces

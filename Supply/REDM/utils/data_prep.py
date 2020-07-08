@@ -1,7 +1,7 @@
 
 import pandas
 from utils.constants import REDM_IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
-    ProductTypeLabels
+    ProductTypeLabels, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, INDUSTRIAL_JOB_SPACES
 from utils.interface import save_to_file
 
 '''
@@ -40,6 +40,8 @@ def add_job_spaces_columns(dataframe):
     for product_type in NON_RESIDENTIAL_TYPES:
         dataframe[product_type +
                   '_js'] = job_spaces_for_product_type(dataframe, product_type)
+    dataframe['job_spaces'] = dataframe[OFFICE_JOB_SPACES] + \
+        dataframe[COMMERCIAL_JOB_SPACES] + dataframe[INDUSTRIAL_JOB_SPACES]
     return dataframe
 
 

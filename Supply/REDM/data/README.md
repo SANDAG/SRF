@@ -37,7 +37,7 @@ emp*indus*, emp*comm_l, emp_office, emp_other*
 
 ### total job spaces
 
-indus_js, comm_js, office_js
+job_spaces, indus_js, comm_js, office_js
 
 ### square feet per employee
 

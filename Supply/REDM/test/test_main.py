@@ -14,7 +14,7 @@ from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
     SINGLE_FAMILY_VACANT_ACRES, MULTI_FAMILY_VACANT_ACRES, \
     OFFICE_VACANT_ACRES, INDUSTRIAL_VACANT_ACRES, COMMERCIAL_VACANT_ACRES, \
     VACANT_ACRES, HOUSING_UNITS, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
-    INDUSTRIAL_JOB_SPACES
+    INDUSTRIAL_JOB_SPACES, TOTAL_JOB_SPACES
 
 COMMANDLINE_INPUT = 'python redm_main.py -t'
 
@@ -52,7 +52,7 @@ class TestMain(unittest.TestCase):
                               COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_BUILDINGS,
                               COMMERCIAL_TOTAL_SQUARE_FOOTAGE, HOUSING_UNITS,
                               OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES,
-                              INDUSTRIAL_JOB_SPACES]
+                              INDUSTRIAL_JOB_SPACES, TOTAL_JOB_SPACES]
         for column in increasing_columns:
             logging.info(column)
             self.assertGreater(
