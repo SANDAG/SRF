@@ -1,6 +1,7 @@
 
 import pandas
-from utils.constants import REDM_IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, job_spaces_columns
+from utils.constants import REDM_IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
+    calculate_job_spaces_columns
 from utils.interface import save_to_file
 
 '''
@@ -21,7 +22,7 @@ def load_interpolated():
 def job_spaces_for_product_type(dataframe, product_type):
     # get applicable columns
     average_area_per_job_label, current_employment_label, total_area_label = \
-        job_spaces_columns(product_type)
+        calculate_job_spaces_columns(product_type)
     average_area_per_job = dataframe[average_area_per_job_label]
     current_employment = dataframe[current_employment_label]
     total_area = dataframe[total_area_label]

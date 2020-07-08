@@ -10,7 +10,8 @@ from utils.constants import development_constants, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
     SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS, \
-    JOB_SPACES_PER_BUILDING_POSTFIX
+    JOB_SPACES_PER_BUILDING_POSTFIX, job_spaces_column, \
+    non_residential_buildings
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -40,15 +41,19 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
                            product_type_developed_land,
                            product_type_vacant_land)
     # update unit counts
-    columns_needing_new_units = [product_type_units]
+    columns_needing_new_units = []
     if product_type_units == SINGLE_FAMILY_HOUSING_UNITS or \
             product_type_units == MULTI_FAMILY_HOUSING_UNITS:
         columns_needing_new_units.append(HOUSING_UNITS)
+        columns_needing_new_units.append(product_type_units)
     else:
-        job_spaces = new_units * \
+        columns_needing_new_units.append(
+            non_residential_buildings(product_type))
+        new_job_spaces = new_units * \
             config.parameters[product_type + JOB_SPACES_PER_BUILDING_POSTFIX]
-        mgras = add_to_columns(mgras, selected_ID, job_spaces,
-                               non_residential_vacant_units(product_type_units)
+        job_spaces_label = job_spaces_column(product_type)
+        mgras = add_to_columns(mgras, selected_ID, new_job_spaces,
+                               job_spaces_label
                                )
     mgras = add_to_columns(mgras, selected_ID, new_units,
                            columns_needing_new_units)

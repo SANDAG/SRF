@@ -44,6 +44,9 @@ REDM will look for these columns and update them during program execution
 - hs | Housing units
 - hs_sf | Single-family housing units
 - hs_mf | Multiple-family housing units
+- office_js | office total job spaces
+- comm_js | commercial total job spaces
+- indus_js | industrial total job spaces
 - dev_sf | acres developed as single family residential; detached housing units on lots smaller than one acre
 - dev_mf | acres developed as multiple family residential
 - dev_indus | acres developed as industrial, wholesale trade, airport, rail station, communications and utilities, center city parking, park and ride lots, other transportation, or marine terminals
@@ -62,10 +65,6 @@ REDM will look for these columns and update them during program execution
 - Ofc_SqFt | total squarefootage of office buildings
 - Ret_Ct | number of commercial/retail buildings
 - Ret_SqFt | total squarefootage of commercial/retail buildings
-- Unoc_Tot | number of unoccupied buildings
-- Unoc_Indus | number of unoccupied industrial buildings
-- Unoc_Offic | number of unoccupied office buildings
-- Unoc_Retl | number of unoccupied retail buildings
 - redev_sf_m | acres developed as single family residential, planned for redevelopment as multiple family residential
 - redev_sf_e | acres developed as single family residential, planned for redevelopment as employment use
 - redev_mf_e | acres developed as multiple family residential, planned for redevelopment as employment use

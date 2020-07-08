@@ -21,14 +21,9 @@ HOUSING_UNITS = 'hs'  # Housing units
 SINGLE_FAMILY_HOUSING_UNITS = 'hs_sf'  # Single-family housing units
 MULTI_FAMILY_HOUSING_UNITS = 'hs_mf'  # Multiple-family housing units
 MOBILE_HOUSING_UNITS = 'hs_mh'  # Mobile home housing units
-INDUSTRIAL_UNITS = 'Ind_Ct'  # number of industrial buildings
-COMMERCIAL_UNITS = 'Ret_Ct'  # number of commercial/retail buildings
-OFFICE_UNITS = 'Ofc_Ct'  # number of office buildings
-
-# unoccupied non-residential units
-INDUSTRIAL_VACANT_UNITS = 'Unoc_Indus'
-COMMERCIAL_VACANT_UNITS = 'Unoc_Retl'
-OFFICE_VACANT_UNITS = 'Unoc_Offic'
+INDUSTRIAL_BUILDINGS = 'Ind_Ct'  # number of industrial buildings
+COMMERCIAL_BUILDINGS = 'Ret_Ct'  # number of commercial/retail buildings
+OFFICE_BUILDINGS = 'Ofc_Ct'  # number of office buildings
 
 # total squarefootage of single-family units
 SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE = 'SqFt_SF'
@@ -48,10 +43,15 @@ SINGLE_FAMILY_HOUSEHOLDS = 'hh_sf'
 MULTI_FAMILY_HOUSEHOLDS = 'hh_mf'
 MOBILE_HOUSEHOLDS = 'hh_mh'  # Mobile home households (occupied housing units)
 
-# occupied non-residential units
+# unused, hoping to remove in v 4.1
+# occupied non-residential square-footages
 INDUSTRIAL_OCCUPIED_UNITS = 'Occ_Indus'
 OFFICE_OCCUPIED_UNITS = 'Occ_Offic'
 COMMERCIAL_OCCUPIED_UNITS = 'Occ_Retl'
+# unoccupied non-residential square-footages
+INDUSTRIAL_VACANT_UNITS = 'Unoc_Indus'
+COMMERCIAL_VACANT_UNITS = 'Unoc_Retl'
+OFFICE_VACANT_UNITS = 'Unoc_Offic'
 
 EMPLOYMENT = 'emp'  # Employment
 CIVILIAN_EMPLOYMENT = 'emp_civ'  # Civilian employment
@@ -254,11 +254,9 @@ REDM_IO_COLUMNS = [
     COMMERCIAL_VACANT_ACRES, INDUSTRIAL_VACANT_ACRES, DEVELOPED_ACRES,
     VACANT_ACRES, UNUSABLE_ACRES, TOTAL_ACRES, DWELLING_UNITS_PER_ACRE,
     HOUSING_CAPACITY, SINGLE_FAMILY_HOUSING_CAPACITY,
-    MULTI_FAMILY_HOUSING_CAPACITY, INDUSTRIAL_UNITS,
-    INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_UNITS,
-    COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_UNITS, OFFICE_VACANT_UNITS,
-    INDUSTRIAL_VACANT_UNITS, COMMERCIAL_VACANT_UNITS, OFFICE_OCCUPIED_UNITS,
-    COMMERCIAL_OCCUPIED_UNITS, INDUSTRIAL_OCCUPIED_UNITS,
+    MULTI_FAMILY_HOUSING_CAPACITY, INDUSTRIAL_BUILDINGS,
+    INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, OFFICE_TOTAL_SQUARE_FOOTAGE,
+    OFFICE_BUILDINGS, COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_BUILDINGS,
     AGRICULTURE_COMMERCIAL_REDEVELOPMENT_ACRES,
     AGRICULTURE_INDUSTRIAL_REDEVELOPMENT_ACRES,
     AGRICULTURE_MULTI_FAMILY_REDEVELOPMENT_ACRES,
@@ -300,7 +298,7 @@ MAX_VACANT_UNITS_POSTFIX = '_max_vacant_units'
 OFFICE_LABELS = [
     OFFICE, OFFICE_EMPLOYMENT, OFFICE_DEVELOPED_ACRES, OFFICE_FAR,
     OFFICE_JOB_AREA, OFFICE_MEAN_PRICE, OFFICE_OCCUPIED_UNITS,
-    OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_UNITS, OFFICE_VACANT_UNITS
+    OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_BUILDINGS, OFFICE_VACANT_UNITS
 ]
 
 PRODUCT_TYPES = [
@@ -319,13 +317,13 @@ def development_constants(product_type):
     '''
     if product_type == OFFICE:
         return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, \
-            OFFICE_UNITS, OFFICE_OCCUPIED_UNITS
+            OFFICE_JOB_SPACES, OFFICE_EMPLOYMENT
     elif product_type == COMMERCIAL:
         return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, \
-            COMMERCIAL_UNITS, COMMERCIAL_OCCUPIED_UNITS
+            COMMERCIAL_JOB_SPACES, COMMERCIAL_EMPLOYMENT
     elif product_type == INDUSTRIAL:
         return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES, \
-            INDUSTRIAL_UNITS, INDUSTRIAL_OCCUPIED_UNITS
+            INDUSTRIAL_JOB_SPACES, INDUSTRIAL_EMPLOYMENT
     elif product_type == SINGLE_FAMILY:
         return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
             SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS
@@ -378,11 +376,11 @@ def product_type_unit_size_labels(product_type):
     elif product_type == MULTI_FAMILY:
         return MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE, MULTI_FAMILY_HOUSING_UNITS
     elif product_type == OFFICE:
-        return OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_UNITS
+        return OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_BUILDINGS
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, INDUSTRIAL_UNITS
+        return INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, INDUSTRIAL_BUILDINGS
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_UNITS
+        return COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_BUILDINGS
 
 
 def non_residential_jobs_per_unit_labels(product_type):
@@ -391,11 +389,11 @@ def non_residential_jobs_per_unit_labels(product_type):
         and total unit count for the product type argument
     '''
     if product_type == OFFICE:
-        return OFFICE_EMPLOYMENT, OFFICE_UNITS
+        return OFFICE_EMPLOYMENT, OFFICE_BUILDINGS
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_EMPLOYMENT, INDUSTRIAL_UNITS
+        return INDUSTRIAL_EMPLOYMENT, INDUSTRIAL_BUILDINGS
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_EMPLOYMENT, COMMERCIAL_UNITS
+        return COMMERCIAL_EMPLOYMENT, COMMERCIAL_BUILDINGS
 
 
 def land_per_unit_labels(product_type):
@@ -408,23 +406,23 @@ def land_per_unit_labels(product_type):
     elif product_type == MULTI_FAMILY:
         return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_HOUSING_UNITS
     elif product_type == OFFICE:
-        return OFFICE_DEVELOPED_ACRES, OFFICE_UNITS
+        return OFFICE_DEVELOPED_ACRES, OFFICE_BUILDINGS
     elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_UNITS
+        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_BUILDINGS
     elif product_type == COMMERCIAL:
-        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_UNITS
+        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_BUILDINGS
 
 
 def non_residential_vacant_units(product_type_unit_key):
-    if product_type_unit_key == OFFICE_UNITS:
+    if product_type_unit_key == OFFICE_BUILDINGS:
         return OFFICE_VACANT_UNITS
-    elif product_type_unit_key == INDUSTRIAL_UNITS:
+    elif product_type_unit_key == INDUSTRIAL_BUILDINGS:
         return INDUSTRIAL_VACANT_UNITS
-    elif product_type_unit_key == COMMERCIAL_UNITS:
+    elif product_type_unit_key == COMMERCIAL_BUILDINGS:
         return COMMERCIAL_VACANT_UNITS
 
 
-def job_spaces_columns(product_type):
+def calculate_job_spaces_columns(product_type):
     if product_type == OFFICE:
         return OFFICE_JOB_AREA, OFFICE_EMPLOYMENT, OFFICE_TOTAL_SQUARE_FOOTAGE
     elif product_type == COMMERCIAL:
@@ -433,3 +431,21 @@ def job_spaces_columns(product_type):
     elif product_type == INDUSTRIAL:
         return INDUSTRIAL_JOB_AREA, INDUSTRIAL_EMPLOYMENT, \
             INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
+
+
+def job_spaces_column(product_type):
+    if product_type == OFFICE:
+        return OFFICE_JOB_SPACES
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_JOB_SPACES
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_JOB_SPACES
+
+
+def non_residential_buildings(product_type):
+    if product_type == OFFICE:
+        return OFFICE_BUILDINGS
+    elif product_type == COMMERCIAL:
+        return COMMERCIAL_BUILDINGS
+    elif product_type == INDUSTRIAL:
+        return INDUSTRIAL_BUILDINGS
