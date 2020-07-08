@@ -3,18 +3,12 @@ from modeling.filters import filter_product_type, filter_by_vacancy, \
 import logging
 
 import utils.config as config
-from utils.constants import development_constants, \
-    product_type_square_footage, MGRA, \
+from utils.constants import MGRA, \
     HOUSING_UNITS, AVERAGE_UNIT_SQFT_POSTFIX, \
     AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
-    JOB_SPACES_PER_BUILDING_POSTFIX, job_spaces_column, \
-    non_residential_buildings
-
-
-def is_residential(product_type):
-    return product_type == SINGLE_FAMILY or product_type == MULTI_FAMILY
+    JOB_SPACES_PER_BUILDING_POSTFIX, ProductTypeLabels
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -36,24 +30,23 @@ def add_to_columns(mgras, selected_ID, value, columns):
 
 
 def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
-                product_type_developed_land, product_type_vacant_land,
-                new_units, product_type_units, product_type):
+                new_units, product_type_labels):
     # update acreages
     mgras = update_acreage(mgras, selected_ID,
                            acreage_per_unit * new_units,
-                           product_type_developed_land,
-                           product_type_vacant_land)
+                           product_type_labels.developed_acres,
+                           product_type_labels.vacant_acres)
     # update unit counts
     columns_needing_new_units = []
-    if is_residential(product_type):
+    if product_type_labels.is_residential():
         columns_needing_new_units.append(HOUSING_UNITS)
-        columns_needing_new_units.append(product_type_units)
+        columns_needing_new_units.append(product_type_labels.total_units)
     else:
-        columns_needing_new_units.append(
-            non_residential_buildings(product_type))
+        columns_needing_new_units.append(product_type_labels.buildings)
         new_job_spaces = new_units * \
-            config.parameters[product_type + JOB_SPACES_PER_BUILDING_POSTFIX]
-        job_spaces_label = job_spaces_column(product_type)
+            config.parameters[product_type_labels.product_type +
+                              JOB_SPACES_PER_BUILDING_POSTFIX]
+        job_spaces_label = product_type_labels.total_units
         mgras = add_to_columns(mgras, selected_ID, new_job_spaces,
                                job_spaces_label
                                )
@@ -61,7 +54,7 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
                            columns_needing_new_units)
     # update square footages
     return add_to_columns(mgras, selected_ID, new_units * acreage_per_unit,
-                          product_type_square_footage(product_type))
+                          product_type_labels.square_footage)
 
 
 def parameters_for_product_type(product_type):
@@ -71,7 +64,7 @@ def parameters_for_product_type(product_type):
                           AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX]
 
 
-def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
+def buildable_units(mgra, product_type_labels,
                     area_per_unit, max_units, vacancy_caps):
     # determine max units to build
     vacancy_cap = vacancy_caps.loc[mgra.index].values.item()
@@ -79,12 +72,13 @@ def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
     # TODO: also use profitability filter value for this mgra
     # to determine the number of profitable units to build.
 
-    # use capacity values for residential
-    if is_residential(product_type):
+    # TODO: use capacity values for residential
+    if product_type_labels.is_residential():
         pass
 
     # only build up to 95% of the vacant space
-    available_units_by_land = mgra[product_type_vacant_key].values.item() * \
+    available_units_by_land = mgra[
+        product_type_labels.vacant_acres].values.item() * \
         0.95 // area_per_unit
 
     # this is a sanity check, no development should be larger than this number
@@ -98,16 +92,13 @@ def normalize(dataframe):
     return (dataframe - dataframe.min()) / (dataframe.max() - dataframe.min())
 
 
-def develop_product_type(mgras, product_type, progress):
+def develop_product_type(mgras, product_type_labels, progress):
     if progress is not None:
-        progress.set_description('developing {}'.format(product_type))
+        progress.set_description('developing {}'.format(
+            product_type_labels.product_type))
 
     new_units_to_build, square_feet_per_unit, acreage_per_unit = \
-        parameters_for_product_type(product_type)
-
-    product_type_developed_key, product_type_vacant_key, \
-        total_units_key, occupied_units_key = development_constants(
-            product_type)
+        parameters_for_product_type(product_type_labels.product_type)
 
     built_units = 0
     while built_units < new_units_to_build:
@@ -116,15 +107,15 @@ def develop_product_type(mgras, product_type, progress):
         # Filter
         # filter for MGRA's that have vacant land available for more units
         filtered = filter_product_type(
-            mgras, product_type_vacant_key, acreage_per_unit)
+            mgras, product_type_labels.vacant_acres, acreage_per_unit)
         available_count = len(filtered)
 
         filtered, vacancy_caps = filter_by_vacancy(
-            filtered, product_type, total_units_key, occupied_units_key)
+            filtered, product_type_labels)
         non_vacant_count = len(filtered)
 
         filtered, vacancy_caps, profits = filter_by_profitability(
-            filtered, product_type, vacancy_caps)
+            filtered, product_type_labels, vacancy_caps)
         profitable_count = len(filtered)
 
         logging.debug(
@@ -134,7 +125,7 @@ def develop_product_type(mgras, product_type, progress):
 
         if len(filtered) < 1:
             print('out of usable mgras for product type {}'.format(
-                product_type))
+                product_type_labels.product_type))
             print('evaluate filtering methods\nexiting')
             return None, progress
 
@@ -145,19 +136,18 @@ def develop_product_type(mgras, product_type, progress):
         selected_ID = selected_row[MGRA].iloc[0]
 
         buildable_count = buildable_units(
-            selected_row, product_type_developed_key,
-            product_type_vacant_key, acreage_per_unit, max_units, vacancy_caps
+            selected_row, product_type_labels,
+            acreage_per_unit, max_units, vacancy_caps
         )
         built_units += buildable_count
 
         logging.debug('building {} {} units on MGRA #{}'.format(
-            buildable_count, product_type, selected_ID))
+            buildable_count, product_type_labels.product_type, selected_ID))
 
         # develop buildable_count units by updating the MGRA in the dataframe
         mgras = update_mgra(mgras, selected_ID, square_feet_per_unit,
-                            acreage_per_unit, product_type_developed_key,
-                            product_type_vacant_key, buildable_count,
-                            total_units_key, product_type)
+                            acreage_per_unit, buildable_count,
+                            product_type_labels)
 
     if progress is not None:
         progress.update()
@@ -176,8 +166,9 @@ def develop(mgras, progress=None):
     product_types = [SINGLE_FAMILY, MULTI_FAMILY,
                      COMMERCIAL, OFFICE, INDUSTRIAL]
     for product_type in product_types:
+        product_type_labels = ProductTypeLabels(product_type)
         mgras, progress = develop_product_type(
-            mgras, product_type, progress)
+            mgras, product_type_labels, progress)
         if mgras is None:
             return mgras, progress
 

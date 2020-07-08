@@ -2,22 +2,20 @@ import unittest
 import pandas
 
 from modeling.filters import filter_by_vacancy
-from utils.constants import SINGLE_FAMILY, SINGLE_FAMILY_HOUSING_UNITS, \
-    SINGLE_FAMILY_HOUSEHOLDS
+from utils.constants import SINGLE_FAMILY, ProductTypeLabels
 
 
 class TestFilters(unittest.TestCase):
     def setUp(self):
         self.mgras = pandas.read_csv('test_data/random_MGRA.csv')
         self.max_vacancy = 0.06
-
+        self.product_type_labels = ProductTypeLabels(SINGLE_FAMILY)
         return super().setUp()
 
     def test_filter_vacancy(self):
 
         filtered, max_new_units = filter_by_vacancy(
-            self.mgras, SINGLE_FAMILY, SINGLE_FAMILY_HOUSING_UNITS,
-            SINGLE_FAMILY_HOUSEHOLDS, self.max_vacancy
+            self.mgras, self.product_type_labels, self.max_vacancy
         )
         self.assertEqual(len(filtered), len(max_new_units))
         self.assertLess(len(filtered), len(self.mgras))
@@ -26,8 +24,7 @@ class TestFilters(unittest.TestCase):
         high_vacancy = .3
         previous_size = len(filtered)
         filtered, _ = filter_by_vacancy(
-            self.mgras, SINGLE_FAMILY,
-            SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS,
+            self.mgras, self.product_type_labels,
             high_vacancy
         )
         self.assertLess(previous_size, len(filtered))

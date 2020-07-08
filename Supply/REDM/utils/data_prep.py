@@ -1,12 +1,12 @@
 
 import pandas
 from utils.constants import REDM_IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
-    calculate_job_spaces_columns
+    ProductTypeLabels
 from utils.interface import save_to_file
 
 '''
     Accepts the v4 input file and the interpolated variables from manhan group
-    creates a new input file with just the REDM applicable columns 
+    creates a new input file with just the REDM applicable columns
 '''
 
 
@@ -21,11 +21,10 @@ def load_interpolated():
 
 def job_spaces_for_product_type(dataframe, product_type):
     # get applicable columns
-    average_area_per_job_label, current_employment_label, total_area_label = \
-        calculate_job_spaces_columns(product_type)
-    average_area_per_job = dataframe[average_area_per_job_label]
-    current_employment = dataframe[current_employment_label]
-    total_area = dataframe[total_area_label]
+    labels = ProductTypeLabels(product_type)
+    average_area_per_job = dataframe[labels.job_area]
+    current_employment = dataframe[labels.occupied_units]
+    total_area = dataframe[labels.square_footage]
     # find estimate of unoccupied job spaces
     used_area = average_area_per_job * current_employment
     vacant_area = total_area - used_area

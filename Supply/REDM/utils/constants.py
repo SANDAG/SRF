@@ -29,7 +29,7 @@ OFFICE_BUILDINGS = 'Ofc_Ct'  # number of office buildings
 SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE = 'SqFt_SF'
 # total squarefootage of multiple-family units
 MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE = 'SqFt_MF'
-# total sqarefeet in industrial buildings
+# total square feet in industrial buildings
 INDUSTRIAL_TOTAL_SQUARE_FOOTAGE = 'Ind_SqFt'
 # total squarefeet in commercial/retail buildings
 COMMERCIAL_TOTAL_SQUARE_FOOTAGE = 'Ret_SqFt'
@@ -310,147 +310,6 @@ NON_RESIDENTIAL_TYPES = [
 ]
 
 
-def development_constants(product_type):
-    '''
-        Returns developed land, vacant land, total units, and occupied units
-        column labels for each product type
-    '''
-    if product_type == OFFICE:
-        return OFFICE_DEVELOPED_ACRES, OFFICE_VACANT_ACRES, \
-            OFFICE_JOB_SPACES, OFFICE_EMPLOYMENT
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_VACANT_ACRES, \
-            COMMERCIAL_JOB_SPACES, COMMERCIAL_EMPLOYMENT
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_VACANT_ACRES, \
-            INDUSTRIAL_JOB_SPACES, INDUSTRIAL_EMPLOYMENT
-    elif product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_VACANT_ACRES, \
-            SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSEHOLDS
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_VACANT_ACRES, \
-            MULTI_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSEHOLDS
-
-
-def product_type_price(product_type):
-    '''
-        Returns the column label for rents/prices
-        for the product type argument
-    '''
-    if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_MEAN_PRICE
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_MEAN_PRICE
-    elif product_type == OFFICE:
-        return OFFICE_MEAN_PRICE
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_MEAN_PRICE
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_MEAN_PRICE
-
-
-def product_type_square_footage(product_type):
-    '''
-        Returns the column label for total square footages
-        for the product type argument
-    '''
-    if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE
-    elif product_type == OFFICE:
-        return OFFICE_TOTAL_SQUARE_FOOTAGE
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_TOTAL_SQUARE_FOOTAGE
-
-
-def product_type_unit_size_labels(product_type):
-    '''
-        Returns the column label for building square footage
-        and unit count for the product type argument
-    '''
-    if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE, SINGLE_FAMILY_HOUSING_UNITS
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE, MULTI_FAMILY_HOUSING_UNITS
-    elif product_type == OFFICE:
-        return OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_BUILDINGS
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_TOTAL_SQUARE_FOOTAGE, INDUSTRIAL_BUILDINGS
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_BUILDINGS
-
-
-def non_residential_jobs_per_unit_labels(product_type):
-    '''
-        Returns the column label for total jobs
-        and total unit count for the product type argument
-    '''
-    if product_type == OFFICE:
-        return OFFICE_EMPLOYMENT, OFFICE_BUILDINGS
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_EMPLOYMENT, INDUSTRIAL_BUILDINGS
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_EMPLOYMENT, COMMERCIAL_BUILDINGS
-
-
-def land_per_unit_labels(product_type):
-    '''
-        Returns the column label for developed acres
-        and total unit count for the product type argument
-    '''
-    if product_type == SINGLE_FAMILY:
-        return SINGLE_FAMILY_DEVELOPED_ACRES, SINGLE_FAMILY_HOUSING_UNITS
-    elif product_type == MULTI_FAMILY:
-        return MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_HOUSING_UNITS
-    elif product_type == OFFICE:
-        return OFFICE_DEVELOPED_ACRES, OFFICE_BUILDINGS
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_BUILDINGS
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_DEVELOPED_ACRES, COMMERCIAL_BUILDINGS
-
-
-def non_residential_vacant_units(product_type_unit_key):
-    if product_type_unit_key == OFFICE_BUILDINGS:
-        return OFFICE_VACANT_UNITS
-    elif product_type_unit_key == INDUSTRIAL_BUILDINGS:
-        return INDUSTRIAL_VACANT_UNITS
-    elif product_type_unit_key == COMMERCIAL_BUILDINGS:
-        return COMMERCIAL_VACANT_UNITS
-
-
-def calculate_job_spaces_columns(product_type):
-    if product_type == OFFICE:
-        return OFFICE_JOB_AREA, OFFICE_EMPLOYMENT, OFFICE_TOTAL_SQUARE_FOOTAGE
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_JOB_AREA, COMMERCIAL_EMPLOYMENT, \
-            COMMERCIAL_TOTAL_SQUARE_FOOTAGE
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_JOB_AREA, INDUSTRIAL_EMPLOYMENT, \
-            INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
-
-
-def job_spaces_column(product_type):
-    if product_type == OFFICE:
-        return OFFICE_JOB_SPACES
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_JOB_SPACES
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_JOB_SPACES
-
-
-def non_residential_buildings(product_type):
-    if product_type == OFFICE:
-        return OFFICE_BUILDINGS
-    elif product_type == COMMERCIAL:
-        return COMMERCIAL_BUILDINGS
-    elif product_type == INDUSTRIAL:
-        return INDUSTRIAL_BUILDINGS
-
-
 class ProductTypeLabels(object):
 
     def __init__(self, product_type):
@@ -500,3 +359,7 @@ class ProductTypeLabels(object):
             # non-residential specific
             self.buildings = INDUSTRIAL_BUILDINGS
             self.job_area = INDUSTRIAL_JOB_AREA
+
+    def is_residential(self):
+        return self.product_type == SINGLE_FAMILY \
+            or self.product_type == MULTI_FAMILY

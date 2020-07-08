@@ -3,9 +3,7 @@ import os
 import pandas
 import sys
 
-from utils.constants import VACANT_ACRES, MGRA, \
-    product_type_unit_size_labels, non_residential_jobs_per_unit_labels, \
-    land_per_unit_labels
+from utils.constants import VACANT_ACRES, MGRA, ProductTypeLabels
 
 
 def plot_column(column, output_dir='data/output', image_name='plot.png'):
@@ -100,17 +98,23 @@ def average_x_per_y(filename, x, y, product_type=''):
 
 
 def average_unit_square_footage(filename, product_type):
-    total_sqft, total_units = product_type_unit_size_labels(product_type)
+    labels = ProductTypeLabels(product_type)
+    total_sqft = labels.square_footage
+    total_units = labels.total_units
     average_x_per_y(filename, total_sqft, total_units, product_type)
 
 
 def average_jobs_per_unit(filename, product_type):
-    jobs, units = non_residential_jobs_per_unit_labels(product_type)
+    labels = ProductTypeLabels(product_type)
+    jobs = labels.occupied_units
+    units = labels.buildings
     average_x_per_y(filename, jobs, units, product_type)
 
 
 def average_land_per_unit(filename, product_type):
-    developed_area, units = land_per_unit_labels(product_type)
+    labels = ProductTypeLabels(product_type)
+    developed_area = labels.developed_acres
+    units = labels.total_units
     average_x_per_y(filename, developed_area, units, product_type)
 
 
