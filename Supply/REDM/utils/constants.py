@@ -297,8 +297,8 @@ MAX_VACANT_UNITS_POSTFIX = '_max_vacant_units'
 # collections
 OFFICE_LABELS = [
     OFFICE, OFFICE_EMPLOYMENT, OFFICE_DEVELOPED_ACRES, OFFICE_FAR,
-    OFFICE_JOB_AREA, OFFICE_MEAN_PRICE, OFFICE_OCCUPIED_UNITS,
-    OFFICE_TOTAL_SQUARE_FOOTAGE, OFFICE_BUILDINGS, OFFICE_VACANT_UNITS
+    OFFICE_JOB_AREA, OFFICE_MEAN_PRICE, OFFICE_TOTAL_SQUARE_FOOTAGE,
+    OFFICE_BUILDINGS, OFFICE_VACANT_UNITS
 ]
 
 PRODUCT_TYPES = [
@@ -449,3 +449,54 @@ def non_residential_buildings(product_type):
         return COMMERCIAL_BUILDINGS
     elif product_type == INDUSTRIAL:
         return INDUSTRIAL_BUILDINGS
+
+
+class ProductTypeLabels(object):
+
+    def __init__(self, product_type):
+        super().__init__()
+        self.product_type = product_type
+        if self.product_type == SINGLE_FAMILY:
+            self.occupied_units = SINGLE_FAMILY_HOUSEHOLDS
+            self.total_units = SINGLE_FAMILY_HOUSING_UNITS
+            self.square_footage = SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE
+            self.developed_acres = SINGLE_FAMILY_DEVELOPED_ACRES
+            self.vacant_acres = SINGLE_FAMILY_VACANT_ACRES
+            self.price = SINGLE_FAMILY_MEAN_PRICE
+        elif self.product_type == MULTI_FAMILY:
+            self.occupied_units = MULTI_FAMILY_HOUSEHOLDS
+            self.total_units = MULTI_FAMILY_HOUSING_UNITS
+            self.square_footage = MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE
+            self.developed_acres = MULTI_FAMILY_DEVELOPED_ACRES
+            self.vacant_acres = MULTI_FAMILY_VACANT_ACRES
+            self.price = MULTI_FAMILY_MEAN_PRICE
+        elif self.product_type == OFFICE:
+            self.occupied_units = OFFICE_EMPLOYMENT
+            self.total_units = OFFICE_JOB_SPACES
+            self.square_footage = OFFICE_TOTAL_SQUARE_FOOTAGE
+            self.developed_acres = OFFICE_DEVELOPED_ACRES
+            self.vacant_acres = OFFICE_VACANT_ACRES
+            self.price = OFFICE_MEAN_PRICE
+            # non-residential specific
+            self.buildings = OFFICE_BUILDINGS
+            self.job_area = OFFICE_JOB_AREA
+        elif self.product_type == COMMERCIAL:
+            self.occupied_units = COMMERCIAL_EMPLOYMENT
+            self.total_units = COMMERCIAL_JOB_SPACES
+            self.square_footage = COMMERCIAL_TOTAL_SQUARE_FOOTAGE
+            self.developed_acres = COMMERCIAL_DEVELOPED_ACRES
+            self.vacant_acres = COMMERCIAL_VACANT_ACRES
+            self.price = COMMERCIAL_MEAN_PRICE
+            # non-residential specific
+            self.buildings = COMMERCIAL_BUILDINGS
+            self.job_area = COMMERCIAL_JOB_AREA
+        elif self.product_type == INDUSTRIAL:
+            self.occupied_units = INDUSTRIAL_EMPLOYMENT
+            self.total_units = INDUSTRIAL_JOB_SPACES
+            self.square_footage = INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
+            self.developed_acres = INDUSTRIAL_DEVELOPED_ACRES
+            self.vacant_acres = INDUSTRIAL_VACANT_ACRES
+            self.price = INDUSTRIAL_MEAN_PRICE
+            # non-residential specific
+            self.buildings = INDUSTRIAL_BUILDINGS
+            self.job_area = INDUSTRIAL_JOB_AREA

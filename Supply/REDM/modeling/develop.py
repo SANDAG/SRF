@@ -4,14 +4,17 @@ import logging
 
 import utils.config as config
 from utils.constants import development_constants, \
-    product_type_square_footage, non_residential_vacant_units, MGRA, \
+    product_type_square_footage, MGRA, \
     HOUSING_UNITS, AVERAGE_UNIT_SQFT_POSTFIX, \
     AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
     OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
     DEVELOPED_ACRES, VACANT_ACRES, \
-    SINGLE_FAMILY_HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS, \
     JOB_SPACES_PER_BUILDING_POSTFIX, job_spaces_column, \
     non_residential_buildings
+
+
+def is_residential(product_type):
+    return product_type == SINGLE_FAMILY or product_type == MULTI_FAMILY
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -42,8 +45,7 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
                            product_type_vacant_land)
     # update unit counts
     columns_needing_new_units = []
-    if product_type_units == SINGLE_FAMILY_HOUSING_UNITS or \
-            product_type_units == MULTI_FAMILY_HOUSING_UNITS:
+    if is_residential(product_type):
         columns_needing_new_units.append(HOUSING_UNITS)
         columns_needing_new_units.append(product_type_units)
     else:
@@ -76,6 +78,10 @@ def buildable_units(mgra, product_type_developed_key, product_type_vacant_key,
 
     # TODO: also use profitability filter value for this mgra
     # to determine the number of profitable units to build.
+
+    # use capacity values for residential
+    if is_residential(product_type):
+        pass
 
     # only build up to 95% of the vacant space
     available_units_by_land = mgra[product_type_vacant_key].values.item() * \
