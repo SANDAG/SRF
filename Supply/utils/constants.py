@@ -1,3 +1,5 @@
+import utils.config as config
+
 """
 Input column names eg.
 CONSTANT = 'SANDAG_column_name' # metadata
@@ -285,22 +287,16 @@ COMMERCIAL = 'commercial'
 OFFICE = 'office'
 
 # postfixes
-MINIMUM_UNIT_SIZE_POSTFIX = '_minimum_unit_size'
-JOB_AREA_POSTFIX = '_square_feet_per_job'
+# MINIMUM_UNIT_SIZE_POSTFIX = '_minimum_unit_size'
 UNITS_PER_YEAR_POSTFIX = '_units_per_year'
 CONSTRUCTION_COST_POSTFIX = '_construction_cost'
 AVERAGE_UNIT_SQFT_POSTFIX = '_average_sqft_per_unit'
 AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX = '_average_land_acres_per_unit'
 JOB_SPACES_PER_BUILDING_POSTFIX = '_job_spaces_per_building'
 MAX_VACANT_UNITS_POSTFIX = '_max_vacant_units'
+TARGET_VACANCY_RATE_POSTFIX = '_target_vacancy_rate'
 
 # collections
-OFFICE_LABELS = [
-    OFFICE, OFFICE_EMPLOYMENT, OFFICE_DEVELOPED_ACRES, OFFICE_FAR,
-    OFFICE_JOB_AREA, OFFICE_MEAN_PRICE, OFFICE_TOTAL_SQUARE_FOOTAGE,
-    OFFICE_BUILDINGS, OFFICE_VACANT_UNITS
-]
-
 PRODUCT_TYPES = [
     SINGLE_FAMILY, MULTI_FAMILY, INDUSTRIAL, COMMERCIAL, OFFICE
 ]
@@ -362,3 +358,27 @@ class ProductTypeLabels(object):
     def is_residential(self):
         return self.product_type == SINGLE_FAMILY \
             or self.product_type == MULTI_FAMILY
+
+    def construction_cost_parameter(self):
+        return self.__param_for(CONSTRUCTION_COST_POSTFIX)
+
+    def units_per_year_parameter(self):
+        return self.__param_for(UNITS_PER_YEAR_POSTFIX)
+
+    def unit_sqft_parameter(self):
+        return self.__param_for(AVERAGE_UNIT_SQFT_POSTFIX)
+
+    def land_use_per_unit_parameter(self):
+        return self.__param_for(AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX)
+
+    def job_spaces_per_building_parameter(self):
+        return self.__param_for(JOB_SPACES_PER_BUILDING_POSTFIX)
+
+    def max_vacant_units_parameter(self):
+        return self.__param_for(MAX_VACANT_UNITS_POSTFIX)
+
+    def target_vacancy_rate_parameter(self):
+        return self.__param_for(TARGET_VACANCY_RATE_POSTFIX)
+
+    def __param_for(self, postfix):
+        return config.parameters[self.product_type + postfix]

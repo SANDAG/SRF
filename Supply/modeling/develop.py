@@ -3,16 +3,7 @@ import logging
 from modeling.filters import apply_filters
 from modeling.dataframe_updates import update_mgra
 import utils.config as config
-from utils.constants import MGRA, AVERAGE_UNIT_SQFT_POSTFIX, \
-    AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
-    ProductTypeLabels, PRODUCT_TYPES
-
-
-def parameters_for_product_type(product_type):
-    return config.parameters[product_type + UNITS_PER_YEAR_POSTFIX], \
-        config.parameters[product_type + AVERAGE_UNIT_SQFT_POSTFIX], \
-        config.parameters[product_type +
-                          AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX]
+from utils.constants import MGRA, ProductTypeLabels, PRODUCT_TYPES
 
 
 def buildable_units(mgra, product_type_labels,
@@ -48,8 +39,9 @@ def develop_product_type(mgras, product_type_labels, progress):
         progress.set_description('developing {}'.format(
             product_type_labels.product_type))
 
-    new_units_to_build, square_feet_per_unit, acreage_per_unit = \
-        parameters_for_product_type(product_type_labels.product_type)
+    new_units_to_build = product_type_labels.units_per_year_parameter()
+    square_feet_per_unit = product_type_labels.unit_sqft_parameter()
+    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
 
     built_units = 0
     while built_units < new_units_to_build:

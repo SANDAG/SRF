@@ -3,9 +3,7 @@ import numpy
 
 import utils.config as config
 
-from utils.constants import LAND_COST_PER_ACRE, \
-    CONSTRUCTION_COST_POSTFIX, MAX_VACANT_UNITS_POSTFIX
-
+from utils.constants import LAND_COST_PER_ACRE
 from utils.converter import x_per_acre_to_x_per_square_foot
 
 
@@ -48,9 +46,8 @@ def filter_by_vacancy(mgra_dataframe, product_type_labels,
     total_units_column = mgra_dataframe[product_type_labels.total_units]
     occupied_units_column = mgra_dataframe[product_type_labels.occupied_units]
     if target_vacancy_rate is None:
-        target_vacancy_rate = config.parameters[
-            product_type_labels.product_type +
-            '_target_vacancy_rate']
+        target_vacancy_rate = \
+            product_type_labels.target_vacancy_rate_parameter()
 
     # maximum new units can be below zero if mgra is already over target
     # vacancy rate since vacancy = (total_units - occupied_units) / total_units
@@ -64,8 +61,7 @@ def filter_by_vacancy(mgra_dataframe, product_type_labels,
 
     # check edge case; if there are few units built (eg. < 50 for single
     # family) we should build even when it causes a high vacancy rate
-    max_vacant_units = config.parameters[product_type_labels.product_type +
-                                         MAX_VACANT_UNITS_POSTFIX]
+    max_vacant_units = product_type_labels.max_vacant_units_parameter()
     # this allows for up to max_vacant_units*2 - 1 units to be built before any
     # are occupied
     max_new_units[total_units_column
@@ -87,8 +83,7 @@ def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     """
     # TODO: find the cost for each development type
     # find total expected costs
-    construction_cost = config.parameters[product_type_labels.product_type +
-                                          CONSTRUCTION_COST_POSTFIX]
+    construction_cost = product_type_labels.construction_cost_parameter()
     land_cost_per_acre = mgra_dataframe[LAND_COST_PER_ACRE]
     land_cost_per_square_foot = x_per_acre_to_x_per_square_foot(
         land_cost_per_acre)

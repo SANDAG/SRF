@@ -1,7 +1,6 @@
 
-import utils.config as config
 from utils.constants import MGRA, DEVELOPED_ACRES, VACANT_ACRES, \
-    HOUSING_UNITS, JOB_SPACES_PER_BUILDING_POSTFIX, TOTAL_JOB_SPACES
+    HOUSING_UNITS, TOTAL_JOB_SPACES
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -37,8 +36,7 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
     else:
         columns_needing_new_units.append(product_type_labels.buildings)
         new_job_spaces = new_units * \
-            config.parameters[product_type_labels.product_type +
-                              JOB_SPACES_PER_BUILDING_POSTFIX]
+            product_type_labels.job_spaces_per_building_parameter()
         mgras = add_to_columns(
             mgras, selected_ID, new_job_spaces,
             [product_type_labels.total_units, TOTAL_JOB_SPACES]
