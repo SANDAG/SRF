@@ -2,7 +2,8 @@ import unittest
 
 import pandas
 
-from modeling.develop import develop, add_to_columns
+from modeling.develop import develop
+from modeling.dataframe_updates import add_to_columns
 from utils.interface import load_parameters
 import utils.config as config
 from utils.constants import MGRA, HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS, \
