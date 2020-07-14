@@ -4,11 +4,9 @@ import logging
 
 from modeling.dataframe_updates import update_mgra
 import utils.config as config
-from utils.constants import MGRA, \
-    AVERAGE_UNIT_SQFT_POSTFIX, \
+from utils.constants import MGRA, AVERAGE_UNIT_SQFT_POSTFIX, \
     AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX, UNITS_PER_YEAR_POSTFIX, \
-    OFFICE, COMMERCIAL, INDUSTRIAL, SINGLE_FAMILY, MULTI_FAMILY, \
-    ProductTypeLabels
+    ProductTypeLabels, PRODUCT_TYPES
 
 
 def parameters_for_product_type(product_type):
@@ -117,9 +115,7 @@ def develop(mgras, progress=None):
     Returns:
         a pandas dataframe with selected MGRA's updated
     """
-    product_types = [SINGLE_FAMILY, MULTI_FAMILY,
-                     COMMERCIAL, OFFICE, INDUSTRIAL]
-    for product_type in product_types:
+    for product_type in PRODUCT_TYPES:
         product_type_labels = ProductTypeLabels(product_type)
         mgras, progress = develop_product_type(
             mgras, product_type_labels, progress)
