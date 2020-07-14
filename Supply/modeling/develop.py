@@ -1,7 +1,6 @@
-from modeling.filters import filter_product_type, filter_by_vacancy, \
-    filter_by_profitability
 import logging
 
+from modeling.filters import apply_filters
 from modeling.dataframe_updates import update_mgra
 import utils.config as config
 from utils.constants import MGRA, AVERAGE_UNIT_SQFT_POSTFIX, \
@@ -57,23 +56,8 @@ def develop_product_type(mgras, product_type_labels, progress):
         max_units = new_units_to_build - built_units
 
         # Filter
-        # filter for MGRA's that have vacant land available for more units
-        filtered = filter_product_type(
-            mgras, product_type_labels.vacant_acres, acreage_per_unit)
-        available_count = len(filtered)
-
-        filtered, vacancy_caps = filter_by_vacancy(
-            filtered, product_type_labels)
-        non_vacant_count = len(filtered)
-
-        filtered, vacancy_caps, profits = filter_by_profitability(
-            filtered, product_type_labels, vacancy_caps)
-        profitable_count = len(filtered)
-
-        logging.debug(
-            'filtered to {} profitable / {} non-vacant / {}'.format(
-                profitable_count, non_vacant_count, available_count
-            ) + ' MGRA\'s with space available')
+        filtered, vacancy_caps, profits = apply_filters(
+            mgras, product_type_labels, acreage_per_unit)
 
         if len(filtered) < 1:
             print('out of usable mgras for product type {}'.format(

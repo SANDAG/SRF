@@ -31,13 +31,17 @@ We will use pyinstaller to create distributable software, the dist files will wo
 - Run with `python main.py`
   - Or, run the main executable from the pyinstaller dist folder after following installation steps
 
+## Module Process
+
+- Note that the supply module considers vacancy rates as an important factor, for development, but that there is also _vacant land_ which is just greenfield, and doesn't factor into the vacancy rate.
+
 ## Interface
 
 The supply module accepts a .csv file and expects the following data on each MGRA:
 
 ### Input and Output Columns
 
-the supply module expects these columns and update them during program execution
+The supply module expects these columns and updates them during program execution
 
 - SqFt_SF | total squarefootage of single-family units
 - SqFt_MF | total squarefootage of multiple-family units
@@ -86,7 +90,7 @@ the supply module expects these columns and update them during program execution
 
 ### Additional Inputs
 
-The following inputs are also required, but they are not updated:
+The following inputs are also required, but are not updated:
 
 - MGRA | Series 13 MGRA (Master Geographic Reference Area)
 - Shape_Area | area of MGRA object (square footage)

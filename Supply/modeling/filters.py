@@ -3,26 +3,43 @@ import numpy
 
 import utils.config as config
 
-from utils.constants import LAND_COST_PER_ACRE, VACANT_ACRES, \
+from utils.constants import LAND_COST_PER_ACRE, \
     CONSTRUCTION_COST_POSTFIX, MAX_VACANT_UNITS_POSTFIX
 
 from utils.converter import x_per_acre_to_x_per_square_foot
 
 
-def filter_all(mgra_dataframe):
+def apply_filters(mgra_dataframe, product_type_labels, acreage_per_unit):
     '''
-    performs any filtering that applies to all product types;
-    eg. filter_vacant_land removes MGRA's with no land available to build on
+    applies each filtering method on the data frame
+    logs the number of mgra's left after removing poor candidates
+    returns: the filtered frame, as well as series/frames for use as
+        selection weights and/or for capping development
     '''
-    return filter_vacant_land(mgra_dataframe)
+    filtered = filter_product_type(
+        mgra_dataframe, product_type_labels.vacant_acres, acreage_per_unit)
+    available_count = len(filtered)
 
+    filtered, vacancy_caps = filter_by_vacancy(
+        filtered, product_type_labels)
+    non_vacant_count = len(filtered)
 
-def filter_vacant_land(mgra_dataframe):
-    return mgra_dataframe[mgra_dataframe[VACANT_ACRES] > 0]
+    filtered, vacancy_caps, profits = filter_by_profitability(
+        filtered, product_type_labels, vacancy_caps)
+    profitable_count = len(filtered)
+
+    logging.debug(
+        'filtered to {} profitable / {} non-vacant / {}'.format(
+            profitable_count, non_vacant_count, available_count
+        ) + ' MGRA\'s with space available')
+
+    return filtered, vacancy_caps, profits
 
 
 def filter_product_type(mgra, product_type_vacant_key, acreage_per_unit):
-    # must have space available
+    # filter for MGRA's that have land available (vacant, redev or infill)
+    # for building more units of that product type
+    # ! boolean should be true if there is vacant, redev, or infill available
     return mgra[mgra[product_type_vacant_key] > acreage_per_unit * 1.2]
 
 
@@ -64,6 +81,11 @@ def filter_by_vacancy(mgra_dataframe, product_type_labels,
 
 
 def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
+    """
+        returns: profitability a dataframe with three columns corresponding to
+        greenfield, infill, and redevelopment profitability for that mgra.
+    """
+    # TODO: find the cost for each development type
     # find total expected costs
     construction_cost = config.parameters[product_type_labels.product_type +
                                           CONSTRUCTION_COST_POSTFIX]
