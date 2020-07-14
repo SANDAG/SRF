@@ -238,7 +238,7 @@ COMMERCIAL_JOB_SPACES = "commercial_js"
 INDUSTRIAL_JOB_SPACES = "industrial_js"
 TOTAL_JOB_SPACES = 'job_spaces'
 
-REDM_IO_COLUMNS = [
+IO_COLUMNS = [
     MGRA, SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE,
     MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE, LAND_COST_PER_ACRE,
     SINGLE_FAMILY_MEAN_PRICE, MULTI_FAMILY_MEAN_PRICE, OFFICE_MEAN_PRICE,
@@ -313,7 +313,6 @@ NON_RESIDENTIAL_TYPES = [
 class ProductTypeLabels(object):
 
     def __init__(self, product_type):
-        super().__init__()
         self.product_type = product_type
         if self.product_type == SINGLE_FAMILY:
             self.occupied_units = SINGLE_FAMILY_HOUSEHOLDS

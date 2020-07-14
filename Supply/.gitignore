@@ -2,7 +2,7 @@
 .vscode/*
 .idea/*
 
-# redm stuff:
+# workspace specific stuff:
 output/*
 data/*
 !data/README.md

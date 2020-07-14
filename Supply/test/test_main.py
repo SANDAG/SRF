@@ -16,7 +16,7 @@ from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
     VACANT_ACRES, HOUSING_UNITS, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
     INDUSTRIAL_JOB_SPACES, TOTAL_JOB_SPACES
 
-COMMANDLINE_INPUT = 'python redm_main.py -t'
+COMMANDLINE_INPUT = 'python main.py -t'
 
 
 class TestMain(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestMain(unittest.TestCase):
         self.expected_file_2 = 'test_data/output/year2_2014.csv'
         return
 
-    def test_redm_main(self):
+    def test_main(self):
         result = os.system(COMMANDLINE_INPUT)
         self.assertEqual(result, 0)
 

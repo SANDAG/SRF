@@ -1,12 +1,13 @@
 
 import pandas
-from utils.constants import REDM_IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
-    ProductTypeLabels, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, INDUSTRIAL_JOB_SPACES
+from utils.constants import IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
+    ProductTypeLabels, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
+    INDUSTRIAL_JOB_SPACES
 from utils.interface import save_to_file
 
 '''
     Accepts the v4 input file and the interpolated variables from manhan group
-    creates a new input file with just the REDM applicable columns
+    creates a new input file with just the Supply applicable columns
 '''
 
 
@@ -50,7 +51,7 @@ def create_version_4point1():
     interpolated_frame = load_interpolated()
     combined_frame = pandas.merge(original_frame, interpolated_frame, on=MGRA)
     frame_with_job_spaces = add_job_spaces_columns(combined_frame)
-    final_frame = frame_with_job_spaces[REDM_IO_COLUMNS]
+    final_frame = frame_with_job_spaces[IO_COLUMNS]
     save_to_file(final_frame, 'data', 'SRF_Input_Base_V4.1.csv')
     return
 

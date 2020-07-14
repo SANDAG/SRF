@@ -1,6 +1,6 @@
-# REDM
+# Supply Module
 
-Real Estate Development Model, currently targeting SANDAG MGRA level datasets
+Real Estate Development Model targeting SANDAG's MGRA level datasets
 
 ## Recommended System Requirements
 
@@ -20,24 +20,24 @@ We will use pyinstaller to create distributable software, the dist files will wo
 
 ## Installation
 
-- Test with `python redm_main.py -t`
-- Create distributable folder with `pyinstaller redm_main.py`
+- Test with `python main.py -t`
+- Create distributable folder with `pyinstaller main.py`
 
 ## Usage
 
 - Add MGRA level data to the `data` folder
   - Ensure that the column labels match those listed under interface
 - Configure program inputs in `parameters.yaml`
-- Run with `python redm_main.py`
-  - Or, run the redm_main executable from the pyinstaller dist folder after following installation steps
+- Run with `python main.py`
+  - Or, run the main executable from the pyinstaller dist folder after following installation steps
 
 ## Interface
 
-REDM accepts a .csv file and expects the following data on each MGRA:
+The supply module accepts a .csv file and expects the following data on each MGRA:
 
 ### Input and Output Columns
 
-REDM will look for these columns and update them during program execution
+the supply module expects these columns and update them during program execution
 
 - SqFt_SF | total squarefootage of single-family units
 - SqFt_MF | total squarefootage of multiple-family units
@@ -86,7 +86,7 @@ REDM will look for these columns and update them during program execution
 
 ### Additional Inputs
 
-REDM also requires these input columns:
+The following inputs are also required, but they are not updated:
 
 - MGRA | Series 13 MGRA (Master Geographic Reference Area)
 - Shape_Area | area of MGRA object (square footage)

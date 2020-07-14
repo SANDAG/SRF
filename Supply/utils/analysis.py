@@ -176,7 +176,7 @@ def run():
         print_usage()
 
 
-# run as module: path/to/REDM $ python -m utils.analysis ...
+# run as module: path/to/Supply $ python -m utils.analysis ...
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         run()
