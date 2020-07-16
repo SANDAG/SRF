@@ -45,16 +45,6 @@ SINGLE_FAMILY_HOUSEHOLDS = 'hh_sf'
 MULTI_FAMILY_HOUSEHOLDS = 'hh_mf'
 MOBILE_HOUSEHOLDS = 'hh_mh'  # Mobile home households (occupied housing units)
 
-# unused, hoping to remove in v 4.1
-# occupied non-residential square-footages
-INDUSTRIAL_OCCUPIED_UNITS = 'Occ_Indus'
-OFFICE_OCCUPIED_UNITS = 'Occ_Offic'
-COMMERCIAL_OCCUPIED_UNITS = 'Occ_Retl'
-# unoccupied non-residential square-footages
-INDUSTRIAL_VACANT_UNITS = 'Unoc_Indus'
-COMMERCIAL_VACANT_UNITS = 'Unoc_Retl'
-OFFICE_VACANT_UNITS = 'Unoc_Offic'
-
 EMPLOYMENT = 'emp'  # Employment
 CIVILIAN_EMPLOYMENT = 'emp_civ'  # Civilian employment
 MILITARY_EMPLOYMENT = 'emp_mil'  # Uniformed military personnel
@@ -304,6 +294,8 @@ PRODUCT_TYPES = [
 NON_RESIDENTIAL_TYPES = [
     INDUSTRIAL, COMMERCIAL, OFFICE
 ]
+
+MGRA_COUNT = 23002
 
 
 class ProductTypeLabels(object):

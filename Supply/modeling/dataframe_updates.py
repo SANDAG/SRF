@@ -33,7 +33,7 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
     if product_type_labels.is_residential():
         columns_needing_new_units.append(HOUSING_UNITS)
         columns_needing_new_units.append(product_type_labels.total_units)
-    else:
+    else:  # product type is non-residential
         columns_needing_new_units.append(product_type_labels.buildings)
         new_job_spaces = new_units * \
             product_type_labels.job_spaces_per_building_parameter()

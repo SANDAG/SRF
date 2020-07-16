@@ -71,15 +71,16 @@ def filter_by_vacancy(mgra_dataframe, product_type_labels,
     # the target vacancy rate
     filtered = mgra_dataframe[max_new_units > 0]
     # also return max_new_units to use for weighting, but also remove
-    # the low values to keep the frame and weighting series the same size
+    # the low values to keep the frame and weighting series the same length
     max_new_units = max_new_units[max_new_units > 0]
     return filtered, max_new_units
 
 
 def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     """
-        returns: profitability a dataframe with three columns corresponding to
-        greenfield, infill, and redevelopment profitability for that mgra.
+        returns:
+            profitability: a dataframe with three columns corresponding to
+            greenfield, infill, and redevelopment profitability for that mgra.
     """
     # TODO: find the cost for each development type
     # find total expected costs
@@ -97,12 +98,15 @@ def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
         years
     amortized_costs = expected_costs / years
 
-    # find expected revenue
+    # get expected revenue
     revenue = mgra_dataframe[product_type_labels.price]
 
     profit = revenue - amortized_costs
-    logging.debug('mean profit: {}'.format(profit.mean()))
     profitability_criteria = (revenue >= amortized_minimum) | (revenue == 0)
+
+    for i in range(10):
+        print(profit.sample(n=1).item())
+
     mgra_dataframe = mgra_dataframe[profitability_criteria]
     vacancy_caps = vacancy_caps[profitability_criteria]
     profit = profit[profitability_criteria]

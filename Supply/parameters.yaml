@@ -19,6 +19,8 @@ office_max_vacant_units: 2
 minimum_redevelopment_age: 20
 profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
+infill_cost_multiplier: 1.1
+redevelopment_cost_multiplier: 1.25
 
 # Simulation
 simulation_years: 2
