@@ -79,7 +79,9 @@ def filter_by_vacancy(mgra_dataframe, product_type_labels,
 def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     """
         returns:
-            profitability: a dataframe with three columns corresponding to
+            - mgra_dataframe: the input dataframe with mgra's with no
+            profitable land removed.
+            - profitability: a dataframe with three columns corresponding to
             greenfield, infill, and redevelopment profitability for that mgra.
     """
     # TODO: find the cost for each development type
