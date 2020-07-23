@@ -6,8 +6,8 @@ import utils.config as config
 from utils.constants import MGRA, ProductTypeLabels, PRODUCT_TYPES
 
 
-def buildable_units(mgra, product_type_labels,
-                    area_per_unit, max_units, vacancy_caps):
+def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
+    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
     # determine max units to build
     vacancy_cap = vacancy_caps.loc[mgra.index].values.item()
 
@@ -21,7 +21,7 @@ def buildable_units(mgra, product_type_labels,
     # only build up to 95% of the vacant space
     available_units_by_land = mgra[
         product_type_labels.vacant_acres].values.item() * \
-        0.95 // area_per_unit
+        0.95 // acreage_per_unit
 
     # this is a sanity check, no development should be larger than this number
     largest_development = config.parameters['largest_development_size']
@@ -40,16 +40,13 @@ def develop_product_type(mgras, product_type_labels, progress):
             product_type_labels.product_type))
 
     new_units_to_build = product_type_labels.units_per_year_parameter()
-    square_feet_per_unit = product_type_labels.unit_sqft_parameter()
-    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
-
     built_units = 0
     while built_units < new_units_to_build:
         max_units = new_units_to_build - built_units
 
         # Filter
         filtered, vacancy_caps, profits = apply_filters(
-            mgras, product_type_labels, acreage_per_unit)
+            mgras, product_type_labels)
 
         if len(filtered) < 1:
             print('out of usable mgras for product type {}'.format(
@@ -64,18 +61,15 @@ def develop_product_type(mgras, product_type_labels, progress):
         selected_ID = selected_row[MGRA].iloc[0]
 
         buildable_count = buildable_units(
-            selected_row, product_type_labels,
-            acreage_per_unit, max_units, vacancy_caps
-        )
+            selected_row, product_type_labels, max_units, vacancy_caps)
         built_units += buildable_count
 
         logging.debug('building {} {} units on MGRA #{}'.format(
             buildable_count, product_type_labels.product_type, selected_ID))
 
         # develop buildable_count units by updating the MGRA in the dataframe
-        mgras = update_mgra(mgras, selected_ID, square_feet_per_unit,
-                            acreage_per_unit, buildable_count,
-                            product_type_labels)
+        mgras = update_mgra(mgras, selected_ID,
+                            buildable_count, product_type_labels)
 
     if progress is not None:
         progress.update()

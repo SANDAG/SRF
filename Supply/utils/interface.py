@@ -4,6 +4,7 @@ import shutil
 import yaml
 import argparse
 import matplotlib.pyplot as plt
+from simpledbf import Dbf5
 
 
 def get_args():
@@ -72,3 +73,8 @@ def plot_data(data, output_dir='data/output', image_name='plot.png'):
     plt.plot(data, 'ro')
     plt.savefig(os.path.join(output_dir, image_name))
     plt.close()
+
+
+def open_dbf(filepath):
+    dbf = Dbf5(filepath)
+    return dbf.to_dataframe()

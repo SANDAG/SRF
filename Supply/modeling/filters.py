@@ -7,13 +7,15 @@ from utils.constants import LAND_COST_PER_ACRE
 from utils.converter import x_per_acre_to_x_per_square_foot
 
 
-def apply_filters(mgra_dataframe, product_type_labels, acreage_per_unit):
+def apply_filters(mgra_dataframe, product_type_labels):
     '''
     applies each filtering method on the data frame
     logs the number of mgra's left after removing poor candidates
     returns: the filtered frame, as well as series/frames for use as
         selection weights and/or for capping development
     '''
+    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
+
     filtered = filter_product_type(
         mgra_dataframe, product_type_labels.vacant_acres, acreage_per_unit)
     available_count = len(filtered)
@@ -106,8 +108,8 @@ def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     profit = revenue - amortized_costs
     profitability_criteria = (revenue >= amortized_minimum) | (revenue == 0)
 
-    for i in range(10):
-        print(profit.sample(n=1).item())
+    # for i in range(10):
+    #     print(profit.sample(n=1).item())
 
     mgra_dataframe = mgra_dataframe[profitability_criteria]
     vacancy_caps = vacancy_caps[profitability_criteria]

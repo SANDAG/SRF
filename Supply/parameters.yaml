@@ -1,5 +1,6 @@
 # I/O
 input_filename: "data/SRF_Input_Base_V4.1.csv"
+sites_filename: "data/Sites_MGRAs.dbf"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # Vacancy

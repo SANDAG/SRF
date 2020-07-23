@@ -21,8 +21,11 @@ def add_to_columns(mgras, selected_ID, value, columns):
     return mgras
 
 
-def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
+def update_mgra(mgras, selected_ID,
                 new_units, product_type_labels):
+
+    square_feet_per_unit = product_type_labels.unit_sqft_parameter()
+    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
     # update acreages
     mgras = update_acreage(mgras, selected_ID,
                            acreage_per_unit * new_units,
@@ -44,5 +47,5 @@ def update_mgra(mgras, selected_ID, square_feet_per_unit, acreage_per_unit,
     mgras = add_to_columns(mgras, selected_ID, new_units,
                            columns_needing_new_units)
     # update square footages
-    return add_to_columns(mgras, selected_ID, new_units * acreage_per_unit,
+    return add_to_columns(mgras, selected_ID, new_units * square_feet_per_unit,
                           product_type_labels.square_footage)
