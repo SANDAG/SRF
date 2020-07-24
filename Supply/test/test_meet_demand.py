@@ -16,17 +16,17 @@ from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
     VACANT_ACRES, HOUSING_UNITS, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
     INDUSTRIAL_JOB_SPACES, TOTAL_JOB_SPACES
 
-COMMANDLINE_INPUT = 'python3 main.py -t'
+COMMANDLINE_INPUT = 'python3 meet_demand.py -t'
 
 
-class TestMain(unittest.TestCase):
+class TestMeetDemand(unittest.TestCase):
 
     def setUp(self):
         self.expected_file_1 = 'test_data/output/year1_2013.csv'
         self.expected_file_2 = 'test_data/output/year2_2014.csv'
         return
 
-    def test_main(self):
+    def test_meet_demand(self):
         result = os.system(COMMANDLINE_INPUT)
         self.assertEqual(result, 0)
 

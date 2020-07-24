@@ -40,6 +40,7 @@ def develop_product_type(mgras, product_type_labels, progress):
             product_type_labels.product_type))
 
     new_units_to_build = product_type_labels.units_per_year_parameter()
+    logging.debug('building {} units'.format(new_units_to_build))
     built_units = 0
     while built_units < new_units_to_build:
         max_units = new_units_to_build - built_units

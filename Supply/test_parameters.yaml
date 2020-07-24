@@ -1,5 +1,6 @@
 # I/O
 input_filename: "test_data/random_MGRA.csv"
+sites_filename: "data/Sites_MGRAs.dbf"
 output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # Filtering

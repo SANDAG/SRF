@@ -14,7 +14,7 @@ from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
     INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_JOB_SPACES, \
     INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
 
-COMMANDLINE_INPUT = 'python3 scheduled_development.py'
+COMMANDLINE_INPUT = 'python3 scheduled_development.py -t'
 
 
 class TestMain(unittest.TestCase):

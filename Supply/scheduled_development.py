@@ -3,7 +3,7 @@ import pandas
 
 import utils.config as config
 from utils.interface import load_parameters, empty_folder, save_to_file, \
-    get_args, open_dbf
+    open_dbf
 from modeling.dataframe_updates import update_mgra
 from utils.constants import ProductTypeLabels, SINGLE_FAMILY, \
     MULTI_FAMILY, MGRA, INDUSTRIAL_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
@@ -17,33 +17,42 @@ def add_to_mgra(mgras, site):
         and the number of units to add
     '''
     mgra_id = site.MGRA.item()
-    # print(mgra_id)
-    if site.sfu.item() > 0:
+    single_family_units = site.sfu.item()
+    multi_family_units = site.mfu.item()
+    employment_units = site.civEmp.item()
+
+    if single_family_units > 0:
         # add single family units
         labels = ProductTypeLabels(SINGLE_FAMILY)
         update_mgra(
-            mgras, mgra_id, site.sfu.item(), labels)
-    if site.mfu.item() > 0:
+            mgras, mgra_id, single_family_units, labels)
+        config.parameters[labels.demand_param_accessor()
+                          ] -= single_family_units
+    if multi_family_units > 0:
         # add multifamily units
         labels = ProductTypeLabels(MULTI_FAMILY)
         update_mgra(
-            mgras, mgra_id, site.mfu.item(), labels)
-    if site.civEmp.item() > 0:
+            mgras, mgra_id, multi_family_units, labels)
+        config.parameters[labels.demand_param_accessor()] -= multi_family_units
+
+    if employment_units > 0:
         # add employment; determine which type to add
         mgra = mgras.loc[mgras[MGRA] == mgra_id, [
             INDUSTRIAL_JOB_SPACES, COMMERCIAL_JOB_SPACES, OFFICE_JOB_SPACES]]
         if mgra[INDUSTRIAL_JOB_SPACES].item() > 0:
             labels = ProductTypeLabels(INDUSTRIAL)
-            update_mgra(mgras, mgra_id, site.civEmp.item(), labels)
+            update_mgra(mgras, mgra_id, employment_units, labels)
         elif mgra[COMMERCIAL_JOB_SPACES].item() > 0:
             labels = ProductTypeLabels(COMMERCIAL)
-            update_mgra(mgras, mgra_id, site.civEmp.item(), labels)
+            update_mgra(mgras, mgra_id, employment_units, labels)
         elif mgra[OFFICE_JOB_SPACES].item() > 0:
             labels = ProductTypeLabels(OFFICE)
-            update_mgra(mgras, mgra_id, site.civEmp.item(), labels)
+            update_mgra(mgras, mgra_id, employment_units, labels)
         else:  # we have to guess the product type... commercial seems likely!
             labels = ProductTypeLabels(COMMERCIAL)
-            update_mgra(mgras, mgra_id, site.civEmp.item(), labels)
+            update_mgra(mgras, mgra_id, employment_units, labels)
+        config.parameters[labels.demand_param_accessor()
+                          ] -= employment_units
 
     return
 
@@ -102,9 +111,9 @@ def run(mgras, intersections, output_dir):
     # if there are none, skip
     # if there is one, put all development on the mgra
     # if there are multiple determine split.
-    max_siteid = intersections.siteid.max()
     sites = []
-    for i in range(max_siteid):
+    max_siteID = intersections.siteid.max()
+    for i in range(max_siteID):
         sites.append(find_sites(intersections, i + 1))
 
     # sites is a list of dataframes.
@@ -122,11 +131,7 @@ def run(mgras, intersections, output_dir):
 
 if __name__ == "__main__":
     # load parameters
-    args = get_args()
-    if args.test:
-        config.parameters = load_parameters('test_parameters.yaml')
-    else:
-        config.parameters = load_parameters('parameters.yaml')
+    config.parameters = load_parameters('parameters.yaml')
 
     if config.parameters is not None:
         # prep output directory
@@ -139,6 +144,7 @@ if __name__ == "__main__":
         # load dataframes
         mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
         input_sites = open_dbf(config.parameters['sites_filename'])
+
         run(mgra_dataframe, input_sites, output_dir)
     else:
         print('could not load parameters, exiting')

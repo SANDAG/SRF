@@ -351,6 +351,9 @@ class ProductTypeLabels(object):
         return self.product_type == SINGLE_FAMILY \
             or self.product_type == MULTI_FAMILY
 
+    def demand_param_accessor(self):
+        return self.product_type + UNITS_PER_YEAR_POSTFIX
+
     def construction_cost_parameter(self):
         return self.__param_for(CONSTRUCTION_COST_POSTFIX)
 
