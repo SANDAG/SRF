@@ -1,5 +1,12 @@
 # I/O
-input_filename: "test_data/random_MGRA.csv"
+#input_filename: "data/preprocessed.csv"
+aa_host: "localhost"
+aa_database: "sandag_db"
+aa_user: "usrPostgres"
+aa_password: "usrPostgres"
+aa_port: 5432
+srf_schema: "srf"
+srf_inputtbl: "_data_preprocessed"
 output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # Filtering

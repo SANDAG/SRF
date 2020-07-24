@@ -209,7 +209,7 @@ checkMuLandInputs <- function(inputList, workDir, createDir = TRUE) {
 #'
 #' @author Manhan Group LLC
 #' @export
-loadMuLandInputs <- function(workDir) {
+loadMuLandInputs_csv <- function(workDir) {
   
   inputDir <- paste0(workDir, "/input/")
   
@@ -253,7 +253,47 @@ loadMuLandInputs <- function(workDir) {
   
 }
 
-
+loadMuLandInputs <- function(configDir,tables) {
+  library(yaml)
+  config_file = paste0(configDir, "/dbparams.yaml")
+  config <- yaml.load_file(config_file)
+  
+  library(RPostgreSQL)
+  m <- dbDriver('PostgreSQL')
+  conn <- dbConnect(m, host=config$aa_host, dbname=config$aa_database, user=config$aa_user, password=config$aa_password, port=config$aa_port)
+  on.exit(dbDisconnect(conn))
+  inputs_schema <- config$mu_schema
+  mysql <- paste0("select schema_name FROM information_schema.schemata WHERE schema_name = '", inputs_schema,"';") 
+  tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input schema doesn't exists!"))
+    
+  # create vector of necessary tables
+  if (missing(tables)){
+  tables <- c("agents",
+             "agents_zones",
+             "bids_adjustments",
+             "bids_functions",
+             "demand",
+             "demand_exogenous_cutoff",
+             "real_estates_zones",
+             "rent_adjustments",
+             "rent_functions",
+             "subsidies",
+             "supply",
+             "zones")
+  }
+  
+  # load csv files into inputList
+  inputList <- list()
+  for (table in tables) {
+    mysql <- paste0("select * from ",inputs_schema,".", table)
+    d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
+    inputList[[table]] <- d
+    
+  }
+  
+  return(inputList)
+  
+}
 
 
 # Return muLand outputs ------------------------------------------------------

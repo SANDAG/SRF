@@ -1,5 +1,8 @@
 # I/O
-input_filename: "data/SRF_Input_Base_V4.csv"
+#input_filename: "data/preprocessed.csv"
+srf_schema: "srf"
+srf_inputtbl: "_data_preprocessed"
+
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # Filtering

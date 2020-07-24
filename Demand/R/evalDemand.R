@@ -80,11 +80,14 @@ fsCal <- function(inputDfList, workDir='fsCal', targets, endogFn=nullEndogFn, to
 # list the names of data to be subset
 data_frames <- c("agents_zones","bids_adjustments","demand_exogenous_cutoff","rent_adjustments","subsidies","supply","zones","real_estates_zones")
 # store input dataframes in a list
-master_data <- list()
+#master_data <- list()
 # loop over these names to load those data
-for (df in data_frames) {
-  master_data[[df]] <- read.csv(file.path("master",paste0(df,"_master.csv"))) 
-}
+#for (df in data_frames) {
+ # master_data[[df]] <- read.csv(file.path("master",paste0(df,"_master.csv"))) 
+#}
+
+master_date <- loadMuLandInputs('R',data_frames)
+
 # start looping over the LUZs
 if (calibration == TRUE) {
   bidAdj_master <- list()
