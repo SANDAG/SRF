@@ -86,7 +86,7 @@ data_frames <- c("agents_zones","bids_adjustments","demand_exogenous_cutoff","re
  # master_data[[df]] <- read.csv(file.path("master",paste0(df,"_master.csv"))) 
 #}
 
-master_date <- loadMuLandInputs('R',data_frames)
+master_date <- loadMuLandInputs('../..',data_frames)
 
 # start looping over the LUZs
 if (calibration == TRUE) {
