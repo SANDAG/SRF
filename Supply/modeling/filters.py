@@ -14,10 +14,9 @@ def apply_filters(mgra_dataframe, product_type_labels):
     returns: the filtered frame, as well as series/frames for use as
         selection weights and/or for capping development
     '''
-    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
 
     filtered = filter_product_type(
-        mgra_dataframe, product_type_labels.vacant_acres, acreage_per_unit)
+        mgra_dataframe, product_type_labels)
     available_count = len(filtered)
 
     filtered, vacancy_caps = filter_by_vacancy(
@@ -36,11 +35,15 @@ def apply_filters(mgra_dataframe, product_type_labels):
     return filtered, vacancy_caps, profits
 
 
-def filter_product_type(mgra, product_type_vacant_key, acreage_per_unit):
+def filter_product_type(mgra, product_type_labels):
     # filter for MGRA's that have land available (vacant, redev or infill)
     # for building more units of that product type
     # ! boolean should be true if there is vacant, redev, or infill available
-    return mgra[mgra[product_type_vacant_key] > acreage_per_unit * 1.2]
+    product_type_vacant_key = product_type_labels.vacant_acres
+    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
+    MINIMUM_UNITS = 5
+    return mgra[mgra[product_type_vacant_key] >
+                acreage_per_unit * MINIMUM_UNITS]
 
 
 def filter_by_vacancy(mgra_dataframe, product_type_labels,

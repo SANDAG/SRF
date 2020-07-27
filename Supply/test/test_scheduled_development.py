@@ -3,16 +3,7 @@ import os
 import pandas
 import logging
 
-from utils.constants import DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES, \
-    SINGLE_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE, \
-    MULTI_FAMILY_DEVELOPED_ACRES, MULTI_FAMILY_HOUSING_UNITS, \
-    MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE, \
-    SINGLE_FAMILY_VACANT_ACRES, MULTI_FAMILY_VACANT_ACRES, \
-    VACANT_ACRES, HOUSING_UNITS, OFFICE_DEVELOPED_ACRES, OFFICE_JOB_SPACES, \
-    OFFICE_TOTAL_SQUARE_FOOTAGE, COMMERCIAL_DEVELOPED_ACRES, \
-    COMMERCIAL_JOB_SPACES, COMMERCIAL_TOTAL_SQUARE_FOOTAGE, \
-    INDUSTRIAL_DEVELOPED_ACRES, INDUSTRIAL_JOB_SPACES, \
-    INDUSTRIAL_TOTAL_SQUARE_FOOTAGE
+from utils.constants import INCREASING_COLUMNS, DECREASING_COLUMNS
 
 COMMANDLINE_INPUT = 'python3 scheduled_development.py -t'
 
@@ -37,30 +28,16 @@ class TestMain(unittest.TestCase):
                 COMMANDLINE_INPUT))
 
         logging.info('ensuring that columns increased')
-        increasing_columns = [DEVELOPED_ACRES, SINGLE_FAMILY_DEVELOPED_ACRES,
-                              SINGLE_FAMILY_HOUSING_UNITS,
-                              SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE,
-                              MULTI_FAMILY_DEVELOPED_ACRES,
-                              MULTI_FAMILY_HOUSING_UNITS,
-                              MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE, HOUSING_UNITS,
-                              OFFICE_DEVELOPED_ACRES, OFFICE_JOB_SPACES,
-                              OFFICE_TOTAL_SQUARE_FOOTAGE,
-                              COMMERCIAL_DEVELOPED_ACRES,
-                              COMMERCIAL_JOB_SPACES,
-                              COMMERCIAL_TOTAL_SQUARE_FOOTAGE,
-                              INDUSTRIAL_DEVELOPED_ACRES,
-                              INDUSTRIAL_JOB_SPACES,
-                              INDUSTRIAL_TOTAL_SQUARE_FOOTAGE]
-        for column in increasing_columns:
+
+        for column in INCREASING_COLUMNS:
             logging.info(column)
             self.assertGreater(
                 frame_after[column].sum(),
                 frame_before[column].sum())
 
         logging.info('ensuring that columns decreased')
-        decreasing_columns = [VACANT_ACRES, SINGLE_FAMILY_VACANT_ACRES,
-                              MULTI_FAMILY_VACANT_ACRES]
-        for column in decreasing_columns:
+
+        for column in DECREASING_COLUMNS:
             logging.info(column)
             self.assertLess(frame_after[column].sum(),
                             frame_before[column].sum())

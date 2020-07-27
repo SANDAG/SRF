@@ -10,11 +10,14 @@ industrial_target_vacancy_rate: 0.06
 commercial_target_vacancy_rate: 0.06
 office_target_vacancy_rate: 0.06
 # used to allow for new developments
+# based on some of the higher values in the 2013 planned developments
+# this probably should account for local variance
 single_family_max_vacant_units: 30
-multi_family_max_vacant_units: 50
-industrial_max_vacant_units: 2
-commercial_max_vacant_units: 3
-office_max_vacant_units: 2
+multi_family_max_vacant_units: 500
+industrial_max_vacant_units: 634
+commercial_max_vacant_units: 600
+# seems a little too high, based on a large development: mira sorrento
+office_max_vacant_units: 1800
 
 # Profitability
 minimum_redevelopment_age: 20
@@ -28,9 +31,6 @@ simulation_years: 1
 simulation_begin: 2012
 
 # Development
-# an arbitrary value representing the maximum number of units that should be added to an MGRA at a time
-# note that most single family housing subdivisions are usually around 20 units or so
-largest_development_size: 100
 # job spaces - taken from averaging employment / count(eg. Ofc_Ct) columns
 office_job_spaces_per_building: 177
 industrial_job_spaces_per_building: 248
@@ -42,16 +42,24 @@ single_family_minimum_unit_size: 800 # from SLC Model
 multi_family_minimum_unit_size: 800 # from SLC Model
 
 # average result of total square footage columns / total units columns
-office_average_sqft_per_unit: 38540.55
-commercial_average_sqft_per_unit: 31537.58
-industrial_average_sqft_per_unit: 34311.21
+office_average_sqft_per_unit: 1399.63208231
+commercial_average_sqft_per_unit: 2037.9073059
+industrial_average_sqft_per_unit: 617.732807
+# developed square feet per building
+# office_average_sqft_per_unit: 38540.55
+# commercial_average_sqft_per_unit: 31537.58
+# industrial_average_sqft_per_unit: 34311.21
 multi_family_average_sqft_per_unit: 2246.69
 single_family_average_sqft_per_unit: 2157.18
 
 # average result of total land acres columns / total units columns
-office_average_land_acres_per_unit: 2.6181432
-commercial_average_land_acres_per_unit: 4.9830753
-industrial_average_land_acres_per_unit: 12.878534
+office_average_land_acres_per_unit: 0.0614644
+commercial_average_land_acres_per_unit: 0.701894545
+industrial_average_land_acres_per_unit: 0.8506631
+# values for land acres per building
+# office_average_land_acres_per_unit: 2.6181432
+# commercial_average_land_acres_per_unit: 4.9830753
+# industrial_average_land_acres_per_unit: 12.878534
 multi_family_average_land_acres_per_unit: 0.038312574
 single_family_average_land_acres_per_unit: 0.2559981
 
@@ -71,9 +79,12 @@ commercial_average_price: 611.55
 # Demand
 # derived from total jobs * growth of 0.96% per year: 2384 office, 5372 commercial, 3256 industrial new jobs per year
 # / average jobs per unit from input data: 177 office, 142 commercial, and 248 industrial
-office_units_per_year: 14
-commercial_units_per_year: 38
-industrial_units_per_year: 13
+# office_units_per_year: 14
+# commercial_units_per_year: 38
+# industrial_units_per_year: 13
+office_units_per_year: 2384
+commercial_units_per_year: 5372
+industrial_units_per_year: 3256
 # from population projection of ~ 30,000 per year (62.6% single family)
 single_family_units_per_year: 6636
 multi_family_units_per_year: 3965

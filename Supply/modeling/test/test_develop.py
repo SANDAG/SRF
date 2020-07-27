@@ -28,7 +28,7 @@ class TestDevelop(unittest.TestCase):
 
         mgra_id = self.test_frame.sample()[MGRA].iloc[0]
         units = 1
-        self.test_frame = add_to_columns(
+        add_to_columns(
             self.test_frame, mgra_id, units,
             [HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS]
         )

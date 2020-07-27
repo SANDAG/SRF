@@ -3,7 +3,7 @@ input_filename: "test_data/random_MGRA.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
 output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
-# Filtering
+# Vacancy
 single_family_target_vacancy_rate: 0.06 # all vacancy rates in %
 multi_family_target_vacancy_rate: 0.06
 industrial_target_vacancy_rate: 0.06
@@ -12,9 +12,9 @@ office_target_vacancy_rate: 0.06
 # used to allow for new developments
 single_family_max_vacant_units: 26
 multi_family_max_vacant_units: 31
-industrial_max_vacant_units: 2
-commercial_max_vacant_units: 3
-office_max_vacant_units: 2
+industrial_max_vacant_units: 100
+commercial_max_vacant_units: 100
+office_max_vacant_units: 100
 
 # Profitability
 minimum_redevelopment_age: 20
@@ -22,13 +22,10 @@ profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
 
 #simulation
-simulation_years: 2
+simulation_years: 1
 simulation_begin: 2012
 
 # Development
-# an arbitrary value representing the maximum number of units that should be added to an MGRA at a time
-# note that most single family housing subdivisions are usually around 20 units or so
-largest_development_size: 100
 # job spaces - taken from averaging employment / count(eg. Ofc_Ct) columns
 office_job_spaces_per_building: 177
 industrial_job_spaces_per_building: 248
@@ -39,16 +36,24 @@ single_family_minimum_unit_size: 800 # from SLC Model
 multi_family_minimum_unit_size: 800 # from SLC Model
 
 # average result of total square footage columns / total units columns
-office_average_sqft_per_unit: 38540.55
-commercial_average_sqft_per_unit: 31537.58
-industrial_average_sqft_per_unit: 34311.21
+office_average_sqft_per_unit: 1399.63208231
+commercial_average_sqft_per_unit: 2037.9073059
+industrial_average_sqft_per_unit: 617.732807
+# developed square feet per building
+# office_average_sqft_per_unit: 38540.55
+# commercial_average_sqft_per_unit: 31537.58
+# industrial_average_sqft_per_unit: 34311.21
 multi_family_average_sqft_per_unit: 2246.69
 single_family_average_sqft_per_unit: 2157.18
 
 # average result of total land acres columns / total units columns
-office_average_land_acres_per_unit: 2.6181432
-commercial_average_land_acres_per_unit: 4.9830753
-industrial_average_land_acres_per_unit: 12.878534
+office_average_land_acres_per_unit: 0.0614644
+commercial_average_land_acres_per_unit: 0.701894545
+industrial_average_land_acres_per_unit: 0.8506631
+# values for land acres per building
+# office_average_land_acres_per_unit: 2.6181432
+# commercial_average_land_acres_per_unit: 4.9830753
+# industrial_average_land_acres_per_unit: 12.878534
 multi_family_average_land_acres_per_unit: 0.038312574
 single_family_average_land_acres_per_unit: 0.2559981
 
@@ -66,9 +71,9 @@ office_average_price: 450.81
 commercial_average_price: 611.55
 
 # Demand
-industrial_units_per_year: 2
-office_units_per_year: 2
-commercial_units_per_year: 2
+industrial_units_per_year: 5
+office_units_per_year: 5
+commercial_units_per_year: 5
 
 single_family_units_per_year: 10
 multi_family_units_per_year: 10

@@ -90,8 +90,8 @@ def count_new_units(before, after, product_type):
 def average_x_per_y(filename, x, y, product_type=''):
     frame = pandas.read_csv(filename)
     # drop zeros
-    frame = frame.loc[frame[x] != 0]
-    frame = frame.loc[frame[y] != 0]
+    frame = frame[frame[x] != 0]
+    frame = frame[frame[y] != 0]
     result = (frame[x] / frame[y]).mean()
     print('{} average {} per {} = {}'.format(
         product_type, x, y, result))

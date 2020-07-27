@@ -2,7 +2,6 @@ import logging
 
 from modeling.filters import apply_filters
 from modeling.dataframe_updates import update_mgra
-import utils.config as config
 from utils.constants import MGRA, ProductTypeLabels, PRODUCT_TYPES
 
 
@@ -23,9 +22,9 @@ def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
         product_type_labels.vacant_acres].values.item() * \
         0.95 // acreage_per_unit
 
-    # this is a sanity check, no development should be larger than this number
-    largest_development = config.parameters['largest_development_size']
-    return int(min(max_units, largest_development,
+    logging.debug('max: {}, vacancy: {}, by land {}'.format(
+        max_units, vacancy_cap, available_units_by_land))
+    return int(min(max_units,
                    vacancy_cap, available_units_by_land))
 
 
@@ -69,8 +68,8 @@ def develop_product_type(mgras, product_type_labels, progress):
             buildable_count, product_type_labels.product_type, selected_ID))
 
         # develop buildable_count units by updating the MGRA in the dataframe
-        mgras = update_mgra(mgras, selected_ID,
-                            buildable_count, product_type_labels)
+        update_mgra(mgras, selected_ID,
+                    buildable_count, product_type_labels)
 
     if progress is not None:
         progress.update()
