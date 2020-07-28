@@ -107,7 +107,7 @@ class TransitAccess:
     ):
         self.ps = ps
         #self.stations_path = join(ps.inputpath, stations_fname)
-        self.stations_path =  '{}.\"Inputs_{}\"'.format(ps.sd_schema, stations_tname)
+        self.stations_path =  '{}.\"{}\"'.format(ps.aa_schema, stations_tname)
         self.access_skim_path = join(ps.scendir, str(year), access_skim_fname)
         self.access_skim_fields = skim_fields_for_query([skim_name.lower() for skim_name in access_skim_names])
         self.access_skim = access_skim.lower()
@@ -210,8 +210,8 @@ def convert_skims(
     
     #transport_zones_path = join(ps.inputpath, transport_zones_fname)
     #station_numbers_path = join(ps.inputpath, station_numbers_fname)
-    transport_zones_path = '{}.\"Inputs_{}\"'.format(ps.sd_schema, transport_zones_tname)
-    station_numbers_path = '{}.\"Inputs_{}\"'.format(ps.sd_schema, station_numbers_tname)
+    transport_zones_path = '{}.\"{}\"'.format(ps.aa_schema, transport_zones_tname)
+    station_numbers_path = '{}.\"{}\"'.format(ps.aa_schema, station_numbers_tname)
     taz_skims_path = join(ps.scendir, str(year), taz_skims_fname)
     
     if omx_fname is not None:
@@ -232,8 +232,8 @@ def convert_skims(
     taz_tblname = schemify("tdm_zones")
     #world_tblname = schemify("world_zone_skims")
     #midday_tblname = schemify("midday_flows")
-    world_tblname = '{}.\"{}\"'.format(ps.sd_schema, "world_zone_skims")
-    midday_tblname = '{}.\"{}\"'.format(ps.sd_schema, "Inputs_MiddayFlows")
+    world_tblname = '{}.\"{}\"'.format(ps.aa_schema, "world_zone_skims")
+    midday_tblname = '{}.\"{}\"'.format(ps.aa_schema, "MiddayFlows")
     tdm_skim_tblname = schemify("tdm_skims")
     taz_skim_tblname = schemify("taz_skims")
     luz_skim_tblname = schemify("luz_skims")
