@@ -217,7 +217,7 @@ def convert_skims(
     if omx_fname is not None:
         omx_path = join(ps.scendir, str(year), omx_fname)
         labels_path = transport_zones_path if transit_access is None else station_numbers_path
-        extract_from_omx(omx_path, skim_names, labels_path, taz_skims_path)
+        extract_from_omx(omx_path, skim_names, labels_path, taz_skims_path,ps=ps)
     
     if transit_access is not None:
         logging.info("Adding transit access")
@@ -306,13 +306,13 @@ def convert_skims(
         )
 
 
-def extract_from_omx(omx_fname, skim_names, transport_zones_path, taz_skims_path):
+def extract_from_omx(omx_fname, skim_names, transport_zones_path, taz_skims_path,ps):
     import openmatrix as omx
     import numpy as np
     logging.info("Extracting skims from {}".format(omx_fname))
     f = omx.open_file(omx_fname)
     try:
-        zones = read_zones_pg(transport_zones_path)
+        zones = read_zones_pg(transport_zones_path,ps)
         
         matrices = [np.array(f[name]) for name in skim_names]
         
@@ -334,7 +334,7 @@ def read_zones(path):
         taz_col = header.index("taz")
         return [row[taz_col] for row in reader]
         
-def read_zones_pg(path):
+def read_zones_pg(path,ps):
     querier = pr.aa_querier(ps=ps)
     args = dict(path_tbl = path)
     with querier.transaction(**args) as tr:
