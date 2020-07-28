@@ -1,0 +1,125 @@
+20-07-27 17:01:30 root         INFO     Running with settings module 'aa_settings'
+20-07-27 17:01:30 root         INFO     **********************
+20-07-27 17:01:30 root         INFO     Starting PECAS Run in ./. scenario S27, AA schema s27
+20-07-27 17:01:31 root         INFO     Writing TechnologyOptionsI out in csv
+20-07-27 17:01:31 root         INFO     Executing query:
+20-07-27 17:01:31 root         INFO     select activity, option_name, option_weight, put_name_code, coefficient from tech_opt.technology_options
+20-07-27 17:01:31 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:03 root         INFO     Running with settings module 'aa_settings'
+20-07-28 00:19:03 root         INFO     **********************
+20-07-28 00:19:03 root         INFO     Starting PECAS Run in ./. scenario S27, AA schema s27
+20-07-28 00:19:03 root         INFO     Writing TechnologyOptionsI out in csv
+20-07-28 00:19:03 root         INFO     Executing query:
+20-07-28 00:19:03 root         INFO     select activity, option_name, option_weight, put_name_code, coefficient from tech_opt.technology_options
+20-07-28 00:19:03 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:18 root         INFO     Executing query:
+20-07-28 00:19:18 root         INFO     select * from split_tblname('s27', '^Inputs_');
+20-07-28 00:19:18 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:18 root         INFO     Dumping to file ./Allyears/Inputs\space_types_i.csv results of query:
+20-07-28 00:19:18 root         INFO     select * from "s27"."Inputs_space_types_i"
+20-07-28 00:19:18 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:18 root         INFO     Dumping to file ./Allyears/Inputs\ActivitiesI.csv results of query:
+20-07-28 00:19:18 root         INFO     select * from "s27"."Inputs_ActivitiesI"
+20-07-28 00:19:18 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:18 root         INFO     Dumping to file ./Allyears/Inputs\ActivitySizeTermsI.csv results of query:
+20-07-28 00:19:18 root         INFO     select * from "s27"."Inputs_ActivitySizeTermsI"
+20-07-28 00:19:18 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:19 root         INFO     Dumping to file ./Allyears/Inputs\PECASZonesI.csv results of query:
+20-07-28 00:19:19 root         INFO     select * from "s27"."Inputs_PECASZonesI"
+20-07-28 00:19:19 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:19 root         INFO     Dumping to file ./Allyears/Inputs\CommoditiesI.csv results of query:
+20-07-28 00:19:19 root         INFO     select * from "s27"."Inputs_CommoditiesI"
+20-07-28 00:19:19 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:19 root         INFO     Dumping to file ./Allyears/Inputs\FloorspaceSupplyI.csv results of query:
+20-07-28 00:19:19 root         INFO     select * from "s27"."Inputs_FloorspaceSupplyI"
+20-07-28 00:19:19 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:19 root         INFO     Dumping to file ./Allyears/Inputs\FloorspaceZonesI.csv results of query:
+20-07-28 00:19:19 root         INFO     select * from "s27"."Inputs_FloorspaceZonesI"
+20-07-28 00:19:20 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:32 root         INFO     Dumping to file ./Allyears/Inputs\ExchangeImportExportI.csv results of query:
+20-07-28 00:19:32 root         INFO     select * from "s27"."Inputs_ExchangeImportExportI"
+20-07-28 00:19:32 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:32 root         INFO     Dumping to file ./Allyears/Inputs\HistogramsI.csv results of query:
+20-07-28 00:19:32 root         INFO     select * from "s27"."Inputs_HistogramsI"
+20-07-28 00:19:33 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:33 root         INFO     Dumping to file ./Allyears/Inputs\PopSynConnection.csv results of query:
+20-07-28 00:19:33 root         INFO     select * from "s27"."Inputs_PopSynConnection"
+20-07-28 00:19:33 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:33 root         INFO     Dumping to file ./Allyears/Inputs\LogsumsI.csv results of query:
+20-07-28 00:19:33 root         INFO     select * from "s27"."Inputs_LogsumsI"
+20-07-28 00:19:33 root         INFO     --------------------------------------------------------------------------------
+20-07-28 00:19:33 root         INFO     Dumping to file ./Allyears/Inputs\MiddayFlows.csv results of query:
+20-07-28 00:19:33 root         INFO     select * from "s27"."Inputs_MiddayFlows"
+20-07-28 00:19:33 root         INFO     --------------------------------------------------------------------------------
+20-07-28 03:49:28 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 03:49:28 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 03:49:29 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 03:50:36 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 03:50:36 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 03:50:36 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 03:52:59 root         INFO     Loading zone info
+20-07-28 03:56:24 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 03:56:24 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 03:56:25 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 03:58:54 root         INFO     Loading zone info
+20-07-28 03:59:25 root         INFO     Loading skims for year 2016
+20-07-28 04:00:17 root         INFO     Adding externals
+20-07-28 04:30:15 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 04:30:15 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 04:30:16 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 04:32:45 root         INFO     Loading zone info
+20-07-28 04:33:16 root         INFO     Loading skims for year 2016
+20-07-28 04:34:08 root         INFO     Adding externals
+20-07-28 04:46:20 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 04:46:20 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 04:46:20 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 04:49:43 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 04:49:43 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 04:49:44 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 04:52:08 root         INFO     Loading zone info
+20-07-28 04:52:38 root         INFO     Loading skims for year 2016
+20-07-28 04:53:31 root         INFO     Adding externals
+20-07-28 05:06:14 root         INFO     Analyzing
+20-07-28 05:06:14 root         INFO     Squeezing skims
+20-07-28 05:10:03 root         INFO     Dumping LUZ skims
+20-07-28 05:15:06 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 05:15:06 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 05:15:06 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 05:15:28 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 05:15:28 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 05:15:28 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 05:17:52 root         INFO     Loading zone info
+20-07-28 05:29:41 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 05:29:41 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 05:29:41 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 05:32:14 root         INFO     Loading zone info
+20-07-28 05:32:14 root         INFO     Loading skims for year 2016
+20-07-28 05:33:07 root         INFO     Adding externals
+20-07-28 05:45:49 root         INFO     Analyzing
+20-07-28 05:45:49 root         INFO     Squeezing skims
+20-07-28 05:49:39 root         INFO     Dumping LUZ skims
+20-07-28 05:51:37 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 05:51:37 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 05:51:37 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 05:54:11 root         INFO     Loading zone info
+20-07-28 05:54:11 root         INFO     Loading skims for year 2016
+20-07-28 05:55:04 root         INFO     Adding externals
+20-07-28 06:07:48 root         INFO     Analyzing
+20-07-28 06:07:48 root         INFO     Squeezing skims
+20-07-28 06:11:38 root         INFO     Dumping LUZ skims
+20-07-28 06:11:39 root         INFO     Extracting skims from ./2016\transit_skims.omx
+20-07-28 06:12:02 root         INFO     Adding transit access
+20-07-28 06:16:40 numexpr.utils INFO     Note: NumExpr detected 16 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 8.
+20-07-28 06:16:40 numexpr.utils INFO     NumExpr defaulting to 8 threads.
+20-07-28 06:16:41 root         INFO     Extracting skims from ./2016\traffic_skims_AM.omx
+20-07-28 06:19:04 root         INFO     Loading zone info
+20-07-28 06:19:04 root         INFO     Loading skims for year 2016
+20-07-28 06:19:58 root         INFO     Adding externals
+20-07-28 06:32:41 root         INFO     Analyzing
+20-07-28 06:32:41 root         INFO     Squeezing skims
+20-07-28 06:36:35 root         INFO     Dumping LUZ skims
+20-07-28 06:36:36 root         INFO     Extracting skims from ./2016\transit_skims.omx
+20-07-28 06:36:56 root         INFO     Adding transit access
+20-07-28 06:45:40 root         INFO     Loading zone info
+20-07-28 06:45:40 root         INFO     Loading skims for year 2016
+20-07-28 06:47:02 root         INFO     Adding externals
