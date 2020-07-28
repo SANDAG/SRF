@@ -18,7 +18,8 @@ def start_of_year(year,ps=_ps):
     dc.dump_pg_tbls(lambda: pr.connect_to_aa(ps),  ps.scendir, ps.aa_schema, str(year))
     skimyear = pr.get_skim_year(year, ps.skimyears)
     skimfilename = ps.skim_fname.format(yr=skimyear)
-    dc.dump_pg_tbls(lambda: pr.connect_to_aa(ps), ps.scendir, ps.aa_schema, str(skimyear)+'_'+skimfilename[0:-4])
+    if skimyear<ps.earliest_squeeze_year:
+        dc.dump_pg_tbls(lambda: pr.connect_to_aa(ps), ps.scendir, ps.aa_schema, str(skimyear)+'_'+skimfilename[0:-4])
     
     if year==ps.baseyear:
         prev_year=year-1
