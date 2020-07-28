@@ -343,7 +343,7 @@ def connect_to_aa(ps=_ps):
 
 def aa_querier(ps=_ps):
     if ps.sql_system == ps.postgres:
-        return Querier(lambda: connect_to_aa(ps=ps), sch=ps.mapit_schema)
+        return Querier(lambda: connect_to_aa(ps=ps), sch=ps.aa_schema)
     else:
         # When we need to work with other database systems, we'll implement this
         raise NotImplementedError
