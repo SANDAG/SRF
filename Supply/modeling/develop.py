@@ -1,4 +1,5 @@
 import logging
+import numpy
 
 from modeling.filters import apply_filters
 from modeling.dataframe_updates import update_mgra
@@ -28,17 +29,18 @@ def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
                    vacancy_cap, available_units_by_land))
 
 
-def normalize(dataframe):
-    # also works with pandas Series
-    return dataframe / dataframe.sum()
+def normalize(collection):
+    # works with pandas Series and numpy arrays
+    return collection / collection.sum()
 
 
-def combine_weights(a, b, preference=1):
+def combine_weights(profitability, vacancy, preference=1):
     '''
-        Series a and b are normalized (summing to 1)
-        then added together at a preference to 1 ratio
+        Prioritizes profitability to make selections, with some
+        deference for vacancy, modified by preference multiplier.
     '''
-    return normalize(a) * preference + normalize(b)
+    weights = vacancy * preference * numpy.exp(profitability)
+    return normalize(weights)
 
 
 def develop_product_type(mgras, product_type_labels, progress):
@@ -65,7 +67,7 @@ def develop_product_type(mgras, product_type_labels, progress):
         # Sample
         # vacancy_weights = normalize(vacancy_caps)
         # profit_weights = normalize(profits)
-        weights = combine_weights(vacancy_caps, profit_margins)
+        weights = combine_weights(profit_margins, vacancy_caps)
         selected_row = filtered.sample(n=1, weights=weights)
         selected_ID = selected_row[MGRA].iloc[0]
 
