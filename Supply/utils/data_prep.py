@@ -2,7 +2,9 @@
 import pandas
 from utils.constants import IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
     ProductTypeLabels, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
-    INDUSTRIAL_JOB_SPACES
+    INDUSTRIAL_JOB_SPACES, HOUSING_CAPACITY, MULTI_FAMILY_HOUSING_CAPACITY, \
+    SINGLE_FAMILY_HOUSING_CAPACITY, HOUSING_UNITS, MULTI_FAMILY_HOUSING_UNITS, \
+    SINGLE_FAMILY_HOUSING_UNITS
 from utils.interface import save_to_file
 
 '''
@@ -46,12 +48,28 @@ def add_job_spaces_columns(dataframe):
     return dataframe
 
 
+def fix_capacity(dataframe):
+    '''
+        capacity values are unfortunately the leftover capacity, not the total
+        capacity.
+        Add together the current units and the leftover capacity to find the
+        total, then replace the previous values
+    '''
+    dataframe[HOUSING_CAPACITY] += dataframe[HOUSING_UNITS]
+    dataframe[MULTI_FAMILY_HOUSING_CAPACITY] += \
+        dataframe[MULTI_FAMILY_HOUSING_UNITS]
+    dataframe[SINGLE_FAMILY_HOUSING_CAPACITY] += \
+        dataframe[SINGLE_FAMILY_HOUSING_UNITS]
+    return dataframe
+
+
 def create_version_4point1():
     original_frame = pandas.read_csv("data/SRF_Input_Base_V4.csv")
     interpolated_frame = load_interpolated()
     combined_frame = pandas.merge(original_frame, interpolated_frame, on=MGRA)
     frame_with_job_spaces = add_job_spaces_columns(combined_frame)
-    final_frame = frame_with_job_spaces[IO_COLUMNS]
+    frame_with_fixed_capacity = fix_capacity(frame_with_job_spaces)
+    final_frame = frame_with_fixed_capacity[IO_COLUMNS]
     save_to_file(final_frame, 'data', 'SRF_Input_Base_V4.1.csv')
     return
 
