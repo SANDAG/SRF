@@ -41,7 +41,7 @@ def filter_product_type(mgra, product_type_labels):
     # ! boolean should be true if there is vacant, redev, or infill available
     product_type_vacant_key = product_type_labels.vacant_acres
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
-    MINIMUM_UNITS = 5
+    MINIMUM_UNITS = 6
     return mgra[mgra[product_type_vacant_key] >
                 acreage_per_unit * MINIMUM_UNITS]
 
@@ -111,10 +111,9 @@ def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     profit = revenue - amortized_costs
     profitability_criteria = (revenue >= amortized_minimum) | (revenue == 0)
 
-    # for i in range(10):
-    #     print(profit.sample(n=1).item())
-
     mgra_dataframe = mgra_dataframe[profitability_criteria]
     vacancy_caps = vacancy_caps[profitability_criteria]
-    profit = profit[profitability_criteria]
-    return mgra_dataframe, vacancy_caps, profit
+    profit_margins = profit[profitability_criteria] / \
+        revenue[profitability_criteria]
+
+    return mgra_dataframe, vacancy_caps, profit_margins

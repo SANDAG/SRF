@@ -30,7 +30,15 @@ def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
 
 def normalize(dataframe):
     # also works with pandas Series
-    return (dataframe - dataframe.min()) / (dataframe.max() - dataframe.min())
+    return dataframe / dataframe.sum()
+
+
+def combine_weights(a, b, preference=1):
+    '''
+        Series a and b are normalized (summing to 1)
+        then added together at a preference to 1 ratio
+    '''
+    return normalize(a) * preference + normalize(b)
 
 
 def develop_product_type(mgras, product_type_labels, progress):
@@ -45,7 +53,7 @@ def develop_product_type(mgras, product_type_labels, progress):
         max_units = new_units_to_build - built_units
 
         # Filter
-        filtered, vacancy_caps, profits = apply_filters(
+        filtered, vacancy_caps, profit_margins = apply_filters(
             mgras, product_type_labels)
 
         if len(filtered) < 1:
@@ -57,7 +65,8 @@ def develop_product_type(mgras, product_type_labels, progress):
         # Sample
         # vacancy_weights = normalize(vacancy_caps)
         # profit_weights = normalize(profits)
-        selected_row = filtered.sample(n=1, weights=vacancy_caps)
+        weights = combine_weights(vacancy_caps, profit_margins)
+        selected_row = filtered.sample(n=1, weights=weights)
         selected_ID = selected_row[MGRA].iloc[0]
 
         buildable_count = buildable_units(
