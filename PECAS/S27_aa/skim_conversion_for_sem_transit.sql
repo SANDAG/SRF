@@ -2,7 +2,7 @@ drop table if exists {taz_skimtbl};
 
 create table {taz_skimtbl} as
 select a.origin as origin_taz, a.destination as destination_taz,
-a.am_allpen_totalivtt, a.am_allpen_totalwait, a.am_allpen_totalwalk, a.am_allpen_xfers
+a.am_allpen_totalivtt, a.am_allpen_totalwait, a.am_allpen_totalwalk, a.am_allpen_xfers,
 b.luz as origin_luz, c.luz as destination_luz
 from {tdm_skimtbl} a
 join {taztbl} b on a.origin = b.tdm_taz
