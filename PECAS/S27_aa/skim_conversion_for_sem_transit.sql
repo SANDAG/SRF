@@ -44,15 +44,7 @@ analyze {taz_skimtbl};
 
 drop table if exists {luz_skimtbl};
 
-create table {luz_skimtbl} (
-    origin integer,
-    destination integer,
-    am_allpen_totalivtt double precision,
-    am_allpen_totalwait double precision,
-    am_allpen_totalwalk double precision,
-    am_allpen_xfers double precision,
-    primary key (origin, destination)
-)
+create table {luz_skimtbl} 
 as
 select a.origin_luz as origin, a.destination_luz as destination,
 case when sum(f."flows")=0 then min(a.am_allpen_totalivtt) else sum(a.am_allpen_totalivtt * f.flows)/sum(f."flows") as am_allpen_totalivtt,
