@@ -88,7 +88,17 @@ def run_shell_script(fname, ps=_ps):
     else:
         subprocess.check_call(fname, shell=True)
 
+def execute_postgresql_query(query, database, port, host, user, ps=_ps):
+    return subprocess.call(
+        [ps.pgpath + "psql", "-c", query, "--dbname=" + database, "--port=" + str(port), "--host=" + host,
+         "--username=" + user])
 
+def check_is_postgres(ps=_ps):
+    # Error if not using postgres so that we can use psycopg. If we need to
+    # use a different database system, functions that call this need to have
+    # an alternate version supplied.
+    if ps.sql_system != ps.postgres:
+        raise ValueError("This function only works on postgres databases")
 
 def build_class_path_in_path(path, *args):
     fullargs = [path] + [pathjoin(path, arg) for arg in args]
@@ -161,6 +171,7 @@ def get_skim_year(year, skimyears):
     return skimyears[i]
 
 
+# Function to adjust the Floorspace by the (previously calculated) correction delta.
 def write_floorspace_i(year, ps=_ps):
     # can parameterize column names from FloorspaceI in pecas_settings, but this is rarely used
     if hasattr(ps, 'fl_itaz'):
@@ -294,10 +305,7 @@ def write_floorspace_i(year, ps=_ps):
                 out_row = list(key)
                 out_row.append(net)
                 floor_i_out_file.writerow(out_row)
-        floor_i_out.close()
-
-
-class ExternalProgramError(Exception):
+        floor_i_out.close()class ExternalProgramError(Exception):
     def __init__(self, value):
         self.value = value
 
@@ -340,6 +348,13 @@ def connect_to_aa(ps=_ps):
         port=parameters['aa_port'],
         user=parameters['aa_user'],
         password=parameters['aa_password'])
+
+def db_user(ps=_ps):
+
+    ## Set up database connection parameters
+    parameters  = load_parameters("../../"+ps.db_param_files)
+    user = parameters['aa_user']
+    return user
 
 def aa_querier(ps=_ps):
     if ps.sql_system == ps.postgres:
