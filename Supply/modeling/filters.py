@@ -1,8 +1,8 @@
 import logging
 import numpy
+import pandas
 
 import utils.config as config
-
 from utils.constants import LAND_COST_PER_ACRE
 from utils.converter import x_per_acre_to_x_per_square_foot
 
@@ -15,16 +15,16 @@ def apply_filters(mgra_dataframe, product_type_labels):
         selection weights and/or for capping development
     '''
 
-    filtered = filter_product_type(
+    filtered, land_caps = filter_product_type(
         mgra_dataframe, product_type_labels)
     available_count = len(filtered)
 
-    filtered, vacancy_caps = filter_by_vacancy(
-        filtered, product_type_labels)
+    filtered, max_units = filter_by_vacancy(
+        filtered, product_type_labels, land_caps=land_caps)
     non_vacant_count = len(filtered)
 
-    filtered, vacancy_caps, profits = filter_by_profitability(
-        filtered, product_type_labels, vacancy_caps)
+    filtered, max_units, profits = filter_by_profitability(
+        filtered, product_type_labels, max_units)
     profitable_count = len(filtered)
 
     logging.debug(
@@ -32,21 +32,23 @@ def apply_filters(mgra_dataframe, product_type_labels):
             profitable_count, non_vacant_count, available_count
         ) + ' MGRA\'s with space available')
 
-    return filtered, vacancy_caps, profits
+    return filtered, max_units, profits
 
 
 def filter_product_type(mgra, product_type_labels):
     # filter for MGRA's that have land available (vacant, redev or infill)
     # for building more units of that product type
     # ! boolean should be true if there is vacant, redev, or infill available
-    product_type_vacant_key = product_type_labels.vacant_acres
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
-    MINIMUM_UNITS = 6
-    return mgra[mgra[product_type_vacant_key] >
-                acreage_per_unit * MINIMUM_UNITS]
+    MINIMUM_UNITS = 5
+    vacant_land = mgra[product_type_labels.vacant_acres]
+    units_available = vacant_land // acreage_per_unit
+
+    criteria = (units_available > MINIMUM_UNITS)
+    return mgra[criteria], units_available[criteria]
 
 
-def filter_by_vacancy(mgra_dataframe, product_type_labels,
+def filter_by_vacancy(mgra_dataframe, product_type_labels, land_caps=None,
                       target_vacancy_rate=None):
     total_units_column = mgra_dataframe[product_type_labels.total_units]
     occupied_units_column = mgra_dataframe[product_type_labels.occupied_units]
@@ -74,10 +76,21 @@ def filter_by_vacancy(mgra_dataframe, product_type_labels,
 
     # return the MGRA's that can add more than 0 units to meet
     # the target vacancy rate
-    filtered = mgra_dataframe[max_new_units > 0]
+    criteria = (max_new_units > 0)
+    filtered = mgra_dataframe[criteria]
+
     # also return max_new_units to use for weighting, but also remove
     # the low values to keep the frame and weighting series the same length
-    max_new_units = max_new_units[max_new_units > 0]
+    if land_caps is not None:
+        # if land_caps is given as an input, return the minimum of each
+        # corresponding index
+        land_caps = land_caps[criteria]
+        # max_new_units needs to be shortened last
+        max_new_units = max_new_units[criteria]
+        max_new_units = pandas.concat(
+            [land_caps, max_new_units], axis=1).min(axis=1)
+    else:
+        max_new_units = max_new_units[criteria]
     return filtered, max_new_units
 
 
