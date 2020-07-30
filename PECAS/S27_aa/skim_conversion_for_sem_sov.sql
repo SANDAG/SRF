@@ -29,7 +29,7 @@ select tz3o.origin,
     tz3o.am_sov_tr_m_dist + wm.distance,
     tz3o.am_sov_tr_m_time + wm.time,
     tz3o.am_sov_tr_m_tollcost,
-    besttime.worldmarket as o_luz, xw.luz as d_luz
+    wm.worldmarket as o_luz, xw.luz as d_luz
 from {tdm_skimtbl} tz3o
 join {taztbl} xw on tz3o.destination = xw.tdm_taz
 join {worldtbl} wm on tz3o.origin = wm.externalstation 
