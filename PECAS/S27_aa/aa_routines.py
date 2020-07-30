@@ -305,7 +305,9 @@ def write_floorspace_i(year, ps=_ps):
                 out_row = list(key)
                 out_row.append(net)
                 floor_i_out_file.writerow(out_row)
-        floor_i_out.close()class ExternalProgramError(Exception):
+        floor_i_out.close()
+
+class ExternalProgramError(Exception):
     def __init__(self, value):
         self.value = value
 
