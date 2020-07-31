@@ -15,7 +15,8 @@ class TestFilters(unittest.TestCase):
     def test_filter_vacancy(self):
 
         filtered, max_new_units = filter_by_vacancy(
-            self.mgras, self.product_type_labels, self.max_vacancy
+            self.mgras, self.product_type_labels,
+            target_vacancy_rate=self.max_vacancy
         )
         self.assertEqual(len(filtered), len(max_new_units))
         self.assertLess(len(filtered), len(self.mgras))
@@ -25,7 +26,7 @@ class TestFilters(unittest.TestCase):
         previous_size = len(filtered)
         filtered, _ = filter_by_vacancy(
             self.mgras, self.product_type_labels,
-            high_vacancy
+            target_vacancy_rate=high_vacancy
         )
         self.assertLess(previous_size, len(filtered))
 
