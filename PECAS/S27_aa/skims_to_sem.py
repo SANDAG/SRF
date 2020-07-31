@@ -12,6 +12,9 @@ import csvutil as cu
 # To run on the command line:
 # python skims_to_sem.py <skim year>
 
+import numexpr as ne
+#HERE: reset number of vml-threads
+ne.set_vml_num_threads(16)
 
 def main(year, ps=_ps):
     externals = irange(230, 236)
@@ -137,18 +140,19 @@ class TransitAccess:
         )
         
         with querier.transaction(**args) as tr:
-            tr.query("drop table if exists {stationtbl}")
-            tr.query("create table {stationtbl} (station integer primary key, taz integer)")
+            #tr.query("drop table if exists {stationtbl}")
+            #tr.query("create table {stationtbl} (station integer primary key, taz integer)")
             #tr.load_from_csv(station_tblname, self.stations_path)
-            tr.query("insert into {stationtbl} select * from {ori_stations_tbl}")
+            #tr.query("insert into {stationtbl} select * from {ori_stations_tbl}")
+
+            tr.query("create view {stationtbl} as select * from {ori_stations_tbl}")
             
             tr.query("drop table if exists {access_skimtbl}")
             tr.query(
                 "create table {access_skimtbl} (\n"
                 "   origin integer,\n"
                 "   destination integer,\n" +
-                self.access_skim_fields + ",\n"
-                "   primary key (origin, destination)\n"
+                self.access_skim_fields + "\n"+
                 ")"
             )
             tr.load_from_csv(access_skim_tblname, self.access_skim_path)
@@ -165,18 +169,23 @@ class TransitAccess:
                     "update {access_skimtbl} set access_skim = {access_skim} / {walk_speed}",
                     walk_speed=self.access_walk_speed
                 )
-            
+            tr.query("alter table {access_skimtbl} add primary key(origin, destination)")
+
             tr.query("drop table if exists {station_skimtbl}")
             tr.query(
                 "create table {station_skimtbl} (\n"
                 "   origin_station integer,\n"
                 "   destination_station integer,\n" +
-                skim_fields_for_query(skim_names) + ",\n"
-                "   primary key (origin_station, destination_station)\n"
+                skim_fields_for_query(skim_names) + "\n" +
                 ")"
             )
             tr.load_from_csv(station_skim_tblname, station_skims_path)
-            
+            tr.query("alter table {statiom_skimtbl} add primary key(origin, destination)")
+
+            tr.query("vacuum analyze {access_skimtbl}")
+            tr.query("vacuum analyze {station_skimtbl}")
+         
+        with querier.transaction(**args) as tr:   
             tr.query_external("transit_access.sql")
             tr.dump_to_csv("select * from {taz_skimtbl}", taz_skims_path)
     
@@ -250,10 +259,10 @@ def convert_skims(
         
         logging.info("Loading zone info")
 
-        tr.query("drop table if exists {taztbl}")
-        tr.query("create table {taztbl} (tdm_taz integer, luz integer)")
+        #tr.query("drop table if exists {taztbl}")
+        #tr.query("create table {taztbl} (tdm_taz integer, luz integer)")
         #tr.load_from_csv(taz_tblname, transport_zones_path)
-        tr.query('insert into {taztbl} select * from {transport_zones_tbl}')
+        tr.query("create view {taztbl} as select taz as tdm_taz,luz from {transport_zones_tbl}")
         
        # tr.query("drop table if exists {worldtbl}")
        # tr.query(
@@ -285,15 +294,19 @@ def convert_skims(
         
         tr.load_from_csv("{tdm_skimtbl}", taz_skims_path)
         tr.query("delete from {tdm_skimtbl} where " + remove_if)
-        
+        tr.query("create index on {tdm_skimtbl} (origin,destination)")
+        tr.query("vacuum analyze {tdm_skimtbl}")
+
+    with querier.transaction(**args) as tr:          
         logging.info("Adding externals")
         
         tr.query_external(sql_fname, end="BREAK")
         
         logging.info("Analyzing")
         
-        tr.query("analyze {taz_skimtbl}")
-        
+        tr.query("vacuum analyze {taz_skimtbl}")
+ 
+    with querier.transaction(**args) as tr:         
         logging.info("Squeezing skims")
         tr.query_external(sql_fname, start="BREAK")
         check_capping(tr, target_skim_names[skim_names.index(check_skim)], externals=externals)
@@ -416,4 +429,9 @@ if __name__ == "__main__":
     skim_year = sys.argv[1]
     skim_year = int(skim_year)
     pr.set_up_logging()
+    user = pr.db_user(ps)
+    ps.sd_schema = user
+    import time
+    start_time = time.time()
     main(skim_year, ps)
+    print("---%s seconds ---" % (time.time() - start_time))
