@@ -145,7 +145,7 @@ class TransitAccess:
             #tr.load_from_csv(station_tblname, self.stations_path)
             #tr.query("insert into {stationtbl} select * from {ori_stations_tbl}")
 
-            tr.query("create view {stationtbl} as select * from {ori_stations_tbl}")
+            tr.query("create or replace view {stationtbl} as select * from {ori_stations_tbl}")
             
             tr.query("drop table if exists {access_skimtbl}")
             tr.query(
@@ -262,7 +262,7 @@ def convert_skims(
         #tr.query("drop table if exists {taztbl}")
         #tr.query("create table {taztbl} (tdm_taz integer, luz integer)")
         #tr.load_from_csv(taz_tblname, transport_zones_path)
-        tr.query("create view {taztbl} as select taz as tdm_taz,luz from {transport_zones_tbl}")
+        tr.query("create or replace view {taztbl} as select taz as tdm_taz,luz from {transport_zones_tbl}")
         
        # tr.query("drop table if exists {worldtbl}")
        # tr.query(
