@@ -180,7 +180,7 @@ class TransitAccess:
                 ")"
             )
             tr.load_from_csv(station_skim_tblname, station_skims_path)
-            tr.query("alter table {statiom_skimtbl} add primary key(origin, destination)")
+            tr.query("alter table {station_skimtbl} add primary key(origin, destination)")
 
             tr.query("analyze {access_skimtbl}")
             tr.query("analyze {station_skimtbl}")
