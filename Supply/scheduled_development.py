@@ -1,5 +1,6 @@
 import logging
 import pandas
+from tqdm import tqdm
 
 import utils.config as config
 from utils.interface import load_parameters, empty_folder, save_to_file, \
@@ -102,7 +103,7 @@ def find_sites(intersections, id):
     return intersections[intersections['siteid'] == id].copy()
 
 
-def run(mgras, intersections, output_dir):
+def run(mgras, intersections, output_dir, progress=None):
     # add each _site_ we actually have a frame of intersections
 
     # find max siteID
@@ -113,11 +114,15 @@ def run(mgras, intersections, output_dir):
     # if there are multiple determine split.
     sites = []
     max_siteID = intersections.siteid.max()
-    for i in range(max_siteID):
+    progress_bar = tqdm(range(max_siteID))
+    progress_bar.set_description("splitting sites on mgras")
+    for i in progress_bar:
         sites.append(find_sites(intersections, i + 1))
 
     # sites is a list of dataframes.
-    for frame in sites:
+    progress_bar = tqdm(sites)
+    progress_bar.set_description('allocating development for each site')
+    for frame in progress_bar:
         if len(frame) == 0:
             pass
         elif len(frame) == 1:

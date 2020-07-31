@@ -20,8 +20,9 @@ We will use pyinstaller to create distributable software, the dist files will wo
 
 ## Installation
 
-- Test with `python main.py -t`
-- Create distributable folder with `pyinstaller main.py`
+- Install dependencies with: `pip install -r requirements.txt`
+- Test with: `python main.py -t`
+- Create distributable folder with: `pyinstaller main.py`
 
 ## Usage
 
@@ -83,7 +84,7 @@ The supply module expects these columns and updates them during program executio
 - redev_ag_c | acres developed as agricultural, extractive industry, or junkyard/dumps/landfills planned for redevelopment as retail trade, hotels/motels/resorts, public services, hospitals, or commercial recreation
 - redev_ag_o | acres developed as agricultural, extractive industry, or junkyard/dumps/landfills planned for redevelopment as offices
 - redev_ag_r | acres developed as agricultural, extractive industry, or junkyard/dumps/landfills planned for redevelopment as residential
-- redev*emp* | acres developed as employment use, planned for redevelopment as a different category of employment use
+- redev_emp\_ | acres developed as employment use, planned for redevelopment as a different category of employment use
 - infill_sf | developed acres planned for single family residential infill
 - infill_mf | developed acres planned for multiple family residential infill
 - infill_emp | developed acres planned for employment infill
@@ -100,10 +101,10 @@ The following inputs are also required, but are not updated:
 - hh | Households (occupied housing units)
 - hh_sf | Single-family households (occupied housing units)
 - hh_mf | Multiple-family households (occupied housing units)
-- emp*indus* | Employment in industrial land uses
+- emp_indus\_ | Employment in industrial land uses
 - emp_comm_l | Employment in commercial land uses
 - emp_office | Employment in office land uses
-- emp*other* | Employment in other land uses
+- emp_other\_ | Employment in other land uses
 - acres | total acres
 - unusable | vacant land not available for development for physical, public policy, or environmental reasons
 - DUA | dwelling units per acre
