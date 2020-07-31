@@ -182,8 +182,8 @@ class TransitAccess:
             tr.load_from_csv(station_skim_tblname, station_skims_path)
             tr.query("alter table {statiom_skimtbl} add primary key(origin, destination)")
 
-            tr.query("vacuum analyze {access_skimtbl}")
-            tr.query("vacuum analyze {station_skimtbl}")
+            tr.query("analyze {access_skimtbl}")
+            tr.query("analyze {station_skimtbl}")
          
         with querier.transaction(**args) as tr:   
             tr.query_external("transit_access.sql")
@@ -295,7 +295,7 @@ def convert_skims(
         tr.load_from_csv("{tdm_skimtbl}", taz_skims_path)
         tr.query("delete from {tdm_skimtbl} where " + remove_if)
         tr.query("create index on {tdm_skimtbl} (origin,destination)")
-        tr.query("vacuum analyze {tdm_skimtbl}")
+        tr.query("analyze {tdm_skimtbl}")
 
     with querier.transaction(**args) as tr:          
         logging.info("Adding externals")
@@ -304,7 +304,7 @@ def convert_skims(
         
         logging.info("Analyzing")
         
-        tr.query("vacuum analyze {taz_skimtbl}")
+        tr.query("analyze {taz_skimtbl}")
  
     with querier.transaction(**args) as tr:         
         logging.info("Squeezing skims")
