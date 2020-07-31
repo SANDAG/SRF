@@ -1,5 +1,4 @@
 import pandas
-from tqdm import tqdm
 import logging
 
 from modeling.develop import develop
@@ -14,30 +13,22 @@ def run(mgra_dataframe, planned_sites):
     simulation_years = config.parameters['simulation_years']
     simulation_begin = config.parameters['simulation_begin']
 
-    steps_per_year = 8
-    progress = tqdm(desc='progress', total=simulation_years *
-                    steps_per_year, position=0)
-
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
-        progress.set_description(
-            'starting year {} adding scheduled development'.format(i+1))
 
-        # add scheduled development
+        print('adding scheduled development')
         add_scheduled_development(mgra_dataframe, planned_sites, output_dir)
-        progress.update()
-        # develop enough land to meet demand for this year.
-        mgra_dataframe, progress = develop(mgra_dataframe, progress)
+        print('developing to meet remaining demand')
+        mgra_dataframe = develop(mgra_dataframe)
         if mgra_dataframe is None:
             print('program terminated, {} years were completed'.format(i))
             return
-        progress.update()
 
-        progress.set_description('saving year {}'.format(i+1))
+        print('saving year{}_{}.csv ...'.format(
+            i + 1, forecast_year))
         save_to_file(mgra_dataframe, output_dir, 'year{}_{}.csv'.format(
             i + 1, forecast_year))
-        progress.update()
-    progress.close()
+        print('Done')
     return
 
 

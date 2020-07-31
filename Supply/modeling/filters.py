@@ -35,17 +35,24 @@ def apply_filters(mgra_dataframe, product_type_labels):
     return filtered, max_units, profits
 
 
-def filter_product_type(mgra, product_type_labels):
+def filter_product_type(mgra_dataframe, product_type_labels):
     # filter for MGRA's that have land available (vacant, redev or infill)
     # for building more units of that product type
     # ! boolean should be true if there is vacant, redev, or infill available
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
     MINIMUM_UNITS = 5
-    vacant_land = mgra[product_type_labels.vacant_acres]
+    vacant_land = mgra_dataframe[product_type_labels.vacant_acres]
     units_available = vacant_land // acreage_per_unit
 
+    # also check residential capacity values here
+    if product_type_labels.is_residential():
+        remaining_capacity = mgra_dataframe[product_type_labels.capacity] - \
+            mgra_dataframe[product_type_labels.total_units]
+        units_available = units_available[
+            units_available > remaining_capacity] = remaining_capacity
+
     criteria = (units_available > MINIMUM_UNITS)
-    return mgra[criteria], units_available[criteria]
+    return mgra_dataframe[criteria], units_available[criteria]
 
 
 def filter_by_vacancy(mgra_dataframe, product_type_labels, land_caps=None,

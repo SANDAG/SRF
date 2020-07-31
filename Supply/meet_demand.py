@@ -13,26 +13,21 @@ def run(mgra_dataframe):
     simulation_years = config.parameters['simulation_years']
     simulation_begin = config.parameters['simulation_begin']
 
-    steps_per_year = 7
-    progress = tqdm(desc='progress', total=simulation_years *
-                    steps_per_year, position=0)
-
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
-        progress.set_description('starting year {}'.format(i+1))
 
         # develop enough land to meet demand for this year.
-        mgra_dataframe, progress = develop(mgra_dataframe, progress)
+        mgra_dataframe = develop(mgra_dataframe)
         if mgra_dataframe is None:
             print('program terminated, {} years were completed'.format(i))
             return
-        progress.update()
-
-        progress.set_description('saving year {}'.format(i+1))
+        progress = tqdm(total=1)
+        progress.set_description(
+            'saving year{}_{}.csv'.format(i+1, forecast_year))
         save_to_file(mgra_dataframe, output_dir, 'year{}_{}.csv'.format(
             i + 1, forecast_year))
         progress.update()
-    progress.close()
+        progress.close()
     return
 
 

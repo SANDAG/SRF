@@ -1,5 +1,6 @@
 import logging
 import numpy
+from tqdm import tqdm
 
 from modeling.filters import apply_filters
 from modeling.dataframe_updates import update_mgra
@@ -13,10 +14,6 @@ def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
 
     # TODO: also use profitability filter value for this mgra
     # to determine the number of profitable units to build.
-
-    # TODO: use capacity values for residential
-    if product_type_labels.is_residential():
-        pass
 
     # only build up to 95% of the vacant space
     available_units_by_land = mgra[
@@ -43,14 +40,13 @@ def combine_weights(profitability, vacancy, preference=1):
     return normalize(weights)
 
 
-def develop_product_type(mgras, product_type_labels, progress):
-    if progress is not None:
-        progress.set_description('developing {}'.format(
-            product_type_labels.product_type))
+def develop_product_type(mgras, product_type_labels):
 
     new_units_to_build = product_type_labels.units_per_year_parameter()
-    logging.debug('building {} units'.format(new_units_to_build))
     built_units = 0
+    progress_bar = tqdm(total=new_units_to_build)
+    progress_bar.set_description(
+        "developing {} units".format(product_type_labels.product_type))
     while built_units < new_units_to_build:
         max_units = new_units_to_build - built_units
 
@@ -62,7 +58,7 @@ def develop_product_type(mgras, product_type_labels, progress):
             print('out of usable mgras for product type {}'.format(
                 product_type_labels.product_type))
             print('evaluate filtering methods\nexiting')
-            return None, progress
+            return None
 
         # Sample
         # vacancy_weights = normalize(vacancy_caps)
@@ -74,20 +70,20 @@ def develop_product_type(mgras, product_type_labels, progress):
         buildable_count = buildable_units(
             selected_row, product_type_labels, max_units, vacancy_caps)
         built_units += buildable_count
-
         logging.debug('building {} {} units on MGRA #{}'.format(
             buildable_count, product_type_labels.product_type, selected_ID))
 
         # develop buildable_count units by updating the MGRA in the dataframe
         update_mgra(mgras, selected_ID,
                     buildable_count, product_type_labels)
+        progress_bar.update(buildable_count)
 
-    if progress is not None:
-        progress.update()
-    return mgras, progress
+    progress_bar.close()
+
+    return mgras
 
 
-def develop(mgras, progress=None):
+def develop(mgras):
     """
     Arguments
         mgras:
@@ -98,13 +94,9 @@ def develop(mgras, progress=None):
     """
     for product_type in PRODUCT_TYPES:
         product_type_labels = ProductTypeLabels(product_type)
-        mgras, progress = develop_product_type(
-            mgras, product_type_labels, progress)
+        mgras = develop_product_type(
+            mgras, product_type_labels)
         if mgras is None:
-            return mgras, progress
+            return mgras
 
-    # tests don't use a progress bar
-    if progress is not None:
-        return mgras, progress
-    else:
-        return mgras
+    return mgras

@@ -195,10 +195,9 @@ HOUSING_CAPACITY = 'Cap_HS'  # housing stock (dwelling unit) capacity
 SINGLE_FAMILY_HOUSING_CAPACITY = 'Cap_HS_SF'
 # housing stock (dwelling unit) capacity - multi-family
 MULTI_FAMILY_HOUSING_CAPACITY = 'Cap_HS_MF'
-# housing stock (dwelling unit) capacity - mobile homes
-MOBILE_HOME_HOUSING_CAPACITY = 'Cap_HS_MH'
+
 CIVILIAN_EMPLOYMENT_CAPACITY = 'cap_emp_civ'  # civilian employment capacity
-SQFT_AREA = 'Shape_Area'
+SHAPE_AREA = 'Shape_Area'
 
 # interpolated columns from manhan group
 SINGLE_FAMILY_MEAN_PRICE = "SF_mean"
@@ -323,6 +322,7 @@ class ProductTypeLabels(object):
             self.developed_acres = SINGLE_FAMILY_DEVELOPED_ACRES
             self.vacant_acres = SINGLE_FAMILY_VACANT_ACRES
             self.price = SINGLE_FAMILY_MEAN_PRICE
+            self.capacity = SINGLE_FAMILY_HOUSING_CAPACITY
         elif self.product_type == MULTI_FAMILY:
             self.occupied_units = MULTI_FAMILY_HOUSEHOLDS
             self.total_units = MULTI_FAMILY_HOUSING_UNITS
@@ -330,6 +330,7 @@ class ProductTypeLabels(object):
             self.developed_acres = MULTI_FAMILY_DEVELOPED_ACRES
             self.vacant_acres = MULTI_FAMILY_VACANT_ACRES
             self.price = MULTI_FAMILY_MEAN_PRICE
+            self.capacity = MULTI_FAMILY_HOUSING_CAPACITY
         elif self.product_type == OFFICE:
             self.occupied_units = OFFICE_EMPLOYMENT
             self.total_units = OFFICE_JOB_SPACES
