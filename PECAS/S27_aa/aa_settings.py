@@ -16,7 +16,6 @@ sys.path.append("../..")
 from machine_settings import *
 #from mapit_settings import *
 
-from aa_routines import load_parameters
 from scriptutil import irange
 from os.path import join
 
@@ -52,6 +51,7 @@ scenario_base = None # Enter a base scenario name e.g. "I174"
 # In any other case, instead using this resume feature, consider replaying by changing aa_startyear and sd_startyear below
 # WARNING If this is set to True you probably need to change it back to False
 resume_run = False
+#resume_run=True
 
 # --- REPLAY FUNCTIONALITY ---
 # The first year in which AA is run.
