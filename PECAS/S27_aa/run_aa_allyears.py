@@ -73,6 +73,10 @@ def write_resume(ps, resume_year):
     
 # noinspection PyBroadException
 def main_impl(ps, aa_runner):
+    logging.info("Recreate the inputs and yearly folder structure by downloading data from pg")
+    import os
+    cmd = 'python dump2csv.py'
+    os.system(cmd) 
 
     logging.info("**********************")
     logging.info(
@@ -107,6 +111,8 @@ def main_impl(ps, aa_runner):
     # ------------------------------------------------------------------------------------------------------------------
 
     while year <= ps.stopyear:
+        write_resume(ps, year)  
+
         skimyear = pr.get_skim_year(year, ps.skimyears)
         skimfilename = ps.skim_fname.format(yr=skimyear)
 
@@ -121,7 +127,9 @@ def main_impl(ps, aa_runner):
         if year >= ps.aa_startyear:
 
             if ps.squeeze_skims and skimyear >= ps.earliest_squeeze_year and skimyear not in converted_skims:
-                 skims.main(skimyear, ps)
+                 #skims.main(skimyear, ps)
+                 cmd = 'python skims_to_sem.py '+str(skimyear)
+                 os.system(cmd)   
                  converted_skims.add(skimyear)
                 
             if year in ps.aayears:
@@ -141,7 +149,6 @@ def main_impl(ps, aa_runner):
                                 "Couldn't copy " + str(file) + " from year " + str(year - 1) + " to year " + str(year))
 
         project_code.after_aa(year, ps=ps)
-        write_resume(ps, year)
         year = year + 1
     
     if ps.travel_model_input_years:
