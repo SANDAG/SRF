@@ -6,7 +6,6 @@ from os.path import join, basename
 from psycopg2 import extras
 
 import aa_routines as pr
-from scriptutil import irange
 from sqlutil import Querier
 
 
@@ -24,10 +23,10 @@ def _script_dir(fname):
 
 
 def dump_2_csv(tr, sql, outfpath):
-    if os.path.exists(outfpath):
-        pass
-    else:
-        tr.dump_to_csv(sql, outfpath)
+    tr.dump_to_csv(
+        sql,
+        outfpath
+    )
 
 def set_tr(connect):
     querier = Querier(connect, debug_log=Logger())
@@ -113,31 +112,17 @@ def dump_pg_tbls(connect, scendir, tbl_schema,tname_pattern):
                 fname = 'zz_' + fname
             
                 
-            flder = os.path.join(scendir,flder)
+            flder = join(scendir,flder)
                        
-            destfile = os.path.join(flder, fname+'.csv')
-            if not os.path.exists(flder):
-                os.mkdir(flder)
-                
-            sql = 'select * from \"{}\".\"{}\"'.format(tbl_schema,tname)
-# =============================================================================
-#             if tname=='Inputs_ExchangeImportExportI':
-#                 sql = 'select "ZoneNumber","Commodity","BuyingSize","SellingSize", \
-#                 case when "SpecifiedExchange" then ''true''::text else ''false''::text end as "SpecifiedExchange", \
-#                 "ImportFunctionMidpoint", \
-#                 "ImportFunctionMidpointPrice", \
-#                 "ExportFunctionMidpoint", \
-#                 "ExportFunctionMidpointPrice",\
-#                 "ImportFunctionDelta",\
-#                 "ImportFunctionSlope",\
-#                 "ImportFunctionEta",\
-#                 "ExportFunctionDelta",\
-#                 "ExportFunctionSlope",\
-#                 "ExportFunctionEta",\
-#                  case when "MonitorExchange" then ''true''::text else ''false''::text end as "MonitorExchange" \
-#                  from \"{}\".\"{}\"'.format(tbl_schema,tname)
-# =============================================================================
-            dump_2_csv(tr, sql, destfile)
+            destfile = join(flder, fname+'.csv')
+            if os.path.exists(destfile):
+                pass
+            else:
+                if not os.path.exists(flder):
+                    os.mkdir(flder)
+                    
+                sql = 'select * from \"{}\".\"{}\"'.format(tbl_schema,tname)
+                dump_2_csv(tr, sql, destfile)
     
       
 
@@ -147,13 +132,16 @@ if __name__ == "__main__":
 
 
     pr.set_up_logging()
-    #write_techopt_header(main_ps.scendir)
-    dump_techopt(lambda: pr.connect_to_aa(ps=main_ps), ".") #download the pg friendly techopt file into csv crosstab format
+    if os.path.exists(join("E:/PECAS/S21u_m/AllYears", "Inputs", "TechnologyOptionsI.csv")):
+        pass
+    else:
+        #write_techopt_header(main_ps.scendir)
+        dump_techopt(lambda: pr.connect_to_aa(ps=main_ps), ".") #download the pg friendly techopt file into csv crosstab format
     
     #write yearly AA input to csv
     #dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','.+')  #dowdload every table in schema s21u_m_aa
-   # dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','^Inputs_')  #download table in Inputs folder
-   # dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','^\d+') #download yearly inputs
+    dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','^Inputs_')  #download table in Inputs folder
+    dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','^\d+') #download yearly inputs
    # dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','^zz_')  #download zz squeeze skim tables
     
     #dump_pg_tbls(lambda: pr.connect_to_aa(ps=main_ps), ".", 's21u_m_aa','^Inputs_ExchangeImportExportI')
