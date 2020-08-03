@@ -15,6 +15,7 @@ def run(mgra_dataframe):
 
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
+        print('simulating year {}'.format(forecast_year))
 
         # develop enough land to meet demand for this year.
         mgra_dataframe = develop(mgra_dataframe)

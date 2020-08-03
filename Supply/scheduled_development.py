@@ -103,8 +103,19 @@ def find_sites(intersections, id):
     return intersections[intersections['siteid'] == id].copy()
 
 
-def run(mgras, intersections, output_dir, progress=None):
-    # add each _site_ we actually have a frame of intersections
+def remove_other_years(intersections, starting_year):
+    return intersections[intersections['phase'] == starting_year].copy()
+
+
+def run(mgras, intersections, output_dir, progress=None, starting_year=None):
+    if starting_year is not None:
+        intersections = remove_other_years(intersections, starting_year)
+
+    if len(intersections) == 0:
+        print('no scheduled development found for year {}'
+              .format(starting_year))
+        return
+    # add each site. we actually have a frame of intersections
 
     # find max siteID
     # for i = 1 through max_siteID
@@ -120,6 +131,7 @@ def run(mgras, intersections, output_dir, progress=None):
         sites.append(find_sites(intersections, i + 1))
 
     # sites is a list of dataframes.
+
     progress_bar = tqdm(sites)
     progress_bar.set_description('allocating development for each site')
     for frame in progress_bar:

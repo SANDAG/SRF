@@ -17,7 +17,9 @@ def run(mgra_dataframe, planned_sites):
         forecast_year = simulation_begin + i + 1
 
         print('adding scheduled development')
-        add_scheduled_development(mgra_dataframe, planned_sites, output_dir)
+        add_scheduled_development(
+            mgra_dataframe, planned_sites, output_dir,
+            starting_year=simulation_begin + i)
         print('developing to meet remaining demand')
         mgra_dataframe = develop(mgra_dataframe)
         if mgra_dataframe is None:
