@@ -1,0 +1,32 @@
+# see FloorspaceO.csv for example output
+# used PECAS_FloorspaceCommodities.csv for codes_labels
+
+codes_labels = {
+    53: "Agriculture and Mining Space",
+    54: "Light Industrial Space",
+    55: "Heavy Industry Space",
+    56: "Office Space",
+    57: "Retail Space",
+    58: "Depot Space",
+    59: "Hotel Space",
+    60: "Primary Schools",
+    61: "Secondary Schools",
+    62: "Post-Secondary Institution Space",
+    63: "College Dormitory Space",
+    64: "Health Care Space",
+    65: "Religious Space",
+    66: "Recreation Space",
+    67: "Active Park Space",
+    68: "Government Operations Space",
+    69: "Dump Space",
+    70: "Spaced Rural Residential Economy",
+    71: "Spaced Rural Residential Luxury",
+    72: "Single Family Detached Residential Economy",
+    73: "Single Family Detached Residential Luxury",
+    74: "Single Family Attached Residential Economy",
+    75: "Single Family Attached Residential Luxury",
+    76: "Multi-Family Residential Economy",
+    77: "Multi-Family Residential Luxury",
+    78: "Mobile Home Residential",
+    79: "Military Residential(Non GQ)",
+}
