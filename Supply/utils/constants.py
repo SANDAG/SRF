@@ -22,6 +22,7 @@ MILITARY_POPULATION = 'gq_mil'  # Military group quarters population
 HOUSING_UNITS = 'hs'  # Housing units
 SINGLE_FAMILY_HOUSING_UNITS = 'hs_sf'  # Single-family housing units
 MULTI_FAMILY_HOUSING_UNITS = 'hs_mf'  # Multiple-family housing units
+RURAL_HOUSING_UNITS = 'hs_ldsf'
 MOBILE_HOUSING_UNITS = 'hs_mh'  # Mobile home housing units
 INDUSTRIAL_BUILDINGS = 'Ind_Ct'  # number of industrial buildings
 COMMERCIAL_BUILDINGS = 'Ret_Ct'  # number of commercial/retail buildings
@@ -31,6 +32,9 @@ OFFICE_BUILDINGS = 'Ofc_Ct'  # number of office buildings
 SINGLE_FAMILY_TOTAL_SQUARE_FOOTAGE = 'SqFt_SF'
 # total squarefootage of multiple-family units
 MULTI_FAMILY_TOTAL_SQUARE_FOOTAGE = 'SqFt_MF'
+
+RURAL_TOTAL_SQUARE_FOOTAGE = 'sqft_ldsf'
+MOBILE_HOME_TOTAL_SQUARE_FOOTAGE = 'sqft_mh'
 # total square feet in industrial buildings
 INDUSTRIAL_TOTAL_SQUARE_FOOTAGE = 'Ind_SqFt'
 # total squarefeet in commercial/retail buildings
@@ -39,6 +43,7 @@ COMMERCIAL_TOTAL_SQUARE_FOOTAGE = 'Ret_SqFt'
 OFFICE_TOTAL_SQUARE_FOOTAGE = 'Ofc_SqFt'
 
 HOUSEHOLDS = 'hh'  # Households (occupied housing units)
+RURAL_HOUSEHOLDS = 'hh_ldsf'
 # Single-family households (occupied housing units)
 SINGLE_FAMILY_HOUSEHOLDS = 'hh_sf'
 # Multiple-family households (occupied housing units)
@@ -182,6 +187,8 @@ LAND_COST_PER_ACRE = 'Land_Cost'  # cost of land per acre
 SINGLE_FAMILY_PRICE = 'Price_SF'
 # price/rent cost per square foot for multi family dwelling
 MULTI_FAMILY_PRICE = 'Price_MF'
+RURAL_PRICE = 'price_ldsf'
+MOBILE_HOME_PRICE = 'price_mh'
 # price/rent cost per square foot for commercial/retail building
 COMMERCIAL_PRICE = 'Ret_Cost'
 # price/rent cost per square foot for industrial building
@@ -202,6 +209,8 @@ SHAPE_AREA = 'Shape_Area'
 # interpolated columns from manhan group
 SINGLE_FAMILY_MEAN_PRICE = "SF_mean"
 MULTI_FAMILY_MEAN_PRICE = "MFmean"
+RURAL_MEAN_PRICE = 'ldsf_mean'
+MOBILE_HOME_MEAN_PRICE = 'mh_mean'
 INDUSTRIAL_MEAN_PRICE = "INDmean"
 OFFICE_MEAN_PRICE = "OFCmean"
 COMMERCIAL_MEAN_PRICE = "RETmean"
@@ -291,11 +300,15 @@ MGRA_COUNT = 23002
 # product types - must match parameter labels
 SINGLE_FAMILY = 'single_family'
 MULTI_FAMILY = 'multi_family'
+RURAL_RESIDENTIAL = 'rural_residential'
+MOBILE_HOME = 'mobile_home'
 INDUSTRIAL = 'industrial'
 COMMERCIAL = 'commercial'
 OFFICE = 'office'
 PRODUCT_TYPES = [
-    SINGLE_FAMILY, MULTI_FAMILY, INDUSTRIAL, COMMERCIAL, OFFICE
+    SINGLE_FAMILY, MULTI_FAMILY,
+    # RURAL_RESIDENTIAL, MOBILE_HOME,
+    INDUSTRIAL, COMMERCIAL, OFFICE
 ]
 NON_RESIDENTIAL_TYPES = [
     INDUSTRIAL, COMMERCIAL, OFFICE
@@ -363,8 +376,7 @@ class ProductTypeLabels(object):
             self.job_area = INDUSTRIAL_JOB_AREA
 
     def is_residential(self):
-        return self.product_type == SINGLE_FAMILY \
-            or self.product_type == MULTI_FAMILY
+        return self.product_type not in NON_RESIDENTIAL_TYPES
 
     def construction_cost_parameter(self):
         return self.__param_from_dict(CONSTRUCTION_COST)

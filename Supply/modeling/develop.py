@@ -34,7 +34,7 @@ def normalize(collection):
 def combine_weights(profitability, vacancy, preference=1):
     '''
         Prioritizes profitability to make selections, with some
-        deference for vacancy, modified by preference multiplier.
+        deference for vacancy, as modified by preference multiplier.
     '''
     weights = vacancy * preference * numpy.exp(profitability)
     return normalize(weights)
