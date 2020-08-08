@@ -5,7 +5,10 @@ Follow steps below to run the demand model:
 1) Change the first line of evalDemand.R to point to the current directory
 For example: setwd("E:/PECAS/SRF/trunk/Demand")
 
-2) start "R"
+2) start "R" and type the following to run demand model
+   source("E:/PECAS/SRF/trunk/Demand/R/evalDemand.R")
 
-4) Type the following to run demand model
- source("E:/PECAS/SRF/trunk/Demand/R/evalDemand.R")
+3) As an alternative to 2), Run the demand model in command prompt window:
+   cd E:\PECAS\SRF\trunk\Demand
+   "C:\Program Files\R\R-4.0.2\bin\R.exe" CMD BATCH .\R\evalDemand.R    
+
