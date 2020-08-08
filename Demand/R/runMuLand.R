@@ -276,7 +276,7 @@ loadMuLandInputs <- function(configDir,tables) {
              "demand_exogenous_cutoff",
              "real_estates_zones",
              "rent_adjustments",
-             "rent_functions",
+             "rent_functions_0",
              "subsidies",
              "supply",
              "zones")
@@ -295,6 +295,28 @@ loadMuLandInputs <- function(configDir,tables) {
   
 }
 
+
+loadMGRA <- function(configDir,tname) {
+  library(yaml)
+  config_file = paste0(configDir, "/dbparams.yaml")
+  config <- yaml.load_file(config_file)
+  
+  library(RPostgreSQL)
+  m <- dbDriver('PostgreSQL')
+  conn <- dbConnect(m, host=config$aa_host, dbname=config$aa_database, user=config$aa_user, password=config$aa_password, port=config$aa_port)
+  on.exit(dbDisconnect(conn))
+  inputs_schema <- config$mu_schema
+  mysql <- paste0("select table_name FROM information_schema.tables WHERE table_schema='", inputs_schema,"' and table_name = '", tname,"';") 
+  tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input Table doesn't exists!"))
+  
+  # load data from pg
+  mysql <- paste0('select mgra as "MGRA", luz as "LUZ" from ',inputs_schema,'."', tname,'"')
+  d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
+  
+  
+  return(d)
+  
+}
 
 # Return muLand outputs ------------------------------------------------------
 #' Read in outputs from the muLand program
@@ -333,11 +355,12 @@ returnMuLandOutputs <- function(inputList, workDir) {
   
   # ensure the MuLand output directory exists
   if(!dir.exists(outputDir)){
-    msg <- paste("Output directory does not exist:",
-                 outputDir,
-                 sep = " ")
+    dir.create(outputDir)
+    #msg <- paste("Output directory does not exist and just created:",
+    #             outputDir,
+    #             sep = " ")
     
-    stop(msg)
+   # stop(msg)
   }
   
   # create data dictionary of the elements of the expected
@@ -465,7 +488,7 @@ runMuLand <- function(inputList, workDir, createDir = TRUE) {
     }
     
     # run the MuLand utility
-    system2(command = "/opt/mu-land/bin/mu-land",
+    system2(command = "../mu-land.exe",
             args = c(workDir), 
             stdout = file.path(workDir, paste(workDir, "log", sep = ".")),
             wait = TRUE)

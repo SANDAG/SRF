@@ -1,13 +1,19 @@
+setwd("E:/PECAS/SRF/trunk/Demand")
+
 ## global parameters
 calibration = FALSE
 scenario = "getRawRent"
 ##
+
+
 library(dplyr)
 library(foreign)
 ## MGRA-LUZ lookup
 # MGRAs <- read.dbf("MGRA/MGRA.dbf",as.is = TRUE)
+
 source(file.path("R","runMuLand.R"))
 source(file.path("R","defaultFunctions.R"))
+MGRAs <- loadMGRA('..','mgra')
 agentCheck <- function(dfList_in,dfList_out,targets) {
   require(dplyr)
   require(reshape2)
@@ -78,7 +84,8 @@ fsCal <- function(inputDfList, workDir='fsCal', targets, endogFn=nullEndogFn, to
   return(inputDfList[["bids_adjustments"]])
 }
 # list the names of data to be subset
-data_frames <- c("agents_zones","bids_adjustments","demand_exogenous_cutoff","rent_adjustments","subsidies","supply","zones","real_estates_zones")
+data_frames <- c( "agents_zones","bids_adjustments","demand_exogenous_cutoff","rent_adjustments","subsidies","supply","zones","real_estates_zones")
+
 # store input dataframes in a list
 #master_data <- list()
 # loop over these names to load those data
@@ -86,7 +93,8 @@ data_frames <- c("agents_zones","bids_adjustments","demand_exogenous_cutoff","re
  # master_data[[df]] <- read.csv(file.path("master",paste0(df,"_master.csv"))) 
 #}
 
-master_date <- loadMuLandInputs('../..',data_frames)
+master_data <- loadMuLandInputs('..')
+
 
 # start looping over the LUZs
 if (calibration == TRUE) {
@@ -105,11 +113,12 @@ for (luz in 1:229) {
   LUZ_MGRAs = filter(MGRAs, LUZ == luz)[["MGRA"]]
   luz_model <- list()
   # load up the data that doesn't need to be filtered
-  luz_model[["agents"]] <- agents_master
-  luz_model[["bids_functions"]] <- bids_functions
-  luz_model[["rent_functions"]] <- rent_functions_0
+  luz_model[["agents"]] <- master_data[["agents"]]
+  luz_model[["bids_functions"]] <- master_data[["bids_functions"]]
+  luz_model[["rent_functions"]] <- master_data[["rent_functions_0"]]
+  #luz_model[["rent_functions"]] <- master_data[["rent_functions"]]
   # filter other data
-  luz_model[["demand"]] <- select(filter(demand_master,LUZ==luz),-LUZ)
+  luz_model[["demand"]] <- select(filter(master_data[["demand"]],LUZ==luz),-LUZ)
   for (df in data_frames) {
     luz_model[[df]] <- filter(master_data[[df]],I_IDX %in% LUZ_MGRAs)
   }
