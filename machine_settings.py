@@ -9,8 +9,11 @@ sql_system = postgres
  
 # installation configuration
 
+# installation configuration
+pgpath = "C:/Program Files/PostgreSQL/9.4/bin/"
 javaRunCommand = "C:/Program Files/Java/jre-10.0.2/bin/java.exe"
 pythonCommand = "python"
+winShCommand = "C:/Program Files/Git/bin/sh.exe"
 
 aa_maxthreads = 32
 

@@ -12,9 +12,10 @@ Step 3: Go to directory  PECAS/S27_aa and make directory "2016" here
 Step 4: Go to directory PECAS/AllYears and make directory "Code" here
         Copy the *.jar files and hdf5 folder from the current model AllYears/Code folder: 
         https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S27/AllYears/Code
+        Also check to make sure aa.properties is in the AllYears/Inputs folder. If not, you will get aa bundle not found mistake.
 
 Step 5: Run aa only model for all years by: 
-        cd PECAS/S27_aa
+        cd PECAS/S28_aa
         python run_aa_allyears.py 
 
 Step 6: Run MU Land Supply Model by:
@@ -23,8 +24,8 @@ Step 6: Run MU Land Supply Model by:
         
         
 Step 7: Run MU Land Demand Model by:
-        cd Demand/R
-        "C:\Program Files\R\R-4.0.0\bin\R.exe" CMD BATCH evalDemand.R      
+        cd E:\PECAS\SRF\trunk\Demand
+        "C:\Program Files\R\R-4.0.2\bin\R.exe" CMD BATCH .\R\evalDemand.R     
         
 
 
