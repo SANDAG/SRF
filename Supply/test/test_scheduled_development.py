@@ -4,7 +4,7 @@ import pandas
 import logging
 import sys
 
-from utils.constants import INCREASING_COLUMNS, DECREASING_COLUMNS
+from utils.access_labels import increasing_columns, decreasing_columns
 
 COMMANDLINE_INPUT = 'python3 scheduled_development.py -t'
 
@@ -32,7 +32,7 @@ class TestMain(unittest.TestCase):
 
         logging.info('ensuring that columns increased')
 
-        for column in INCREASING_COLUMNS:
+        for column in increasing_columns():
             logging.info(column)
             self.assertGreater(
                 frame_after[column].sum(),
@@ -40,7 +40,7 @@ class TestMain(unittest.TestCase):
 
         logging.info('ensuring that columns decreased')
 
-        for column in DECREASING_COLUMNS:
+        for column in decreasing_columns():
             logging.info(column)
             self.assertLess(frame_after[column].sum(),
                             frame_before[column].sum())

@@ -3,8 +3,7 @@ import os
 import pandas
 import logging
 
-from utils.constants import INCREASING_COLUMNS, DECREASING_COLUMNS
-
+from utils.access_labels import increasing_columns, decreasing_columns
 COMMANDLINE_INPUT = 'python3 meet_demand.py -t'
 
 
@@ -28,7 +27,7 @@ class TestMeetDemand(unittest.TestCase):
                 COMMANDLINE_INPUT))
 
         logging.info('ensuring that columns increased')
-        for column in INCREASING_COLUMNS:
+        for column in increasing_columns():
             logging.info(column)
             self.assertGreater(
                 frame_after[column].sum(),
@@ -36,7 +35,7 @@ class TestMeetDemand(unittest.TestCase):
 
         logging.info('ensuring that columns decreased')
 
-        for column in DECREASING_COLUMNS:
+        for column in decreasing_columns():
             logging.info(column)
             self.assertLess(frame_after[column].sum(),
                             frame_before[column].sum())

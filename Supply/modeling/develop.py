@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from modeling.filters import apply_filters
 from modeling.dataframe_updates import update_mgra
-from utils.constants import MGRA, ProductTypeLabels, PRODUCT_TYPES
+from utils.access_labels import product_types, ProductTypeLabels, mgra_labels
 
 
 def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
@@ -41,7 +41,6 @@ def combine_weights(profitability, vacancy, preference=1):
 
 
 def develop_product_type(mgras, product_type_labels):
-
     new_units_to_build = product_type_labels.units_per_year_parameter()
     built_units = 0
     progress_bar = tqdm(total=new_units_to_build)
@@ -65,7 +64,7 @@ def develop_product_type(mgras, product_type_labels):
         # profit_weights = normalize(profits)
         weights = combine_weights(profit_margins, vacancy_caps)
         selected_row = filtered.sample(n=1, weights=weights)
-        selected_ID = selected_row[MGRA].iloc[0]
+        selected_ID = selected_row[mgra_labels.MGRA].iloc[0]
 
         buildable_count = buildable_units(
             selected_row, product_type_labels, max_units, vacancy_caps)
@@ -92,7 +91,7 @@ def develop(mgras):
     Returns:
         a pandas dataframe with selected MGRA's updated
     """
-    for product_type in PRODUCT_TYPES:
+    for product_type in product_types():
         product_type_labels = ProductTypeLabels(product_type)
         mgras = develop_product_type(
             mgras, product_type_labels)

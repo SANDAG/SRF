@@ -3,7 +3,7 @@ import numpy
 import pandas
 
 import utils.config as config
-from utils.constants import LAND_COST_PER_ACRE
+from utils.access_labels import mgra_labels
 from utils.converter import x_per_acre_to_x_per_square_foot
 
 
@@ -112,7 +112,7 @@ def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     # TODO: find the cost for each development type
     # find total expected costs
     construction_cost = product_type_labels.construction_cost_parameter()
-    land_cost_per_acre = mgra_dataframe[LAND_COST_PER_ACRE]
+    land_cost_per_acre = mgra_dataframe[mgra_labels.LAND_COST_PER_ACRE]
     land_cost_per_square_foot = x_per_acre_to_x_per_square_foot(
         land_cost_per_acre)
     expected_costs = construction_cost + land_cost_per_square_foot

@@ -6,9 +6,15 @@ import utils.config as config
 from utils.interface import load_parameters, empty_folder, save_to_file, \
     open_dbf
 from modeling.dataframe_updates import update_mgra
-from utils.constants import ProductTypeLabels, SINGLE_FAMILY, \
-    MULTI_FAMILY, MGRA, INDUSTRIAL_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
-    OFFICE_JOB_SPACES, INDUSTRIAL, COMMERCIAL, OFFICE, UNITS_PER_YEAR
+
+from utils.access_labels import ProductTypeLabels, mgra_labels, UNITS_PER_YEAR
+
+
+SINGLE_FAMILY = 'single_family'
+MULTI_FAMILY = 'multi_family'
+OFFICE = 'office'
+COMMERCIAL = 'commercial'
+INDUSTRIAL = 'industrial'
 
 
 def reduce_demand(product_type, units):
@@ -40,19 +46,26 @@ def add_to_mgra(mgras, site):
         reduce_demand(labels.product_type, multi_family_units)
     if employment_units > 0:
         # add employment; determine which type to add
-        mgra = mgras.loc[mgras[MGRA] == mgra_id, [
-            INDUSTRIAL_JOB_SPACES, COMMERCIAL_JOB_SPACES, OFFICE_JOB_SPACES]]
-        if mgra[INDUSTRIAL_JOB_SPACES].item() > 0:
-            labels = ProductTypeLabels(INDUSTRIAL)
+        industrial_labels = ProductTypeLabels(INDUSTRIAL)
+        industrial_spaces = industrial_labels.total_units
+        commercial_labels = ProductTypeLabels(COMMERCIAL)
+        commercial_spaces = commercial_labels.total_units
+        office_labels = ProductTypeLabels(OFFICE)
+        office_spaces = office_labels.total_units
+
+        mgra = mgras.loc[mgras[mgra_labels.MGRA] == mgra_id, [
+            industrial_spaces, commercial_spaces, office_spaces]]
+        if mgra[industrial_spaces].item() > 0:
+            labels = industrial_labels
             update_mgra(mgras, mgra_id, employment_units, labels)
-        elif mgra[COMMERCIAL_JOB_SPACES].item() > 0:
-            labels = ProductTypeLabels(COMMERCIAL)
+        elif mgra[commercial_spaces].item() > 0:
+            labels = commercial_labels
             update_mgra(mgras, mgra_id, employment_units, labels)
-        elif mgra[OFFICE_JOB_SPACES].item() > 0:
-            labels = ProductTypeLabels(OFFICE)
+        elif mgra[office_spaces].item() > 0:
+            labels = office_labels
             update_mgra(mgras, mgra_id, employment_units, labels)
         else:  # we have to guess the product type... commercial seems likely!
-            labels = ProductTypeLabels(COMMERCIAL)
+            labels = commercial_labels
             update_mgra(mgras, mgra_id, employment_units, labels)
         reduce_demand(labels.product_type, employment_units)
 

@@ -2,14 +2,14 @@ import unittest
 import pandas
 
 from modeling.filters import filter_by_vacancy
-from utils.constants import SINGLE_FAMILY, ProductTypeLabels
+from utils.access_labels import ProductTypeLabels
 
 
 class TestFilters(unittest.TestCase):
     def setUp(self):
         self.mgras = pandas.read_csv('test_data/random_MGRA.csv')
         self.max_vacancy = 0.06
-        self.product_type_labels = ProductTypeLabels(SINGLE_FAMILY)
+        self.product_type_labels = ProductTypeLabels()
         return super().setUp()
 
     def test_filter_vacancy(self):
