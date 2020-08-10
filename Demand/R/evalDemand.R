@@ -1,4 +1,4 @@
-setwd("E:/PECAS/SRF/trunk/Demand")
+setwd(".")
 
 ## global parameters
 calibration = FALSE
