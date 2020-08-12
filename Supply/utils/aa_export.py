@@ -1,3 +1,6 @@
+# superceded by aa_luz_export.py, this could be a useful reference
+# for doing something on the mgra level though.
+
 # see FloorspaceO.csv for example output
 '''
 eg.

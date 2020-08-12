@@ -5,7 +5,7 @@ from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, open_dbf
-from utils.aa_export import export_aa
+from utils.aa_luz_export import export_luz_data
 import utils.config as config
 
 
@@ -32,7 +32,7 @@ def run(mgra_dataframe, planned_sites):
             i + 1, forecast_year))
         print('saved')
         print('creating AA commodity export file ...')
-        export_aa(mgra_dataframe)
+        export_luz_data(mgra_dataframe)
         print('Done')
     return
 
