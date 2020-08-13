@@ -48,7 +48,8 @@ codes_labels = {
 
 
 def create_row(luz, commodity, quantity):
-    return {"LUZ": luz,
+    # needs to be labeled 'TAZ' for compatibility
+    return {"TAZ": luz,
             "Commodity": commodity,
             "Quantity": quantity}
 
