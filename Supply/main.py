@@ -1,11 +1,12 @@
 import pandas
 import logging
 
+from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, open_dbf
+from utils.aa_luz_export import export_luz_data
 import utils.config as config
-from scheduled_development import run as add_scheduled_development
 
 
 def run(mgra_dataframe, planned_sites):
@@ -16,20 +17,22 @@ def run(mgra_dataframe, planned_sites):
     for i in range(simulation_years):
         forecast_year = simulation_begin + i + 1
 
-        print('adding scheduled development')
+        print('adding scheduled development:')
         add_scheduled_development(
             mgra_dataframe, planned_sites, output_dir,
             starting_year=simulation_begin + i)
-        print('developing to meet remaining demand')
+        print('developing to meet remaining demand:')
         mgra_dataframe = develop(mgra_dataframe)
         if mgra_dataframe is None:
             print('program terminated, {} years were completed'.format(i))
             return
 
-        print('saving year{}_{}.csv ...'.format(
-            i + 1, forecast_year))
+        print('saving year{}_{}.csv ... '.format(i + 1, forecast_year))
         save_to_file(mgra_dataframe, output_dir, 'year{}_{}.csv'.format(
             i + 1, forecast_year))
+        print('saved')
+        print('creating AA commodity export file ...')
+        export_luz_data(mgra_dataframe)
         print('Done')
     return
 

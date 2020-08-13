@@ -1,9 +1,8 @@
 import pandas
 
+from utils.interface import save_to_file
 from utils.access_labels import mgra_labels, residential_types, \
     non_residential_types, ProductTypeLabels, all_columns
-from utils.interface import save_to_file
-
 '''
     Accepts the v4 input file and the interpolated variables from manhan group
     creates a new input file with just the Supply applicable columns
@@ -43,7 +42,6 @@ def add_job_spaces_columns(dataframe):
     dataframe[mgra_labels.TOTAL_JOB_SPACES] = 0
     # create job spaces column for each non-residential type
     for product_type in non_residential_types:
-        print(product_type)  # check that we get the key we expect
         labels = ProductTypeLabels(product_type)
         dataframe[labels.total_units] = job_spaces_for_product_type(
             dataframe, product_type)
@@ -70,16 +68,18 @@ def fix_capacity(dataframe):
 
 def create_version_4point1():
     original_frame = pandas.read_csv("data/SRF_Input_Base_V4.csv")
-    interpolated_frame = load_interpolated()
+    # add interpolated variables
+    interpolated_frame = load_interpolated().drop([mgra_labels.LUZ], axis=1)
     combined_frame = pandas.merge(
         original_frame, interpolated_frame, on=mgra_labels.MGRA)
+    # add job spaces
     frame_with_job_spaces = add_job_spaces_columns(combined_frame)
+    # fix capacity
     frame_with_fixed_capacity = fix_capacity(frame_with_job_spaces)
-    # include redev and infill in access_labels.all_columns() before removing
-    # unused columns
-    # ! waiting on changes from luz level aa export branch as well
+
+    # ! include redev and infill in access_labels.all_columns() before
+    # remove unused columns
     final_frame = frame_with_fixed_capacity[all_columns()]
-    # final_frame = frame_with_fixed_capacity
     save_to_file(final_frame, 'data', 'SRF_Input_Base_V4.1.csv')
     return
 

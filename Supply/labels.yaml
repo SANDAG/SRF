@@ -18,7 +18,7 @@ EMPLOYMENT: "emp" # Employment
 
 HOUSING_CAPACITY: "Cap_HS" # housing stock (dwelling unit) capacity
 DWELLING_UNITS_PER_ACRE: "DUA" # dwelling units per acre
-CIVILIAN_EMPLOYMENT_CAPACITY: "cap_emp_civ" # civilian employment capacity
+CIVILIAN_EMPLOYMENT_CAPACITY: "Cap_Emp_Ci" # civilian employment capacity
 
 SHAPE_AREA: "Shape_Area"
 
