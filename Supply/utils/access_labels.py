@@ -40,6 +40,15 @@ class MGRALabels(object):
         ]
         self.SHAPE_AREA = labels_dict["SHAPE_AREA"]
 
+    def list_labels(self):
+        return [
+            self.MGRA, self.LUZ, self.TOTAL_ACRES, self.DEVELOPED_ACRES,
+            self.VACANT_ACRES, self.LAND_COST_PER_ACRE, self.HOUSING_UNITS,
+            self.HOUSEHOLDS, self.TOTAL_JOB_SPACES, self.EMPLOYMENT,
+            self.HOUSING_CAPACITY, self.DWELLING_UNITS_PER_ACRE,
+            self.CIVILIAN_EMPLOYMENT_CAPACITY
+        ]
+
 
 mgra_labels = MGRALabels()
 
@@ -70,6 +79,16 @@ class ProductTypeLabels(object):
         self.developed_acres = product_type_dict['DEVELOPED_ACRES']
         self.vacant_acres = product_type_dict['VACANT_ACRES']
         self.price = product_type_dict['MEAN_PRICE']
+
+    def list_labels(self):
+        result = [self.occupied_units, self.total_units, self.square_footage,
+                  self.developed_acres, self.vacant_acres, self.price
+                  ]
+        if self.residential:
+            result.append(self.capacity)
+        else:
+            result.append(self.job_area)
+        return result
 
     def is_residential(self):
         return self.residential
@@ -132,3 +151,12 @@ def decreasing_columns():
     for product_type in non_residential_types.values():
         decreasing_columns.append(product_type['VACANT_ACRES'])
     return decreasing_columns
+
+
+def all_columns():
+    # need a list of all column labels used
+    columns = mgra_labels.list_labels()
+
+    for product_type in product_types():
+        columns.extend(ProductTypeLabels(product_type).list_labels())
+    return columns

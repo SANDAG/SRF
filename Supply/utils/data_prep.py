@@ -1,10 +1,7 @@
-
 import pandas
-from utils.constants import IO_COLUMNS, MGRA, NON_RESIDENTIAL_TYPES, \
-    ProductTypeLabels, OFFICE_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
-    INDUSTRIAL_JOB_SPACES, HOUSING_CAPACITY, MULTI_FAMILY_HOUSING_CAPACITY, \
-    SINGLE_FAMILY_HOUSING_CAPACITY, HOUSING_UNITS, \
-    MULTI_FAMILY_HOUSING_UNITS, SINGLE_FAMILY_HOUSING_UNITS
+
+from utils.access_labels import mgra_labels, residential_types, \
+    non_residential_types, ProductTypeLabels, all_columns
 from utils.interface import save_to_file
 
 '''
@@ -19,7 +16,9 @@ def sort_by_column(frame, column):
 
 
 def load_interpolated():
-    return sort_by_column(pandas.read_csv('data/interpolated_vars.csv'), MGRA)
+    return sort_by_column(
+        pandas.read_csv('data/interpolated_vars.csv'), mgra_labels.MGRA
+    )
 
 
 def job_spaces_for_product_type(dataframe, product_type):
@@ -40,11 +39,17 @@ def job_spaces_for_product_type(dataframe, product_type):
 
 
 def add_job_spaces_columns(dataframe):
-    for product_type in NON_RESIDENTIAL_TYPES:
-        dataframe[product_type +
-                  '_js'] = job_spaces_for_product_type(dataframe, product_type)
-    dataframe['job_spaces'] = dataframe[OFFICE_JOB_SPACES] + \
-        dataframe[COMMERCIAL_JOB_SPACES] + dataframe[INDUSTRIAL_JOB_SPACES]
+    # start column for total job spaces
+    dataframe[mgra_labels.TOTAL_JOB_SPACES] = 0
+    # create job spaces column for each non-residential type
+    for product_type in non_residential_types:
+        print(product_type)  # check that we get the key we expect
+        labels = ProductTypeLabels(product_type)
+        dataframe[labels.total_units] = job_spaces_for_product_type(
+            dataframe, product_type)
+        # also add to the total job spaces column
+        dataframe[mgra_labels.TOTAL_JOB_SPACES] += dataframe[
+            labels.total_units]
     return dataframe
 
 
@@ -55,21 +60,26 @@ def fix_capacity(dataframe):
         Add together the current units and the leftover capacity to find the
         total, then replace the previous values
     '''
-    dataframe[HOUSING_CAPACITY] += dataframe[HOUSING_UNITS]
-    dataframe[MULTI_FAMILY_HOUSING_CAPACITY] += \
-        dataframe[MULTI_FAMILY_HOUSING_UNITS]
-    dataframe[SINGLE_FAMILY_HOUSING_CAPACITY] += \
-        dataframe[SINGLE_FAMILY_HOUSING_UNITS]
+    dataframe[mgra_labels.HOUSING_CAPACITY] += dataframe[
+        mgra_labels.HOUSING_UNITS]
+    for product_type in residential_types:
+        labels = ProductTypeLabels(product_type)
+        dataframe[labels.capacity] += dataframe[labels.total_units]
     return dataframe
 
 
 def create_version_4point1():
     original_frame = pandas.read_csv("data/SRF_Input_Base_V4.csv")
     interpolated_frame = load_interpolated()
-    combined_frame = pandas.merge(original_frame, interpolated_frame, on=MGRA)
+    combined_frame = pandas.merge(
+        original_frame, interpolated_frame, on=mgra_labels.MGRA)
     frame_with_job_spaces = add_job_spaces_columns(combined_frame)
     frame_with_fixed_capacity = fix_capacity(frame_with_job_spaces)
-    final_frame = frame_with_fixed_capacity[IO_COLUMNS]
+    # include redev and infill in access_labels.all_columns() before removing
+    # unused columns
+    # ! waiting on changes from luz level aa export branch as well
+    final_frame = frame_with_fixed_capacity[all_columns()]
+    # final_frame = frame_with_fixed_capacity
     save_to_file(final_frame, 'data', 'SRF_Input_Base_V4.1.csv')
     return
 
