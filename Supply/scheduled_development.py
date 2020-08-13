@@ -8,7 +8,11 @@ from utils.interface import load_parameters, empty_folder, save_to_file, \
 from modeling.dataframe_updates import update_mgra
 from utils.constants import ProductTypeLabels, SINGLE_FAMILY, \
     MULTI_FAMILY, MGRA, INDUSTRIAL_JOB_SPACES, COMMERCIAL_JOB_SPACES, \
-    OFFICE_JOB_SPACES, INDUSTRIAL, COMMERCIAL, OFFICE
+    OFFICE_JOB_SPACES, INDUSTRIAL, COMMERCIAL, OFFICE, UNITS_PER_YEAR
+
+
+def reduce_demand(product_type, units):
+    config.parameters[UNITS_PER_YEAR][product_type] -= units
 
 
 def add_to_mgra(mgras, site):
@@ -27,15 +31,13 @@ def add_to_mgra(mgras, site):
         labels = ProductTypeLabels(SINGLE_FAMILY)
         update_mgra(
             mgras, mgra_id, single_family_units, labels)
-        config.parameters[labels.demand_param_accessor()
-                          ] -= single_family_units
+        reduce_demand(labels.product_type, single_family_units)
     if multi_family_units > 0:
         # add multifamily units
         labels = ProductTypeLabels(MULTI_FAMILY)
         update_mgra(
             mgras, mgra_id, multi_family_units, labels)
-        config.parameters[labels.demand_param_accessor()] -= multi_family_units
-
+        reduce_demand(labels.product_type, multi_family_units)
     if employment_units > 0:
         # add employment; determine which type to add
         mgra = mgras.loc[mgras[MGRA] == mgra_id, [
@@ -52,8 +54,7 @@ def add_to_mgra(mgras, site):
         else:  # we have to guess the product type... commercial seems likely!
             labels = ProductTypeLabels(COMMERCIAL)
             update_mgra(mgras, mgra_id, employment_units, labels)
-        config.parameters[labels.demand_param_accessor()
-                          ] -= employment_units
+        reduce_demand(labels.product_type, employment_units)
 
     return
 

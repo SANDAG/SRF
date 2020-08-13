@@ -2,6 +2,7 @@ import unittest
 import os
 import pandas
 import logging
+import sys
 
 from utils.constants import INCREASING_COLUMNS, DECREASING_COLUMNS
 
@@ -16,6 +17,8 @@ class TestMain(unittest.TestCase):
         return
 
     def test_main(self):
+        if len(sys.argv) > 1:
+            return
         result = os.system(COMMANDLINE_INPUT)
         self.assertEqual(result, 0)
 

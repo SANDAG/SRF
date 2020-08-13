@@ -300,15 +300,15 @@ PRODUCT_TYPES = [
 NON_RESIDENTIAL_TYPES = [
     INDUSTRIAL, COMMERCIAL, OFFICE
 ]
-# postfixes
-# MINIMUM_UNIT_SIZE_POSTFIX = '_minimum_unit_size'
-UNITS_PER_YEAR_POSTFIX = '_units_per_year'
-CONSTRUCTION_COST_POSTFIX = '_construction_cost'
-AVERAGE_UNIT_SQFT_POSTFIX = '_average_sqft_per_unit'
-AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX = '_average_land_acres_per_unit'
-JOB_SPACES_PER_BUILDING_POSTFIX = '_job_spaces_per_building'
-MAX_VACANT_UNITS_POSTFIX = '_max_vacant_units'
-TARGET_VACANCY_RATE_POSTFIX = '_target_vacancy_rate'
+
+# param names
+UNITS_PER_YEAR = 'units_per_year'
+CONSTRUCTION_COST = 'construction_cost'
+UNIT_SQFT = 'sqft_per_unit'
+LAND_USAGE_PER_UNIT = 'land_acres_per_unit'
+JOB_SPACES_PER_BUILDING = 'job_spaces_per_building'
+MAX_VACANT_UNITS = 'max_vacant_units'
+TARGET_VACANCY_RATE = 'target_vacancy_rates'
 
 
 class ProductTypeLabels(object):
@@ -366,29 +366,26 @@ class ProductTypeLabels(object):
         return self.product_type == SINGLE_FAMILY \
             or self.product_type == MULTI_FAMILY
 
-    def demand_param_accessor(self):
-        return self.product_type + UNITS_PER_YEAR_POSTFIX
-
     def construction_cost_parameter(self):
-        return self.__param_for(CONSTRUCTION_COST_POSTFIX)
+        return self.__param_from_dict(CONSTRUCTION_COST)
 
     def units_per_year_parameter(self):
-        return self.__param_for(UNITS_PER_YEAR_POSTFIX)
+        return self.__param_from_dict(UNITS_PER_YEAR)
 
     def unit_sqft_parameter(self):
-        return self.__param_for(AVERAGE_UNIT_SQFT_POSTFIX)
+        return self.__param_from_dict(UNIT_SQFT)
 
     def land_use_per_unit_parameter(self):
-        return self.__param_for(AVERAGE_LAND_USAGE_PER_UNIT_POSTFIX)
+        return self.__param_from_dict(LAND_USAGE_PER_UNIT)
 
     def job_spaces_per_building_parameter(self):
-        return self.__param_for(JOB_SPACES_PER_BUILDING_POSTFIX)
+        return self.__param_from_dict(JOB_SPACES_PER_BUILDING)
 
     def max_vacant_units_parameter(self):
-        return self.__param_for(MAX_VACANT_UNITS_POSTFIX)
+        return self.__param_from_dict(MAX_VACANT_UNITS)
 
     def target_vacancy_rate_parameter(self):
-        return self.__param_for(TARGET_VACANCY_RATE_POSTFIX)
+        return self.__param_from_dict(TARGET_VACANCY_RATE)
 
-    def __param_for(self, postfix):
-        return config.parameters[self.product_type + postfix]
+    def __param_from_dict(self, param_name):
+        return config.parameters[param_name][self.product_type]
