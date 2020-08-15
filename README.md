@@ -10,10 +10,11 @@ Step 3: Go to directory PECAS/S28_aa and make directory "2016" here
         the current model "2016" folder: https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28/2016
 
 Step 4: Go to directory PECAS/AllYears and make directory "Code" here
-        Copy the *.jar files and hdf5 folder from the current model AllYears/Code folder: 
-        https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28/AllYears/Code .
+        Copy the *.jar files and hdf5 folder from the current PECAS model AllYears/Code folder.
+        The current PECAS model can be checked out from the following url: 
+        https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28 .
         Also check to make sure aa.properties is in the AllYears/Inputs folder. If not, you will get aa bundle not found error.
-
+    
 Step 5: Run aa only model for all years by: 
         cd PECAS/S28_aa
         python run_aa_allyears.py 
