@@ -10,5 +10,7 @@ For example: setwd("E:/PECAS/SRF/trunk/Demand")
 
 3) As an alternative to 2), Run the demand model in command prompt window:
    cd E:\PECAS\SRF\trunk\Demand
-   "C:\Program Files\R\R-4.0.2\bin\R.exe" CMD BATCH .\R\evalDemand.R    
+   "C:\Program Files\R\R-4.0.2\bin\R.exe" CMD BATCH .\R\evalDemand.R  
+   Or
+   "C:\Program Files\R\R-4.0.2\bin\Rscript.exe" .\R\evalDemand.R   
 
