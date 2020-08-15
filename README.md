@@ -3,16 +3,16 @@ SRF Development (Sub-Regional Forecasting System)
 
 Step 1: Contact the administrator to set up database user and modify the PostgreSQL connection information in dbparams.yaml. 
 
-Step 2: Update machine_settings.py based on your computer's setting such as the path to java run command.
+Step 2: Update machine_settings.py based on your computer's setting such as the path to java run command. If Java path is not correct, you will get "file not found" error.
 
 Step 3: Go to directory PECAS/S28_aa and make directory "2016" here
         Copy the travel demand model outputs: traffic_skims_AM.omx, traffic_skims_MD.omx and transit_skims.omx from
-        the current model "2016" folder: https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S27/2016
+        the current model "2016" folder: https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28/2016
 
 Step 4: Go to directory PECAS/AllYears and make directory "Code" here
         Copy the *.jar files and hdf5 folder from the current model AllYears/Code folder: 
-        https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28/AllYears/Code
-        Also check to make sure aa.properties is in the AllYears/Inputs folder. If not, you will get aa bundle not found mistake.
+        https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28/AllYears/Code .
+        Also check to make sure aa.properties is in the AllYears/Inputs folder. If not, you will get "aa bundle not found" error.
 
 Step 5: Run aa only model for all years by: 
         cd PECAS/S28_aa
