@@ -27,8 +27,8 @@ Step 7: Run MU Land Demand Model by:
         cd E:\PECAS\SRF\trunk\Demand
         "C:\Program Files\R\R-4.0.2\bin\R.exe" CMD BATCH .\R\evalDemand.R
         or 
-         "C:\Program Files\R\R-4.0.2\bin\Rscript.exe" .\R\evalDemand.R
-        
+         "C:\Program Files\R\R-4.0.2\bin\Rscript.exe" .\R\evalDemand.R . 
+        Make sure the path to R command or Rscript command is correct.
 
 
 
