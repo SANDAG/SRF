@@ -2,6 +2,10 @@
 # I/O
 input_filename: "data/SRF_Input_Base_V4.1.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
+
+srf_schema: "srf"
+srf_inputtbl: "_data_preprocessed"
+
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # set to 1 for verbose output

@@ -6,7 +6,11 @@ from modeling.develop import develop
 from utils.interface import \
     load_parameters, empty_folder, save_to_file, get_args
 import utils.config as config
+import psycopg2
 
+import sys
+sys.path.append("../..")
+from machine_settings import *
 
 def run(mgra_dataframe):
     output_dir = config.parameters['output_directory']
@@ -31,6 +35,17 @@ def run(mgra_dataframe):
         progress.close()
     return
 
+def connect_to_aa():
+        ## Set up database connection parameters
+        parameters  = load_parameters("../../"+db_param_files)
+
+        return psycopg2.connect(
+        database=parameters['aa_database'],
+        host=parameters['aa_host'],
+        port=parameters['aa_port'],
+        user=parameters['aa_user'],
+        password=parameters['aa_password'])
+        
 
 if __name__ == "__main__":
     # load parameters
@@ -49,7 +64,11 @@ if __name__ == "__main__":
         if config.parameters['debug']:
             logging.basicConfig(level=logging.DEBUG)
         # load dataframe
-        mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
+        #mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
+        conn = connect_to_aa()
+        mysql = 'select * from {}.\"{}\"'.format(config.parameters['srf_schema'], config.parameters['srf_inputtbl'])
+        mgra_dataframe = pandas.read_sql(mysql, conn)
+        conn.close()
         run(mgra_dataframe)
     else:
         print('could not load parameters, exiting')

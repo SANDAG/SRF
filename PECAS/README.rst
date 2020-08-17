@@ -16,3 +16,11 @@ The release candidate sent to Manhan Group for QA/QC is
 
 https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S21u_m
 
+and 
+
+https://svn.hbaspecto.com/svn/pecas/PECASSanDiego/S28
+
+S21u_m_aa is the AA only model extracted from S21u_m model linked above. 
+
+S28_aa is the AA only model extracted from S28 model linked above.
+
