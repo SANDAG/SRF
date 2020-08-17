@@ -31,7 +31,7 @@ We will use pyinstaller to create distributable software, the dist files will wo
 Add MGRA level data to the `data` folder
 
 - Ensure that the column labels match those found in `labels.yaml`
-  - If the mgra version 4.1 is not found, the program will use `interpolated_vars.csv` to create one with `SRF_Input_Base_V4.csv`
+  - If the mgra version 4.1 is not found, the program will look for `interpolated_vars.csv` and `SRF_Input_Base_V4.csv` to create one
   - If adding scheduled development, ensure that there is a compatible sites file; `Sites_MGRAs.dbf`
   - If exporting to AA, ensure that there is a compatible crosswalk file; `CRE2FSC.csv`
 
