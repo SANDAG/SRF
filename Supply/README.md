@@ -21,16 +21,29 @@ We will use pyinstaller to create distributable software, the dist files will wo
 ## Installation
 
 - Install dependencies with: `pip install -r requirements.txt`
-- Test with: `python main.py -t`
+- Test with: `python run_tests.py -t`
 - Create distributable folder with: `pyinstaller main.py`
 
 ## Usage
 
-- Add MGRA level data to the `data` folder
-  - Ensure that the column labels match those listed under interface
-- Configure program inputs in `parameters.yaml`
-- Run with `python main.py`
-  - Or, run the main executable from the pyinstaller dist folder after following installation steps
+### Data Folder
+
+Add MGRA level data to the `data` folder
+
+- Ensure that the column labels match those found in `labels.yaml`
+  - If the mgra version 4.1 is not found, the program will use `interpolated_vars.csv` to create one with `SRF_Input_Base_V4.csv`
+  - If adding scheduled development, ensure that there is a compatible sites file; `Sites_MGRAs.dbf`
+  - If exporting to AA, ensure that there is a compatible crosswalk file; `CRE2FSC.csv`
+
+### Parameter Configuration
+
+Change program inputs parameters in `parameters.yaml`
+
+### Execution
+
+Run with `python main.py`
+
+- Alternatively, run the main executable from the pyinstaller dist folder after following installation steps
 
 ## Module Process
 
@@ -38,11 +51,11 @@ We will use pyinstaller to create distributable software, the dist files will wo
 
 ## Interface
 
-The supply module accepts a .csv file and expects the following data on each MGRA:
+The Supply module accepts a .csv file and expects the following data on each MGRA:
 
 ### Input and Output Columns
 
-The supply module expects these columns and updates them during program execution
+The Supply module expects these columns and updates them during program execution
 
 - SqFt_SF | total squarefootage of single-family units
 - SqFt_MF | total squarefootage of multiple-family units
