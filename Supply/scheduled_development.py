@@ -18,6 +18,7 @@ INDUSTRIAL = 'industrial'
 
 
 def reduce_demand(product_type, units):
+    # note that it can be problematic to change parameters mid simulation
     config.parameters[UNITS_PER_YEAR][product_type] -= units
 
 
@@ -134,9 +135,6 @@ def run(mgras, intersections, output_dir, progress=None, starting_year=None):
     # find max siteID
     # for i = 1 through max_siteID
     # return instances of siteID in intersections
-    # if there are none, skip
-    # if there is one, put all development on the mgra
-    # if there are multiple determine split.
     sites = []
     max_siteID = intersections.siteid.max()
     progress_bar = tqdm(range(max_siteID))
@@ -144,8 +142,11 @@ def run(mgras, intersections, output_dir, progress=None, starting_year=None):
     for i in progress_bar:
         sites.append(find_sites(intersections, i + 1))
 
-    # sites is a list of dataframes.
-
+    # we now have sites as a list of dataframes.
+    # for each frame
+    # if there are no entries, skip
+    # if there is one, put all development on the mgra
+    # if there are multiple determine split.
     progress_bar = tqdm(sites)
     progress_bar.set_description('allocating development for each site')
     for frame in progress_bar:
