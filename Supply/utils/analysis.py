@@ -3,7 +3,7 @@ import os
 import pandas
 import sys
 
-from utils.constants import VACANT_ACRES, MGRA, ProductTypeLabels
+from utils.access_labels import mgra_labels, ProductTypeLabels
 
 
 def plot_column(column, output_dir='data/output', image_name='plot.png'):
@@ -13,7 +13,7 @@ def plot_column(column, output_dir='data/output', image_name='plot.png'):
 
 
 def plot_total_acres(mgra_dataframe, output_dir):
-    mgra_dataframe.plot.scatter(x=MGRA, y='total_acres')
+    mgra_dataframe.plot.scatter(x=mgra_labels.MGRA, y='total_acres')
     plt.savefig(os.path.join(output_dir, 'plot.png'))
     plt.close()
 
@@ -30,7 +30,8 @@ def analyze_mgra(filename, output_dir):
     print(mgra_dataframe.memory_usage(deep=True))
     print('single frame memory usage: {}MB'.format(
         mgra_dataframe.memory_usage(deep=True).sum()/100000))
-    vacant_count = len(mgra_dataframe[mgra_dataframe[VACANT_ACRES] > 0.5])
+    vacant_count = len(
+        mgra_dataframe[mgra_dataframe[mgra_labels.VACANT_ACRES] > 0.5])
 
     print('MGRA\'s with 1/2 acre or more vacant: {}/{}'.format(
         vacant_count, len(mgra_dataframe)))

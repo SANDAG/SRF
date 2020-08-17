@@ -9,8 +9,7 @@ import pandas
 import csv
 
 from utils.interface import save_to_file
-from utils.access_labels import mgra_labels, non_residential_types, \
-    ProductTypeLabels
+from utils.access_labels import mgra_labels, ProductTypeLabels
 
 CROSSWALK_FILEPATH = 'data/CRE2FSC.csv'
 

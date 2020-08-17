@@ -77,7 +77,7 @@ def create_version_4point1():
     # fix capacity
     frame_with_fixed_capacity = fix_capacity(frame_with_job_spaces)
 
-    # ! include redev and infill in access_labels.all_columns() before
+    # ! add redev and infill in access_labels.all_columns()
     # remove unused columns
     final_frame = frame_with_fixed_capacity[all_columns()]
     save_to_file(final_frame, 'data', 'SRF_Input_Base_V4.1.csv')
