@@ -1,0 +1,143 @@
+---
+# this is a file that enables the user to easily update the column names that the supply program will expect to find in the MGRA input file
+
+MGRA: "MGRA" # Series 13 MGRA
+LUZ: "LUZ"
+TOTAL_ACRES: "acres" # total acres
+DEVELOPED_ACRES: "dev" # total developed acres
+VACANT_ACRES: "vac" # total vacant acres
+# vacant land not available for development for physical, public policy,
+# or environmental reasons
+UNUSABLE_ACRES: "unusable"
+LAND_COST_PER_ACRE: "Land_Cost" # cost of land per acre
+
+HOUSING_UNITS: "hs"
+HOUSEHOLDS: "hh" # total Households (occupied housing units)
+TOTAL_JOB_SPACES: "job_spaces"
+EMPLOYMENT: "emp" # Employment
+
+HOUSING_CAPACITY: "Cap_HS" # housing stock (dwelling unit) capacity
+DWELLING_UNITS_PER_ACRE: "DUA" # dwelling units per acre
+CIVILIAN_EMPLOYMENT_CAPACITY: "Cap_Emp_Ci" # civilian employment capacity
+
+SHAPE_AREA: "Shape_Area"
+
+product_types:
+  residential:
+    single_family:
+      HOUSING_UNITS: "hs_sf" # Single-family housing units
+      HOUSEHOLDS: "hh_sf"
+      TOTAL_SQUARE_FOOTAGE: "SqFt_SF"
+      DEVELOPED_ACRES: "dev_sf"
+      VACANT_ACRES: "vac_sf"
+      MEAN_PRICE: "SF_mean"
+      HOUSING_CAPACITY: "Cap_HS_SF"
+    multi_family:
+      HOUSING_UNITS: "hs_mf" # Multiple-family housing units
+      HOUSEHOLDS: "hh_mf"
+      TOTAL_SQUARE_FOOTAGE: "SqFt_MF"
+      DEVELOPED_ACRES: "dev_mf"
+      VACANT_ACRES: "vac_mf"
+      MEAN_PRICE: "MFmean"
+      HOUSING_CAPACITY: "Cap_HS_MF"
+    # rural_residential:
+    #   HOUSING_UNITS: "hs_ldsf"
+    #   HOUSEHOLDS: "hh_ldsf"
+    #   TOTAL_SQUARE_FOOTAGE: "sqft_ldsf"
+    #   DEVELOPED_ACRES: "dev_ldsf"
+    #   VACANT_ACRES: "vac_ldsf"
+    #   MEAN_PRICE: "ldsf_mean"
+    # mobile_home:
+    #   HOUSING_UNITS: "hs_mh" # Mobile home housing units
+    #   HOUSEHOLDS: "hh_mh"
+    #   TOTAL_SQUARE_FOOTAGE: "sqft_mh"
+    #   DEVELOPED_ACRES: "dev_mh"
+    #   VACANT_ACRES: "vac_mh"
+    #   MEAN_PRICE: "mh_mean"
+  non_residential:
+    industrial:
+      EMPLOYMENT: "emp_indus_"
+      JOB_SPACES: "industrial_js"
+      TOTAL_SQUARE_FOOTAGE: "Ind_SqFt"
+      DEVELOPED_ACRES: "dev_indus"
+      VACANT_ACRES: "vac_indus"
+      MEAN_PRICE: "INDmean"
+      JOB_AREA: "sf_indmean"
+    commercial:
+      EMPLOYMENT: "emp_comm_l"
+      JOB_SPACES: "commercial_js"
+      TOTAL_SQUARE_FOOTAGE: "Ret_SqFt"
+      DEVELOPED_ACRES: "dev_comm"
+      VACANT_ACRES: "vac_comm"
+      MEAN_PRICE: "RETmean"
+      JOB_AREA: "sf_commean"
+    office:
+      EMPLOYMENT: "emp_office"
+      JOB_SPACES: "office_js"
+      TOTAL_SQUARE_FOOTAGE: "Ofc_SqFt"
+      DEVELOPED_ACRES: "dev_office"
+      VACANT_ACRES: "vac_office"
+      MEAN_PRICE: "OFCmean"
+      JOB_AREA: "sf_ofcmean"
+    # other:
+    #   EMPLOYMENT: "emp_other"
+
+redevelopment:
+  # by planned / resultant product type
+  multi-family:
+    SINGLE_FAMILY_MULTI_FAMILY_REDEVELOPMENT_ACRES: "redev_sf_m"
+    # acres developed as mobile home parks, planned for redevelopment as multiple
+    # family residential
+    MOBILE_HOME_MULTI_FAMILY_REDEVELOPMENT_ACRES: "redev_mh_m"
+    # acres developed as agricultural, extractive industry, or
+    # junkyard/dumps/landfills planned for redevelopment as
+    # multiple family residential
+    AGRICULTURE_MULTI_FAMILY_REDEVELOPMENT_ACRES: "redev_ag_m"
+  employment:
+    # acres developed as single family residential, planned for redevelopment as
+    # employment use
+    SINGLE_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES: "redev_sf_e"
+    # acres developed as multiple family residential, planned for redevelopment as
+    # employment use
+    MULTI_FAMILY_EMPLOYMENT_REDEVELOPMENT_ACRES: "redev_mf_e"
+    # acres developed as mobile home parks, planned for redevelopment as
+    # employment use
+    MOBILE_HOME_EMPLOYMENT_REDEVELOPMENT_ACRES: "redev_mh_e"
+    # acres developed as employment use, planned for redevelopment as a
+    # different category of employment use
+    EMPLOYMENT_EMPLOYMENT_REDEVELOPMENT_ACRES: "redev_emp_"
+  single-family:
+    # acres developed as mobile home parks, planned for redevelopment as single
+    # family residential
+    MOBILE_HOME_SINGLE_FAMILY_REDEVELOPMENT_ACRES: "redev_mh_s"
+    # acres developed as agricultural, extractive industry,
+    # or junkyard/dumps/landfills planned for redevelopment as
+    # single family residential
+    AGRICULTURE_SINGLE_FAMILY_REDEVELOPMENT_ACRES: "redev_ag_s"
+  industrial:
+    # acres developed as agricultural, extractive industry,
+    # or junkyard/dumps/landfills planned for redevelopment as industrial,
+    # wholesale trade, airport, rail station, communications and utilities,
+    # center city parking, park and ride lots, other transportation,
+    AGRICULTURE_INDUSTRIAL_REDEVELOPMENT_ACRES: "redev_ag_i"
+  commercial:
+    # acres developed as agricultural, extractive industry, or
+    # junkyard/dumps/landfills planned for redevelopment as retail trade,
+    # hotels/motels/resorts, public services, hospitals, or commercial recreation
+    AGRICULTURE_COMMERCIAL_REDEVELOPMENT_ACRES: "redev_ag_c"
+  office:
+    # acres developed as agricultural, extractive industry, or
+    # junkyard/dumps/landfills planned for redevelopment as offices
+    AGRICULTURE_OFFICE_REDEVELOPMENT_ACRES: "redev_ag_o"
+  residential:
+    # acres developed as employment use, planned for redevelopment as
+    # residential
+    EMPLOYMENT_RESIDENTIAL_REDEVELOPMENT_ACRES: "redev_emp1"
+
+infill:
+  # developed acres planned for single family residential infill
+  SINGLE_FAMILY_INFILL_ACRES: "infill_sf"
+  # developed acres planned for multiple family residential infill
+  MULTI_FAMILY_INFILL_ACRES: "infill_mf"
+  # developed acres planned for employment infill
+  EMPLOYMENT_INFILL_ACRES: "infill_emp"

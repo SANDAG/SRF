@@ -1,0 +1,83 @@
+---
+# I/O
+input_filename: "data/SRF_Input_Base_V4.1.csv"
+sites_filename: "data/Sites_MGRAs.dbf"
+
+# database_info_filename: "../dbparams.yaml"
+# srf_schema: "srf"
+# srf_inputtbl: "_data_preprocessed"
+
+output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
+
+# set to 1 for verbose output
+debug: 0
+
+# Simulation
+simulation_years: 1
+simulation_begin: 2012
+
+# Vacancy
+target_vacancy_rates:
+  single_family: 0.06
+  multi_family: 0.06
+  rural_residential: 0.06
+  mobile_home: 0.06
+  industrial: 0.06
+  commercial: 0.06
+  office: 0.06
+
+max_vacant_units:
+  # used to allow for new developments
+  # based on some of the higher values in the 2013 planned developments
+  # ! this probably should account for local variance
+  single_family: 30
+  multi_family: 500
+  rural_residential: 10
+  mobile_home: 300
+  industrial: 634
+  commercial: 600
+  # ! seems a little too high, based on a large development: mira sorrento
+  office: 1800
+
+# Profitability
+minimum_redevelopment_age: 20
+profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
+amortization_years: 20
+infill_cost_multiplier: 1.1
+redevelopment_cost_multiplier: 1.25
+
+# Sizes
+sqft_per_unit:
+  # average result of total square footage columns / total units columns
+  office: 1399.63208231
+  commercial: 2037.9073059
+  industrial: 617.732807
+  multi_family: 2246.69
+  single_family: 2157.18
+
+land_acres_per_unit:
+  # average result of total land acres columns / total units columns
+  office: 0.0614644
+  commercial: 0.701894545
+  industrial: 0.8506631
+  multi_family: 0.038312574
+  single_family: 0.2559981
+
+construction_cost:
+  # Construction Cost/Square Foot by product type
+  # Proposed by SANDAG based on this source: https://ccorpinsights.com/costs-per-square-foot/
+  office: 379.5
+  commercial: 228.5
+  industrial: 261.5
+  multi_family: 192.5
+  single_family: 388
+
+# Demand
+units_per_year:
+  # derived from total jobs * growth of 0.96% per year:
+  office: 2384
+  commercial: 5372
+  industrial: 3256
+  # from population projection of ~ 30,000 per year (62.6% single family)
+  single_family: 6636
+  multi_family: 3965
