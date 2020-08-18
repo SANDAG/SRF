@@ -59,13 +59,15 @@ def empty_folder(folder):
             return 2
 
 
-def save_to_file(printable, output_directory, filename):
+def save_to_file(printable, output_directory, filename, as_yaml=False):
     create_folder_if_needed(output_directory)
     filepath = os.path.join(output_directory, filename)
     # use pandas to_csv function if available
     if hasattr(printable, 'to_csv'):
         printable.to_csv(filepath, index=False)
     else:
+        if as_yaml:
+            printable = yaml.dump(printable)
         print(printable, file=open(filepath, 'w'), end='')
 
 
