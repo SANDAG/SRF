@@ -1,8 +1,7 @@
-import pandas
 from tqdm import tqdm
 
-from utils.config import parameters
-from utils.interface import save_to_file, open_dbf
+from utils.interface import save_to_file, open_mgra_io_file, open_sites_file, \
+    parameters
 from modeling.dataframe_updates import update_mgra
 
 from utils.access_labels import ProductTypeLabels, mgra_labels, UNITS_PER_YEAR
@@ -163,8 +162,4 @@ def run(mgras, intersections, starting_year=None):
 
 if __name__ == "__main__":
     if parameters is not None:
-        # load dataframes
-        mgra_dataframe = pandas.read_csv(parameters['input_filename'])
-        input_sites = open_dbf(parameters['sites_filename'])
-
-        run(mgra_dataframe, input_sites)
+        run(open_mgra_io_file(), open_sites_file())

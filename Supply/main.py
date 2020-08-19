@@ -1,12 +1,10 @@
 import os.path
-import pandas
 
 from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
-from utils.interface import save_to_file, open_dbf
+from utils.interface import save_to_file, open_mgra_io_file, open_sites_file, \
+    parameters
 from utils.aa_luz_export import export_luz_data, CROSSWALK_FILEPATH
-from utils.config import parameters
-from utils.data_prep import create_version_4point1
 
 
 def run(mgra_dataframe, planned_sites):
@@ -43,15 +41,12 @@ def run(mgra_dataframe, planned_sites):
 
 if __name__ == "__main__":
     if parameters is not None:
-        # prep input
-        if not os.path.exists('data/SRF_Input_Base_V4.1.csv'):
-            create_version_4point1()
         # load dataframe
-        mgra_dataframe = pandas.read_csv(parameters['input_filename'])
+        mgra_dataframe = open_mgra_io_file()
         # load scheduled development if a file is available
         scheduled_development_filepath = parameters['sites_filename']
         if os.path.isfile(scheduled_development_filepath):
-            planned_sites = open_dbf(scheduled_development_filepath)
+            planned_sites = open_sites_file()
         else:
             print('no scheduled development file found (\"{}\"), skipping'
                   .format(scheduled_development_filepath))

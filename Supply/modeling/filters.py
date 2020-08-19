@@ -2,7 +2,7 @@ import logging
 import numpy
 import pandas
 
-import utils.config as config
+from utils.interface import parameters
 from utils.access_labels import mgra_labels
 from utils.converter import x_per_acre_to_x_per_square_foot
 
@@ -118,9 +118,9 @@ def filter_by_profitability(mgra_dataframe, product_type_labels, vacancy_caps):
     expected_costs = construction_cost + land_cost_per_square_foot
 
     # find minimum returns for viable MGRA's
-    profit_multiplier = config.parameters['profit_multiplier']
+    profit_multiplier = parameters['profit_multiplier']
     minimum_revenue = expected_costs * profit_multiplier
-    years = config.parameters['amortization_years']
+    years = parameters['amortization_years']
     amortized_minimum = minimum_revenue / \
         years
     amortized_costs = expected_costs / years

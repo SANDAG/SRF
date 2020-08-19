@@ -5,7 +5,13 @@ import yaml
 import argparse
 import matplotlib.pyplot as plt
 from simpledbf import Dbf5
+import psycopg2
+import pandas
+import logging
 
+
+# This file has became a strange mix of universally useful tools and extremely
+# use case specific methods
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -14,11 +20,10 @@ def get_args():
     return parser.parse_args()
 
 
-def load_parameters(param_filename):
-    with open(param_filename, 'r') as stream:
+def load_yaml(filename):
+    with open(filename, 'r') as stream:
         try:
-            parameters = yaml.safe_load(stream)
-            return parameters
+            return yaml.safe_load(stream)
         except yaml.YAMLError as error:
             print(error)
     return None
@@ -71,6 +76,34 @@ def save_to_file(printable, output_directory, filename, as_yaml=False):
         print(printable, file=open(filepath, 'w'), end='')
 
 
+def configure():
+    args = get_args()
+    try:
+        if args.test:
+            # only meet_demand.py should use a test argument
+            parameters = load_yaml('test_parameters.yaml')
+        else:
+            parameters = load_yaml('parameters.yaml')
+    except(FileNotFoundError):
+        parameters = None
+
+    if parameters is not None:
+        # prep output directory
+        output_dir = parameters['output_directory']
+        empty_folder(output_dir)
+        save_to_file(parameters, output_dir,
+                     'parameters_used.yaml', as_yaml=True)
+        # configure logging level
+        if parameters['debug']:
+            logging.basicConfig(level=logging.DEBUG)
+    else:
+        print('could not load parameters, exiting')
+    return parameters
+
+
+parameters = configure()
+
+
 def plot_data(data, output_dir='data/output', image_name='plot.png'):
     plt.plot(data, 'ro')
     plt.savefig(os.path.join(output_dir, image_name))
@@ -80,3 +113,35 @@ def plot_data(data, output_dir='data/output', image_name='plot.png'):
 def open_dbf(filepath):
     dbf = Dbf5(filepath)
     return dbf.to_dataframe()
+
+
+def open_sites_file():
+    # TODO: later this will also read from a database
+    return open_dbf(parameters['sites_filename'])
+
+
+def connect_to_db(db_param_filename):
+    # Set up database connection
+    connection_info = load_yaml(db_param_filename)
+    print(connection_info)
+    return psycopg2.connect(
+        database=connection_info['database'],
+        host=connection_info['host'],
+        port=connection_info['port'],
+        user=connection_info['user'],
+        password=connection_info['password'])
+
+
+def open_mgra_io_file(from_database=False):
+    if from_database:
+        with connect_to_db(
+                parameters['database_info_filename']
+        ) as connection:
+            print(connection)
+            sql_statement = 'select * from {}.\"{}\"'.format(
+                parameters['srf_schema'],
+                parameters['srf_inputtbl']
+            )
+            return pandas.read_sql(sql_statement, connection)
+    else:  # load from file
+        return pandas.read_csv(parameters['input_filename'])

@@ -260,7 +260,7 @@ loadMuLandInputs <- function(configDir,tables) {
   
   library(RPostgreSQL)
   m <- dbDriver('PostgreSQL')
-  conn <- dbConnect(m, host=config$aa_host, dbname=config$aa_database, user=config$aa_user, password=config$aa_password, port=config$aa_port)
+  conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
   on.exit(dbDisconnect(conn))
   inputs_schema <- config$mu_schema
   mysql <- paste0("select schema_name FROM information_schema.schemata WHERE schema_name = '", inputs_schema,"';") 
@@ -303,7 +303,7 @@ loadMGRA <- function(configDir,tname) {
   
   library(RPostgreSQL)
   m <- dbDriver('PostgreSQL')
-  conn <- dbConnect(m, host=config$aa_host, dbname=config$aa_database, user=config$aa_user, password=config$aa_password, port=config$aa_port)
+  conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
   on.exit(dbDisconnect(conn))
   inputs_schema <- config$mu_schema
   mysql <- paste0("select table_name FROM information_schema.tables WHERE table_schema='", inputs_schema,"' and table_name = '", tname,"';") 
