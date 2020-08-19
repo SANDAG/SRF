@@ -118,6 +118,32 @@ class ProductTypeLabels(object):
         return config.parameters[param_name][self.product_type]
 
 
+class RedevelopmentLabels(object):
+    def __init__(self):
+        super().__init__()
+        redevelopment_dict = labels_dict['redevelopment']
+        self.multi_family = redevelopment_dict['multi_family'].values()
+        self.employment = redevelopment_dict['employment'].values()
+        self.single_family = redevelopment_dict['single_family'].values()
+        self.industrial = redevelopment_dict['industrial'].values()
+        self.commercial = redevelopment_dict['commercial'].values()
+        self.office = redevelopment_dict['office'].values()
+        self.residential = redevelopment_dict['residential'].values()
+        self.infill = labels_dict['infill'].values()
+
+    def list_labels(self):
+        result = []
+        result.extend(self.multi_family)
+        result.extend(self.employment)
+        result.extend(self.single_family)
+        result.extend(self.industrial)
+        result.extend(self.commercial)
+        result.extend(self.office)
+        result.extend(self.residential)
+        result.extend(self.infill)
+        return result
+
+
 def increasing_columns():
     increasing_columns = []
     # add general labels
@@ -155,8 +181,11 @@ def decreasing_columns():
 
 def all_columns():
     # need a list of all column labels used
+    # start with general labels
     columns = mgra_labels.list_labels()
-
+    # add all product types
     for product_type in product_types():
         columns.extend(ProductTypeLabels(product_type).list_labels())
+    # also add redevelopment and infill
+    columns.extend(RedevelopmentLabels().list_labels())
     return columns

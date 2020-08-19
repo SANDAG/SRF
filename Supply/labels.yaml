@@ -84,7 +84,7 @@ product_types:
 
 redevelopment:
   # by planned / resultant product type
-  multi-family:
+  multi_family:
     SINGLE_FAMILY_MULTI_FAMILY_REDEVELOPMENT_ACRES: "redev_sf_m"
     # acres developed as mobile home parks, planned for redevelopment as multiple
     # family residential
@@ -106,7 +106,7 @@ redevelopment:
     # acres developed as employment use, planned for redevelopment as a
     # different category of employment use
     EMPLOYMENT_EMPLOYMENT_REDEVELOPMENT_ACRES: "redev_emp_"
-  single-family:
+  single_family:
     # acres developed as mobile home parks, planned for redevelopment as single
     # family residential
     MOBILE_HOME_SINGLE_FAMILY_REDEVELOPMENT_ACRES: "redev_mh_s"
@@ -133,6 +133,8 @@ redevelopment:
     # acres developed as employment use, planned for redevelopment as
     # residential
     EMPLOYMENT_RESIDENTIAL_REDEVELOPMENT_ACRES: "redev_emp1"
+    AGRICULTURE_RESIDENTIAL_REDEVELOPMENT_ACRES: "redev_ag_r"
+    AGRICULTURE_RURAL_RESIDENTIAL_REDEVELOPMENT_ACRES: "redev_ag_l"
 
 infill:
   # developed acres planned for single family residential infill
