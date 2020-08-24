@@ -1,6 +1,5 @@
 import psycopg2
 import pandas
-from tqdm import tqdm
 import logging
 
 from modeling.develop import develop
@@ -23,13 +22,10 @@ def run(mgra_dataframe):
         if mgra_dataframe is None:
             print('program terminated, {} years were completed'.format(i))
             return
-        progress = tqdm(total=1)
-        progress.set_description(
-            'saving year{}_{}.csv'.format(i+1, forecast_year))
+
+        # save output file
         save_to_file(mgra_dataframe, output_dir, 'year{}_{}.csv'.format(
             i + 1, forecast_year))
-        progress.update()
-        progress.close()
     return
 
 
@@ -58,7 +54,8 @@ if __name__ == "__main__":
         # prep output directory
         output_dir = config.parameters['output_directory']
         empty_folder(output_dir)
-        save_to_file(config.parameters, output_dir, 'parameters.txt')
+        save_to_file(config.parameters, output_dir,
+                     'parameters.txt', output_status=False)
         # configure logging level
         if config.parameters['debug']:
             logging.basicConfig(level=logging.DEBUG)

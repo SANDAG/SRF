@@ -169,7 +169,8 @@ if __name__ == "__main__":
         # prep output directory
         output_dir = config.parameters['output_directory']
         empty_folder(output_dir)
-        save_to_file(config.parameters, output_dir, 'parameters.txt')
+        save_to_file(config.parameters, output_dir,
+                     'parameters.txt', output_status=False)
         # configure logging level
         if config.parameters['debug']:
             logging.basicConfig(level=logging.DEBUG)

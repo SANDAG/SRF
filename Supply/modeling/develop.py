@@ -1,10 +1,14 @@
 import logging
 import numpy
 from tqdm import tqdm
+import random
+import copy
 
-from modeling.filters import apply_filters
+from modeling.filters import apply_filters, generic_filter
 from modeling.dataframe_updates import update_mgra
-from utils.access_labels import product_types, ProductTypeLabels, mgra_labels
+from utils.access_labels import all_product_type_labels, \
+    mgra_labels
+from modeling.candidates import make_redev_candidates, trim_columns
 
 
 def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
@@ -40,46 +44,49 @@ def combine_weights(profitability, vacancy, preference=1):
     return normalize(weights)
 
 
-def develop_product_type(mgras, product_type_labels):
-    new_units_to_build = product_type_labels.units_per_year_parameter()
-    built_units = 0
-    progress_bar = tqdm(total=new_units_to_build)
-    progress_bar.set_description(
-        "developing {} units".format(product_type_labels.product_type))
-    while built_units < new_units_to_build:
-        max_units = new_units_to_build - built_units
+def choose_candidate(candidates, mgras, product_type_labels, max_units):
+    # Filter
+    filtered, vacancy_caps, profit_margins = apply_filters(
+        candidates, product_type_labels)
+    if len(filtered) < 1:
+        print('out of usable mgras for product type {}'.format(
+            product_type_labels.product_type))
+        print('evaluate filtering methods\nexiting')
+        return None
 
-        # Filter
-        filtered, vacancy_caps, profit_margins = apply_filters(
-            mgras, product_type_labels)
+    # Sample
+    weights = combine_weights(profit_margins, vacancy_caps)
+    selected_row = filtered.sample(n=1, weights=weights)
+    selected_ID = selected_row[mgra_labels.MGRA].iloc[0]
 
-        if len(filtered) < 1:
-            print('out of usable mgras for product type {}'.format(
-                product_type_labels.product_type))
-            print('evaluate filtering methods\nexiting')
-            return None
+    buildable_count = buildable_units(
+        selected_row, product_type_labels, max_units, vacancy_caps)
+    logging.debug('building {} {} units on MGRA #{}'.format(
+        buildable_count, product_type_labels.product_type, selected_ID))
 
-        # Sample
-        # vacancy_weights = normalize(vacancy_caps)
-        # profit_weights = normalize(profits)
-        weights = combine_weights(profit_margins, vacancy_caps)
-        selected_row = filtered.sample(n=1, weights=weights)
-        selected_ID = selected_row[mgra_labels.MGRA].iloc[0]
+    # develop buildable_count units by updating the MGRA in the dataframe
+    update_mgra(mgras, selected_ID,
+                buildable_count, product_type_labels)
 
-        buildable_count = buildable_units(
-            selected_row, product_type_labels, max_units, vacancy_caps)
-        built_units += buildable_count
-        logging.debug('building {} {} units on MGRA #{}'.format(
-            buildable_count, product_type_labels.product_type, selected_ID))
+    return mgras, buildable_count
 
-        # develop buildable_count units by updating the MGRA in the dataframe
-        update_mgra(mgras, selected_ID,
-                    buildable_count, product_type_labels)
-        progress_bar.update(buildable_count)
 
-    progress_bar.close()
+def demand_unsatisfied(demand):
+    return demand[0] < demand[1]
 
-    return mgras
+
+def demands_unsatisfied(labels_demands):
+    for _, demand in labels_demands:
+        if demand_unsatisfied(demand):
+            return True
+    return False
+
+
+def sum_demand(labels_demands):
+    total = 0
+    for _, demand in labels_demands:
+        total += demand[1]
+    return total
 
 
 def develop(mgras):
@@ -91,11 +98,40 @@ def develop(mgras):
     Returns:
         a pandas dataframe with selected MGRA's updated
     """
-    for product_type in product_types():
-        product_type_labels = ProductTypeLabels(product_type)
-        mgras = develop_product_type(
-            mgras, product_type_labels)
-        if mgras is None:
-            return mgras
+    # create candidate set
+    # candidate_set = CandidateSet(mgras)
+    candidates = copy.deepcopy(mgras)
+    # remove candidates with no vacant land ( 23002 to 8802)
+    candidates = generic_filter(candidates, [mgra_labels.VACANT_ACRES])
+    candidates = trim_columns(candidates)
+    # for each mgra that has redev add candidates with each redev?
+    redev_candidates = make_redev_candidates(mgras)
+    print(redev_candidates.columns)
+    print(len(redev_candidates))
+    # candidates = pandas.merge(candidates, redev_candidates)
+    # prep demand
+    labels_demands = []
+    for product_type_labels in all_product_type_labels():
+        labels_demands.append((
+            product_type_labels,
+            (0, product_type_labels.units_per_year_parameter())
+        ))
 
+    progress_bar = tqdm(total=sum_demand(labels_demands))
+    progress_bar.set_description(
+        'allocating units by alternating through each product type')
+    # select one build candidate at a time for each product type
+    while demands_unsatisfied(labels_demands):
+        for index, (labels, demand) in enumerate(labels_demands):
+            if demand_unsatisfied(demand):
+                mgras, built_demand = choose_candidate(
+                    candidates,
+                    mgras, labels, demand[1] - demand[0]
+                )
+                labels_demands[index] = (
+                    labels, (demand[0] + built_demand, demand[1]))
+                progress_bar.update(built_demand)
+        random.shuffle(labels_demands)
+
+    progress_bar.close()
     return mgras

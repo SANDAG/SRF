@@ -59,7 +59,9 @@ def empty_folder(folder):
             return 2
 
 
-def save_to_file(printable, output_directory, filename):
+def save_to_file(printable, output_directory, filename, output_status=True):
+    if(output_status):
+        print('saving {} to {} folder'.format(filename, output_directory))
     create_folder_if_needed(output_directory)
     filepath = os.path.join(output_directory, filename)
     # use pandas to_csv function if available
@@ -67,6 +69,8 @@ def save_to_file(printable, output_directory, filename):
         printable.to_csv(filepath, index=False)
     else:
         print(printable, file=open(filepath, 'w'), end='')
+    if(output_status):
+        print('saved')
 
 
 def plot_data(data, output_dir='data/output', image_name='plot.png'):

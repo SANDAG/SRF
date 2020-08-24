@@ -7,6 +7,20 @@ from utils.access_labels import mgra_labels
 from utils.converter import x_per_acre_to_x_per_square_foot
 
 
+def generic_filter(dataframe, columns, filter_nans=True, filter_zeros=True):
+    '''
+        columns: a list containing the columns to be evaluated
+        returns: dataframe with the rows removed that have NAN's or zeros in
+        any of the specified columns
+    '''
+    for column in columns:
+        if filter_zeros:
+            dataframe = dataframe[dataframe[column] != 0]
+        if filter_nans:
+            dataframe = dataframe[pandas.notnull(dataframe[column])]
+    return dataframe
+
+
 def apply_filters(mgra_dataframe, product_type_labels):
     '''
     applies each filtering method on the data frame
@@ -43,6 +57,11 @@ def filter_product_type(mgra_dataframe, product_type_labels):
     MINIMUM_UNITS = 5
     vacant_land = mgra_dataframe[product_type_labels.vacant_acres]
     units_available = vacant_land // acreage_per_unit
+
+    # pseudo code for also checking all applicable redev and infill columns
+    # redev_units_available = \
+    #    get_max_of_redev_and_infill_options() // acreage_per_unit
+    # units_available = max(units_available, redev_units_available)
 
     # also check residential capacity values here
     if product_type_labels.is_residential():

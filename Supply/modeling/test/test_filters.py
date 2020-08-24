@@ -1,16 +1,43 @@
 import unittest
 import pandas
 
-from modeling.filters import filter_by_vacancy
+from modeling.filters import filter_by_vacancy, generic_filter
 from utils.access_labels import ProductTypeLabels
 
 
 class TestFilters(unittest.TestCase):
     def setUp(self):
         self.mgras = pandas.read_csv('test_data/random_MGRA.csv')
+        self.nan_frame = pandas.read_csv('test_data/frame_nans.csv')
         self.max_vacancy = 0.06
         self.product_type_labels = ProductTypeLabels()
         return super().setUp()
+
+    def membership_check(self, items, collection, excluded=False):
+        for item in items:
+            if excluded:
+                self.assertNotIn(item, list(collection))
+            else:
+                self.assertIn(item, list(collection))
+
+    def test_generic_filter(self):
+        self.ids_to_keep = [1, 2, 9]
+        self.ids_with_nans = [5, 8]
+        self.ids_with_zeros = [3, 4, 5, 6, 7]
+
+        self.membership_check(self.ids_to_keep, self.nan_frame['id'])
+        # check if both zeros and NaNs can be removed
+        self.filtered_both = generic_filter(
+            self.nan_frame, self.nan_frame.columns)
+        self.membership_check(self.ids_to_keep, self.filtered_both['id'])
+        self.membership_check(self.ids_with_nans,
+                              self.filtered_both['id'], excluded=True)
+        self.membership_check(self.ids_with_zeros,
+                              self.filtered_both['id'], excluded=True)
+        # check if just zeros can be removed
+        # self.filtered_zeros = generic_filter(
+        #     self.nan_frame, self.nan_frame.columns, filter_nans=False)
+        # self.membership_check(self.ids_with_nans, self.filtered_zeros['id'])
 
     def test_filter_vacancy(self):
 

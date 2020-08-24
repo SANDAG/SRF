@@ -118,6 +118,13 @@ class ProductTypeLabels(object):
         return config.parameters[param_name][self.product_type]
 
 
+def all_product_type_labels():
+    labels_list = []
+    for product_type in product_types():
+        labels_list.append(ProductTypeLabels(product_type))
+    return labels_list
+
+
 class RedevelopmentLabels(object):
     def __init__(self):
         super().__init__()
