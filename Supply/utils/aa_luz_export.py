@@ -4,14 +4,14 @@ eg.
 LUZ,Commodity,Quantity
 16,Active Park Space,0
 '''
-
+import os
 import pandas
 import csv
 
-from utils.interface import save_to_file
+from utils.interface import save_to_file, extract_csv_from_database, parameters
 from utils.access_labels import mgra_labels, ProductTypeLabels
 
-CROSSWALK_FILEPATH = 'data/CRE2FSC.csv'
+CROSSWALK_FILENAME = 'aa_crosswalk.csv'
 
 # used PECAS_FloorspaceCommodities.csv for codes_labels
 codes_labels = {
@@ -64,7 +64,7 @@ def calculate_quantity(square_footages, ratios):
 
 def luz_dict_from_crosswalk():
     result_dict = {}
-    with open(CROSSWALK_FILEPATH) as f:
+    with open(os.path.join('data', CROSSWALK_FILENAME)) as f:
         reader = csv.DictReader(f)
         for row in reader:
             luz = int(row["LUZ"])
@@ -89,6 +89,9 @@ def luz_dict_from_crosswalk():
 
 
 def export_luz_data(frame):
+    extract_csv_from_database(
+        parameters['schema'], parameters['aa_crosswalk_table'],
+        'data', CROSSWALK_FILENAME)
     luz_dict = luz_dict_from_crosswalk()
     output_dict = {}
     focus_columns = [

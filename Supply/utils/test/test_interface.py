@@ -1,7 +1,7 @@
 import unittest
 import os
 import shutil
-from utils.interface import load_parameters, empty_folder, save_to_file
+from utils.interface import load_yaml, empty_folder, save_to_file
 
 
 class TestIO(unittest.TestCase):
@@ -13,8 +13,8 @@ class TestIO(unittest.TestCase):
         shutil.rmtree('temp')
         shutil.rmtree('do_not_empty')
 
-    def test_load_parameters(self):
-        parameters = load_parameters('parameters.yaml')
+    def test_load_yaml(self):
+        parameters = load_yaml('parameters.yaml')
         self.assertIsNotNone(parameters)
 
     def test_empty_folder(self):
