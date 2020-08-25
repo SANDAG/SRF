@@ -1,10 +1,7 @@
-import logging
-import pandas
 from tqdm import tqdm
 
-import utils.config as config
-from utils.interface import load_parameters, empty_folder, save_to_file, \
-    open_dbf
+from utils.interface import save_to_file, open_mgra_io_file, open_sites_file, \
+    parameters
 from modeling.dataframe_updates import update_mgra
 
 from utils.access_labels import ProductTypeLabels, mgra_labels, UNITS_PER_YEAR
@@ -19,7 +16,7 @@ INDUSTRIAL = 'industrial'
 
 def reduce_demand(product_type, units):
     # note that it can be problematic to change parameters mid simulation
-    config.parameters[UNITS_PER_YEAR][product_type] -= units
+    parameters[UNITS_PER_YEAR][product_type] -= units
 
 
 def add_to_mgra(mgras, site):
@@ -122,7 +119,9 @@ def remove_other_years(intersections, starting_year):
     return intersections[intersections['phase'] == starting_year].copy()
 
 
-def run(mgras, intersections, output_dir, progress=None, starting_year=None):
+def run(mgras, intersections, starting_year=None):
+    output_dir = parameters['output_directory']
+
     if starting_year is not None:
         intersections = remove_other_years(intersections, starting_year)
 
@@ -162,22 +161,6 @@ def run(mgras, intersections, output_dir, progress=None, starting_year=None):
 
 
 if __name__ == "__main__":
-    # load parameters
-    config.parameters = load_parameters('parameters.yaml')
-
-    if config.parameters is not None:
-        # prep output directory
-        output_dir = config.parameters['output_directory']
-        empty_folder(output_dir)
-        save_to_file(config.parameters, output_dir,
-                     'parameters.txt', output_status=False)
-        # configure logging level
-        if config.parameters['debug']:
-            logging.basicConfig(level=logging.DEBUG)
-        # load dataframes
-        mgra_dataframe = pandas.read_csv(config.parameters['input_filename'])
-        input_sites = open_dbf(config.parameters['sites_filename'])
-
-        run(mgra_dataframe, input_sites, output_dir)
-    else:
-        print('could not load parameters, exiting')
+    if parameters is not None:
+        run(open_mgra_io_file(from_database=True),
+            open_sites_file(from_database=True))

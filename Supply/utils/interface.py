@@ -5,6 +5,13 @@ import yaml
 import argparse
 import matplotlib.pyplot as plt
 from simpledbf import Dbf5
+import psycopg2
+import pandas
+import logging
+from envyaml import EnvYAML
+
+# This file has became a strange mix of generally useful tools and extremely
+# use case specific methods
 
 
 def get_args():
@@ -14,11 +21,10 @@ def get_args():
     return parser.parse_args()
 
 
-def load_parameters(param_filename):
-    with open(param_filename, 'r') as stream:
+def load_yaml(filename):
+    with open(filename, 'r') as stream:
         try:
-            parameters = yaml.safe_load(stream)
-            return parameters
+            return yaml.safe_load(stream)
         except yaml.YAMLError as error:
             print(error)
     return None
@@ -59,7 +65,8 @@ def empty_folder(folder):
             return 2
 
 
-def save_to_file(printable, output_directory, filename, output_status=True):
+def save_to_file(printable, output_directory, filename,
+                 as_yaml=False, output_status=True):
     if(output_status):
         print('saving {} to {} folder'.format(filename, output_directory))
     create_folder_if_needed(output_directory)
@@ -68,9 +75,39 @@ def save_to_file(printable, output_directory, filename, output_status=True):
     if hasattr(printable, 'to_csv'):
         printable.to_csv(filepath, index=False)
     else:
+        if as_yaml:
+            printable = yaml.dump(printable)
         print(printable, file=open(filepath, 'w'), end='')
     if(output_status):
         print('saved')
+
+
+def configure():
+    args = get_args()
+    try:
+        if args.test:
+            # only meet_demand.py should use a test argument
+            parameters = load_yaml('test_parameters.yaml')
+        else:
+            parameters = load_yaml('parameters.yaml')
+    except(FileNotFoundError):
+        parameters = None
+
+    if parameters is not None:
+        # prep output directory
+        output_dir = parameters['output_directory']
+        empty_folder(output_dir)
+        save_to_file(parameters, output_dir,
+                     'parameters_used.yaml', as_yaml=True)
+        # configure logging level
+        if parameters['debug']:
+            logging.basicConfig(level=logging.DEBUG)
+    else:
+        print('could not load parameters, exiting')
+    return parameters
+
+
+parameters = configure()
 
 
 def plot_data(data, output_dir='data/output', image_name='plot.png'):
@@ -82,3 +119,55 @@ def plot_data(data, output_dir='data/output', image_name='plot.png'):
 def open_dbf(filepath):
     dbf = Dbf5(filepath)
     return dbf.to_dataframe()
+
+
+def open_sites_file(from_database=False):
+    if from_database:
+        return open_database_file(
+            parameters['schema'],
+            parameters['scheduled_development_table']
+        )
+    else:
+        return open_dbf(parameters['sites_filename'])
+
+
+def connect_to_db(db_param_filename):
+    # Set up database connection
+    connection_info = EnvYAML(db_param_filename)
+    print(connection_info)
+    return psycopg2.connect(
+        database=connection_info['database'],
+        host=connection_info['host'],
+        port=connection_info['port'],
+        user=connection_info['user'],
+        password=connection_info['password'])
+
+
+def open_database_file(schema, table):
+    print('connecting to database...')
+    with connect_to_db(
+        parameters['database_info_filename']
+    ) as connection:
+        print(connection)
+        sql_statement = 'select * from {}.\"{}\"'.format(
+            schema,
+            table
+        )
+        print(sql_statement)
+        print('reading from database...')
+        return pandas.read_sql(sql_statement, connection)
+
+
+def extract_csv_from_database(schema, table, output_dir, filename):
+    dataframe = open_database_file(schema, table)
+    save_to_file(dataframe, output_dir, filename)
+
+
+def open_mgra_io_file(from_database=False):
+    if get_args().test:  # hack to always use local test file when testing
+        from_database = False
+    if from_database:
+        return open_database_file(
+            parameters['schema'], parameters['input_table'])
+    else:  # load from file
+        return pandas.read_csv(parameters['input_filename'])

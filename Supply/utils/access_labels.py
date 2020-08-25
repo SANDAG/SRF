@@ -1,7 +1,6 @@
-from utils.interface import load_parameters
-import utils.config as config
+from utils.interface import load_yaml, parameters
 
-# param names
+# parameter names
 UNITS_PER_YEAR = 'units_per_year'
 CONSTRUCTION_COST = 'construction_cost'
 UNIT_SQFT = 'sqft_per_unit'
@@ -12,7 +11,7 @@ TARGET_VACANCY_RATE = 'target_vacancy_rates'
 
 
 def open_labels():
-    return load_parameters('labels.yaml')
+    return load_yaml('labels.yaml')
 
 
 labels_dict = open_labels()
@@ -115,7 +114,7 @@ class ProductTypeLabels(object):
         return self.__param_from_dict(TARGET_VACANCY_RATE)
 
     def __param_from_dict(self, param_name):
-        return config.parameters[param_name][self.product_type]
+        return parameters[param_name][self.product_type]
 
 
 def all_product_type_labels():

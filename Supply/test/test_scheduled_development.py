@@ -6,7 +6,7 @@ import sys
 
 from utils.access_labels import increasing_columns, decreasing_columns
 
-COMMANDLINE_INPUT = 'python3 scheduled_development.py -t'
+COMMANDLINE_INPUT = 'python3 scheduled_development.py'
 
 
 class TestMain(unittest.TestCase):

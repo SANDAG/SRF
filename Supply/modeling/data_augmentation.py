@@ -1,8 +1,10 @@
+# 'deprecated'
+
 import numpy as np
 
 from utils.constants import OFFICE_PRICE, COMMERCIAL_PRICE, INDUSTRIAL_PRICE, \
     SINGLE_FAMILY_PRICE, MULTI_FAMILY_PRICE
-import utils.config as config
+from utils.interface import parameters
 
 
 def fill_in_price_data(dataframe):
@@ -35,9 +37,9 @@ def add_non_residential_average_prices(dataframe):
     # This works, but we will just use the parameters in the profitability
     # filter and leave this unused for now
     dataframe.loc[dataframe[OFFICE_PRICE] == 0, OFFICE_PRICE] = \
-        config.parameters['office_average_price']
+        parameters['office_average_price']
     dataframe.loc[dataframe[COMMERCIAL_PRICE] == 0, COMMERCIAL_PRICE] = \
-        config.parameters['commercial_average_price']
+        parameters['commercial_average_price']
     dataframe.loc[dataframe[INDUSTRIAL_PRICE] == 0, INDUSTRIAL_PRICE] = \
-        config.parameters['industrial_average_price']
+        parameters['industrial_average_price']
     return dataframe

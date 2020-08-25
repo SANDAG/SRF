@@ -3,9 +3,11 @@
 input_filename: "data/SRF_Input_Base_V4.1.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
 
-# database_info_filename: "../dbparams.yaml"
-# srf_schema: "srf"
-# srf_inputtbl: "_data_preprocessed"
+database_info_filename: "../dbparams.yaml"
+schema: "srf"
+input_table: "_supply_input"
+scheduled_development_table: "_supply_scheduled_sites"
+aa_crosswalk_table: "_supply_aa_crosswalk"
 
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 

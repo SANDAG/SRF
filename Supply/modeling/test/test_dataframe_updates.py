@@ -3,17 +3,14 @@ import unittest
 import pandas
 
 from modeling.dataframe_updates import add_to_columns
-from utils.interface import load_parameters
-import utils.config as config
+from utils.interface import parameters
 import utils.access_labels as access
 from utils.access_labels import ProductTypeLabels
 
 
 class TestDataframeUpdates(unittest.TestCase):
     def setUp(self):
-        config.parameters = load_parameters('test_parameters.yaml')
-        self.assertIsNotNone(config.parameters)
-        self.test_frame = pandas.read_csv(config.parameters['input_filename'])
+        self.test_frame = pandas.read_csv(parameters['input_filename'])
 
     def test_add_to_columns(self):
         housing_label = access.mgra_labels.HOUSING_UNITS
