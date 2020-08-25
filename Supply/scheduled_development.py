@@ -162,4 +162,5 @@ def run(mgras, intersections, starting_year=None):
 
 if __name__ == "__main__":
     if parameters is not None:
-        run(open_mgra_io_file(), open_sites_file())
+        run(open_mgra_io_file(from_database=True),
+            open_sites_file(from_database=True))

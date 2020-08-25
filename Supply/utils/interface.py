@@ -10,7 +10,7 @@ import pandas
 import logging
 
 
-# This file has became a strange mix of universally useful tools and extremely
+# This file has became a strange mix of generally useful tools and extremely
 # use case specific methods
 
 def get_args():
@@ -115,9 +115,14 @@ def open_dbf(filepath):
     return dbf.to_dataframe()
 
 
-def open_sites_file():
-    # TODO: later this will also read from a database
-    return open_dbf(parameters['sites_filename'])
+def open_sites_file(from_database=False):
+    if from_database:
+        return open_database_file(
+            parameters['schema'],
+            parameters['scheduled_development_table']
+        )
+    else:
+        return open_dbf(parameters['sites_filename'])
 
 
 def connect_to_db(db_param_filename):
@@ -132,16 +137,31 @@ def connect_to_db(db_param_filename):
         password=connection_info['password'])
 
 
+def open_database_file(schema, table):
+    print('connecting to database...')
+    with connect_to_db(
+        parameters['database_info_filename']
+    ) as connection:
+        print(connection)
+        sql_statement = 'select * from {}.\"{}\"'.format(
+            schema,
+            table
+        )
+        print(sql_statement)
+        print('reading from database...')
+        return pandas.read_sql(sql_statement, connection)
+
+
+def extract_csv_from_database(schema, table, output_dir, filename):
+    dataframe = open_database_file(schema, table)
+    save_to_file(dataframe, output_dir, filename)
+
+
 def open_mgra_io_file(from_database=False):
+    if get_args().test:  # hack to always use local test file when testing
+        from_database = False
     if from_database:
-        with connect_to_db(
-                parameters['database_info_filename']
-        ) as connection:
-            print(connection)
-            sql_statement = 'select * from {}.\"{}\"'.format(
-                parameters['srf_schema'],
-                parameters['srf_inputtbl']
-            )
-            return pandas.read_sql(sql_statement, connection)
+        return open_database_file(
+            parameters['schema'], parameters['input_table'])
     else:  # load from file
         return pandas.read_csv(parameters['input_filename'])

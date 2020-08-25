@@ -30,4 +30,4 @@ def run(mgra_dataframe):
 
 if __name__ == "__main__":
     if parameters is not None:
-        run(open_mgra_io_file())
+        run(open_mgra_io_file(from_database=True))

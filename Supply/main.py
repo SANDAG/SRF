@@ -1,10 +1,9 @@
-import os.path
 
 from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
 from utils.interface import save_to_file, open_mgra_io_file, open_sites_file, \
     parameters
-from utils.aa_luz_export import export_luz_data, CROSSWALK_FILEPATH
+from utils.aa_luz_export import export_luz_data
 
 
 def run(mgra_dataframe, planned_sites):
@@ -30,26 +29,15 @@ def run(mgra_dataframe, planned_sites):
             i + 1, forecast_year))
         print('saved')
         print('creating AA commodity export file ...')
-        if os.path.isfile(CROSSWALK_FILEPATH):
-            export_luz_data(mgra_dataframe)
-        else:
-            print('missing crosswalk file: \"{}\". Skipping aa export'.format(
-                CROSSWALK_FILEPATH))
+        export_luz_data(mgra_dataframe)
         print('Done')
     return
 
 
 if __name__ == "__main__":
     if parameters is not None:
-        # load dataframe
-        mgra_dataframe = open_mgra_io_file()
-        # load scheduled development if a file is available
-        scheduled_development_filepath = parameters['sites_filename']
-        if os.path.isfile(scheduled_development_filepath):
-            planned_sites = open_sites_file()
-        else:
-            print('no scheduled development file found (\"{}\"), skipping'
-                  .format(scheduled_development_filepath))
-            planned_sites = None
+        # load dataframe(s)
+        mgra_dataframe = open_mgra_io_file(from_database=True)
+        planned_sites = open_sites_file(from_database=True)
         # start simulation
         run(mgra_dataframe, planned_sites)
