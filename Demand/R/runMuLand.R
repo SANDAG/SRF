@@ -276,7 +276,8 @@ loadMuLandInputs <- function(configDir,tables) {
              "demand_exogenous_cutoff",
              "real_estates_zones",
              "rent_adjustments",
-             "rent_functions_0",
+             #"rent_functions_0",
+             "rent_functions",
              "subsidies",
              "supply",
              "zones")

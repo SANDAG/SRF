@@ -115,8 +115,8 @@ for (luz in 1:229) {
   # load up the data that doesn't need to be filtered
   luz_model[["agents"]] <- master_data[["agents"]]
   luz_model[["bids_functions"]] <- master_data[["bids_functions"]]
-  luz_model[["rent_functions"]] <- master_data[["rent_functions_0"]]
-  #luz_model[["rent_functions"]] <- master_data[["rent_functions"]]
+  #luz_model[["rent_functions"]] <- master_data[["rent_functions_0"]]
+  luz_model[["rent_functions"]] <- master_data[["rent_functions"]]
   # filter other data
   luz_model[["demand"]] <- select(filter(master_data[["demand"]],LUZ==luz),-LUZ)
   for (df in data_frames) {
