@@ -10,7 +10,7 @@ COMMANDLINE_INPUT = 'python3 meet_demand.py -t'
 class TestMeetDemand(unittest.TestCase):
 
     def setUp(self):
-        self.expected_file_1 = 'test_data/random_MGRA.csv'
+        self.expected_file_1 = 'data/SRF_Input_Base_V4.1.csv'
         self.expected_file_2 = 'test_data/output/year1_2013.csv'
         return
 
@@ -28,7 +28,8 @@ class TestMeetDemand(unittest.TestCase):
 
         logging.info('ensuring that columns increased')
         for column in increasing_columns():
-            logging.info(column)
+            logging.info("column: {} (sum: {})".format(
+                column, frame_before[column].sum()))
             self.assertGreater(
                 frame_after[column].sum(),
                 frame_before[column].sum())

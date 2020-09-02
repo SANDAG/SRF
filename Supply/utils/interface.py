@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os
+import sys
 import shutil
 import yaml
 import argparse
@@ -98,9 +99,14 @@ def configure():
         output_dir = parameters['output_directory']
         empty_folder(output_dir)
         save_to_file(parameters, output_dir,
-                     'parameters_used.yaml', as_yaml=True)
+                     'parameters_used.yaml', as_yaml=True, output_status=False)
         # configure logging level
         if parameters['debug']:
+            if parameters['to_file']:
+                sys.stderr = open(
+                    os.path.join(output_dir, 'debug_output'),
+                    mode='x'
+                )
             logging.basicConfig(level=logging.DEBUG)
     else:
         print('could not load parameters, exiting')

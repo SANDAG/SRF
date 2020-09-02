@@ -12,7 +12,9 @@ aa_crosswalk_table: "_supply_aa_crosswalk"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # set to 1 for verbose output
-debug: 0
+debug: 1
+# save debug output to file
+to_file: 0
 
 # Simulation
 simulation_years: 1
@@ -31,7 +33,7 @@ target_vacancy_rates:
 max_vacant_units:
   # used to allow for new developments
   # based on some of the higher values in the 2013 planned developments
-  # ! this probably should account for local variance
+  # FIXME: this probably should account for local variance
   single_family: 30
   multi_family: 500
   rural_residential: 10
@@ -45,6 +47,8 @@ max_vacant_units:
 minimum_redevelopment_age: 20
 profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
+# used to determine the construction cost
+vacant_cost_multiplier: 1.0
 infill_cost_multiplier: 1.1
 redevelopment_cost_multiplier: 1.25
 
