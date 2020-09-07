@@ -2,6 +2,7 @@ import unittest
 import os
 import pandas
 import logging
+import sys
 
 from utils.access_labels import increasing_columns, decreasing_columns
 COMMANDLINE_INPUT = 'python3 meet_demand.py -t'
@@ -15,6 +16,11 @@ class TestMeetDemand(unittest.TestCase):
         return
 
     def test_meet_demand(self):
+        # skip this integration test if there is an argument given to
+        # the test runner
+        if len(sys.argv) > 1:
+            return
+
         result = os.system(COMMANDLINE_INPUT)
         self.assertEqual(result, 0)
 

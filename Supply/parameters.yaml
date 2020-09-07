@@ -20,6 +20,8 @@ to_file: 0
 simulation_years: 1
 simulation_begin: 2012
 
+# Filtering
+minimum_units: 5
 # Vacancy
 target_vacancy_rates:
   single_family: 0.06

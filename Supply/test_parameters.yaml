@@ -22,6 +22,8 @@ to_file: 0
 simulation_years: 1
 simulation_begin: 2012
 
+# Filtering
+minimum_units: 5
 # Vacancy
 target_vacancy_rates:
   single_family: 0.06 # all vacancy rates in %
@@ -80,8 +82,8 @@ construction_cost:
 
 # Demand
 units_per_year:
-  office: 10
-  commercial: 10
-  industrial: 10
-  single_family: 10
-  multi_family: 10
+  office: 500
+  commercial: 500
+  industrial: 500
+  single_family: 500
+  multi_family: 500

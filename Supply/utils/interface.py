@@ -61,8 +61,9 @@ def empty_folder(folder):
                     return 1
             return 0
         else:
-            print('Did not empty folder \"{}\", check parameter naming'
-                  .format(folder))
+            if "do_not_empty" not in folder:
+                print('Did not empty folder \"{}\", check parameter naming'
+                      .format(folder))
             return 2
 
 

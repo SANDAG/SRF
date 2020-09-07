@@ -30,6 +30,6 @@ class TestIO(unittest.TestCase):
 
     def test_save_to_file(self):
         item = 'hello there'
-        save_to_file(item, 'temp', 'hello.txt')
+        save_to_file(item, 'temp', 'hello.txt', output_status=False)
         self.assertEquals(item, open(
             'temp/hello.txt', 'r').read())

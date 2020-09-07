@@ -17,6 +17,8 @@ class TestMain(unittest.TestCase):
         return
 
     def test_main(self):
+        # skip this integration test if there is an argument given to
+        # the test runner
         if len(sys.argv) > 1:
             return
         result = os.system(COMMANDLINE_INPUT)

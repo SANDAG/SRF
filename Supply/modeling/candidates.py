@@ -17,12 +17,27 @@ def trim_columns(frame, include_columns=[], remove_columns=[]):
     return frame.drop(remove_columns)
 
 
-def create_candidate_set(mgras):
+def create_candidate_set(mgras, mgras_with_vacant_land):
     candidate_list = []
     redevelopment_labels = RedevelopmentLabels().list_labels()
     product_types = all_product_type_labels()
-    progress_bar = tqdm(total=len(mgras))
+    progress_bar = tqdm(total=len(mgras) + len(mgras_with_vacant_land))
     progress_bar.set_description('creating candidate set')
+
+    for index, series in mgras_with_vacant_land.iterrows():
+        # create vacant land candidates
+        for label in product_types:
+            if series[label.vacant_acres] != 0.0:
+                other_product_types = all_product_type_labels()
+                remove_columns = [
+                    product.vacant_acres for product in other_product_types]
+                remove_columns.remove(label.vacant_acres)
+                new_candidate = trim_columns(
+                    series,
+                    remove_columns=remove_columns)
+                candidate_list.append(new_candidate)
+        progress_bar.update()
+
     for index, series in mgras.iterrows():
         # create Redev and infill candidates
         for label in redevelopment_labels:
@@ -39,17 +54,8 @@ def create_candidate_set(mgras):
                     ]
                 )
                 candidate_list.append(new_candidate)
-        # create vacant land candidates
-        for label in product_types:
-            other_product_types = all_product_type_labels()
-            remove_columns = [
-                product.vacant_acres for product in other_product_types]
-            remove_columns.remove(label.vacant_acres)
-            new_candidate = trim_columns(
-                series,
-                remove_columns=remove_columns)
-            candidate_list.append(new_candidate)
         progress_bar.update()
+
     progress_bar.close()
 
     return pandas.DataFrame(candidate_list)

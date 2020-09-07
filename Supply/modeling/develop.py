@@ -8,22 +8,23 @@ from modeling.dataframe_updates import update_mgra
 from utils.access_labels import all_product_type_labels, \
     mgra_labels
 from modeling.candidates import create_candidate_set
+# from utils.interface import save_to_file
 
 
-def buildable_units(mgra, product_type_labels, max_units, vacancy_caps):
+def buildable_units(candidate, product_type_labels, max_units):
     # determine max units to build
-    vacancy_cap = vacancy_caps.loc[mgra.index].values.item()
+    vacancy_cap = candidate.vacancy_cap.item()
 
     # FIXME: possibly use profitability filter value for this mgra
     # to determine the number of profitable units to build.
 
     # only build up to 95% of the vacant space
-    acreage = acreage_available(mgra, product_type_labels)
+    acreage = acreage_available(candidate, product_type_labels)
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
     available_units_by_land = acreage.values.item() * \
         0.95 // acreage_per_unit
 
-    logging.debug('max: {}, vacancy: {}, by land {}'.format(
+    logging.debug('max: {}, vacancy: {}, by land: {}'.format(
         max_units, vacancy_cap, available_units_by_land))
     return int(min(max_units,
                    vacancy_cap, available_units_by_land))
@@ -34,29 +35,30 @@ def normalize(collection):
     return collection / collection.sum()
 
 
-def combine_weights(profitability, vacancy, preference=0.5, mnl_choice=True):
+def combine_weights(profitability, vacancy, scale=1, mnl_choice=True):
     '''
         Uses profitability and total units allowed by vacancy to make
         normalized weights,
-        deference for vacancy, as modified by preference multiplier.
+        deference for vacancy, as modified by scale multiplier.
     '''
     if mnl_choice:
-        profitability = numpy.exp(profitability)
-        weights = vacancy * preference * profitability
+        exponent_profitability = numpy.exp(scale*profitability)
+        weights = vacancy * exponent_profitability
     else:
-        weights = vacancy * preference + profitability
+        # simple weighting
+        weights = vacancy + (scale * profitability)
 
     return normalize(weights)
 
 
 def choose_candidate(candidates, mgras, product_type_labels, max_units):
     # Filter
-    filtered, vacancy_caps, profit_margins = apply_filters(
+    filtered = apply_filters(
         candidates, product_type_labels)
     if len(filtered) < 1:
-        print('out of usable mgras for product type {}'.format(
+        print('out of suitable mgras for product type {}'.format(
             product_type_labels.product_type))
-        print('evaluate filtering methods\nexiting')
+        print('evaluate filtering methods...\nexiting')
         return None
 
     # !
@@ -64,15 +66,14 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
     # return
 
     # Sample
-    weights = combine_weights(profit_margins, vacancy_caps)
+    weights = combine_weights(filtered.profit_margin, filtered.vacancy_cap)
     selected_candidate = filtered.sample(n=1, weights=weights)
 
     buildable_count = buildable_units(
-        selected_candidate, product_type_labels, max_units, vacancy_caps)
+        selected_candidate, product_type_labels, max_units)
 
     # develop buildable_count units by updating the MGRA in the original
     # dataframe
-    # TODO replace selected id with the candidate row
     removed_units_reference = update_mgra(mgras, selected_candidate,
                                           buildable_count, product_type_labels,
                                           scheduled_development=False)
@@ -125,7 +126,9 @@ def develop(mgras):
     candidates = mgras.copy()
     # remove candidates with no vacant land ( 23002 to 8802)
     candidates = generic_filter(candidates, [mgra_labels.VACANT_ACRES])
-    candidates = create_candidate_set(candidates)
+    candidates = create_candidate_set(mgras.copy(), candidates)
+    # save_to_file(candidates, 'data/output', 'candidates.csv')
+
     # prep demand
     labels_demands = []
     for product_type_labels in all_product_type_labels():
