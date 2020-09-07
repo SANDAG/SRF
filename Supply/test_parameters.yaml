@@ -3,13 +3,11 @@
 input_filename: "data/SRF_Input_Base_V4.1.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
 
-# aa_host: "localhost"
-# aa_database: "sandag_db"
-# aa_user: "usrPostgres"
-# aa_password: ""
-# aa_port: 5432
-# srf_schema: "srf"
-# srf_inputtbl: "_data_preprocessed"
+database_info_filename: "../dbparams.yaml"
+schema: "srf"
+input_table: "_supply_input"
+scheduled_development_table: "_supply_scheduled_sites"
+aa_crosswalk_table: "_supply_aa_crosswalk"
 
 output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
@@ -82,8 +80,8 @@ construction_cost:
 
 # Demand
 units_per_year:
-  office: 500
-  commercial: 500
-  industrial: 500
-  single_family: 500
-  multi_family: 500
+  office: 1000
+  commercial: 1000
+  industrial: 1000
+  single_family: 1000
+  multi_family: 1000

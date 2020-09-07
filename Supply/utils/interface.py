@@ -171,8 +171,8 @@ def extract_csv_from_database(schema, table, output_dir, filename):
 
 
 def open_mgra_io_file(from_database=False):
-    if get_args().test:  # hack to always use local test file when testing
-        from_database = False
+    # if get_args().test:  # hack to always use local test file when testing
+    #     from_database = False
     if from_database:
         return open_database_file(
             parameters['schema'], parameters['input_table'])
