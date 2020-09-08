@@ -133,11 +133,12 @@ def develop(mgras):
     labels_demands = []
     for product_type_labels in all_product_type_labels():
         units_required = product_type_labels.units_per_year_parameter()
-        if units_required > 0:
-            labels_demands.append((
-                product_type_labels,
-                (0, units_required)
-            ))
+        if units_required < 0:
+            units_required = 0
+        labels_demands.append((
+            product_type_labels,
+            (0, units_required)
+        ))
 
     progress_bar = tqdm(total=sum_demand(labels_demands))
     progress_bar.set_description(

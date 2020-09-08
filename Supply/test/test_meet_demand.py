@@ -32,17 +32,20 @@ class TestMeetDemand(unittest.TestCase):
             self.fail("could not read files, \'{}\' likely failed".format(
                 COMMANDLINE_INPUT))
 
-        logging.info('ensuring that columns increased')
+        logging.info('ensuring that columns increased:')
         for column in increasing_columns():
             logging.info("column: {} (sum: {})".format(
                 column, frame_before[column].sum()))
             self.assertGreater(
                 frame_after[column].sum(),
-                frame_before[column].sum())
+                frame_before[column].sum(),
+                '{} did not increase, not a breaking error'.format(column))
 
-        logging.info('ensuring that columns decreased')
+        logging.info('ensuring that columns decreased:')
 
         for column in decreasing_columns():
             logging.info(column)
-            self.assertLess(frame_after[column].sum(),
-                            frame_before[column].sum())
+            self.assertLess(
+                frame_after[column].sum(),
+                frame_before[column].sum(),
+                '{} did not decrease, not a breaking error'.format(column))
