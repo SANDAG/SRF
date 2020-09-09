@@ -19,6 +19,68 @@ def reduce_demand(product_type, units):
     parameters[UNITS_PER_YEAR][product_type] -= units
 
 
+def pick_labels_with_highest_value(labels, values):
+    '''
+    Parameters
+    ----------
+    labels : list with the possible labels
+    values : list with the values that correspond to each label
+    Both lists must be in the same order and of the same length
+    Returns
+    -------
+    The labels (item) that corresponded to the highest value
+    '''
+    possibilities = dict(zip(labels, values))
+    return max(possibilities, key=lambda k: possibilities[k])
+
+
+def total_for_luz(mgras, luz_id, units_label):
+    return mgras.loc[mgras[mgra_labels.LUZ] == luz_id, units_label].sum()
+
+
+def find_largest_luz_employment_type(mgras, luz_id):
+    industrial_labels = ProductTypeLabels(INDUSTRIAL)
+    commercial_labels = ProductTypeLabels(COMMERCIAL)
+    office_labels = ProductTypeLabels(OFFICE)
+
+    industrial_spaces = total_for_luz(
+        mgras, luz_id, industrial_labels.total_units)
+    commercial_spaces = total_for_luz(
+        mgras, luz_id, commercial_labels.total_units)
+    office_spaces = total_for_luz(mgras, luz_id, office_labels.total_units)
+
+    return pick_labels_with_highest_value(
+        [industrial_labels, commercial_labels, office_labels],
+        [industrial_spaces, commercial_spaces, office_spaces])
+
+
+def find_current_employment_type(mgras, mgra):
+    '''
+    mgra: read-only row in the original dataframe
+    returns: the product type labels corresponding to the type with the most
+        units already developed
+    '''
+
+    industrial_labels = ProductTypeLabels(INDUSTRIAL)
+    industrial_spaces = mgra[industrial_labels.total_units].item()
+
+    commercial_labels = ProductTypeLabels(COMMERCIAL)
+    commercial_spaces = mgra[commercial_labels.total_units].item()
+
+    office_labels = ProductTypeLabels(OFFICE)
+    office_spaces = mgra[office_labels.total_units].item()
+
+    if industrial_spaces == 0 and \
+            commercial_spaces == 0 and office_spaces == 0:
+        # if there are no units, check the LUZ for units
+        return find_largest_luz_employment_type(
+            mgras, mgra[mgra_labels.LUZ].item())
+
+    return pick_labels_with_highest_value(
+        [industrial_labels, commercial_labels, office_labels],
+        [industrial_spaces, commercial_spaces, office_spaces])
+
+
 def add_to_mgra(mgras, site):
     '''
         mgras: the dataframe to update.
@@ -44,27 +106,10 @@ def add_to_mgra(mgras, site):
         reduce_demand(labels.product_type, multi_family_units)
     if employment_units > 0:
         # add employment; determine which type to add
-        industrial_labels = ProductTypeLabels(INDUSTRIAL)
-        industrial_spaces = industrial_labels.total_units
-        commercial_labels = ProductTypeLabels(COMMERCIAL)
-        commercial_spaces = commercial_labels.total_units
-        office_labels = ProductTypeLabels(OFFICE)
-        office_spaces = office_labels.total_units
+        mgra = mgras.loc[mgras[mgra_labels.MGRA] == mgra_id]
+        labels = find_current_employment_type(mgras, mgra)
+        update_mgra(mgras, mgra_id, employment_units, labels)
 
-        mgra = mgras.loc[mgras[mgra_labels.MGRA] == mgra_id, [
-            industrial_spaces, commercial_spaces, office_spaces]]
-        if mgra[industrial_spaces].item() > 0:
-            labels = industrial_labels
-            update_mgra(mgras, mgra_id, employment_units, labels)
-        elif mgra[commercial_spaces].item() > 0:
-            labels = commercial_labels
-            update_mgra(mgras, mgra_id, employment_units, labels)
-        elif mgra[office_spaces].item() > 0:
-            labels = office_labels
-            update_mgra(mgras, mgra_id, employment_units, labels)
-        else:  # we have to guess the product type... commercial seems likely!
-            labels = commercial_labels
-            update_mgra(mgras, mgra_id, employment_units, labels)
         reduce_demand(labels.product_type, employment_units)
 
     return
@@ -162,5 +207,5 @@ def run(mgras, intersections, starting_year=None):
 
 if __name__ == "__main__":
     if parameters is not None:
-        run(open_mgra_io_file(from_database=True),
-            open_sites_file(from_database=True))
+        run(open_mgra_io_file(from_database=False),
+            open_sites_file(from_database=False))
