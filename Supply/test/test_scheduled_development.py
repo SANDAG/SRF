@@ -18,7 +18,7 @@ class TestMain(unittest.TestCase):
 
     def setUp(self):
         self.expected_file_1 = 'data/SRF_Input_Base_V4.1.csv'
-        self.expected_file_2 = 'data/output/planned_development_added.csv'
+        self.expected_file_2 = 'data/output/scheduled_development_added.csv'
 
         self.industrial_labels = ProductTypeLabels("industrial")
         self.commercial_labels = ProductTypeLabels("commercial")
@@ -30,7 +30,8 @@ class TestMain(unittest.TestCase):
         # skip this integration test if there is an argument given to
         # the test runner
         if len(sys.argv) > 1:
-            return
+            return unittest.skip('commandline argument given')
+
         result = os.system(COMMANDLINE_INPUT)
         self.assertEqual(result, 0)
 

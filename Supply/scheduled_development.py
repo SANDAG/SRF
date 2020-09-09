@@ -160,19 +160,19 @@ def find_sites(intersections, id):
     return intersections[intersections['siteid'] == id].copy()
 
 
-def remove_other_years(intersections, starting_year):
-    return intersections[intersections['phase'] == starting_year].copy()
+def remove_other_years(intersections, year):
+    return intersections[intersections['phase'] == year].copy()
 
 
-def run(mgras, intersections, starting_year=None):
+def run(mgras, intersections, year=None):
     output_dir = parameters['output_directory']
 
-    if starting_year is not None:
-        intersections = remove_other_years(intersections, starting_year)
+    if year is not None:
+        intersections = remove_other_years(intersections, year)
 
     if len(intersections) == 0:
         print('no scheduled development found for year {}'
-              .format(starting_year))
+              .format(year))
         return
     # add each site. we actually have a frame of intersections
 
@@ -201,7 +201,7 @@ def run(mgras, intersections, starting_year=None):
         else:
             distribute_units(mgras, frame)
 
-    save_to_file(mgras, output_dir, 'planned_development_added.csv')
+    save_to_file(mgras, output_dir, 'scheduled_development_added.csv')
     return
 
 

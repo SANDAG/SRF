@@ -7,30 +7,28 @@ from utils.aa_luz_export import export_luz_data
 
 def run(mgra_dataframe, planned_sites):
     output_dir = parameters['output_directory']
-    simulation_years = parameters['simulation_years']
     simulation_begin = parameters['simulation_begin']
 
-    for i in range(simulation_years):
-        forecast_year = simulation_begin + i + 1
-        # add scheduled development if available
-        if planned_sites is not None:
-            print('adding scheduled development:')
-            add_scheduled_development(
-                mgra_dataframe, planned_sites,
-                starting_year=simulation_begin + i)
-        # finish meeting demand as needed
-        print('developing to meet remaining demand:')
-        mgra_dataframe = develop(mgra_dataframe)
-        if mgra_dataframe is None:
-            print('program terminated, {} years were completed'.format(i))
-            return
-        # save output file
-        save_to_file(mgra_dataframe, output_dir, 'year{}_{}.csv'.format(
-            i + 1, forecast_year))
-        # create aa export if crosswalk is available
-        print('creating AA commodity export file ...')
+    forecast_year = simulation_begin + 1
+    # add scheduled development if available
+    if planned_sites is not None:
+        print('adding scheduled development:')
+        add_scheduled_development(
+            mgra_dataframe, planned_sites,
+            year=simulation_begin)
+    # finish meeting demand as needed
+    print('developing to meet remaining demand:')
+    mgra_dataframe = develop(mgra_dataframe)
+    if mgra_dataframe is None:
+        print('program terminated early')
+        return
+    # save output file
+    save_to_file(mgra_dataframe, output_dir,
+                 'forecasted_year_{}.csv'.format(forecast_year))
+    # create aa export if crosswalk is available
+    print('creating AA commodity export file ...')
 
-        export_luz_data(mgra_dataframe)
+    export_luz_data(mgra_dataframe)
     return
 
 

@@ -12,14 +12,14 @@ class TestMeetDemand(unittest.TestCase):
 
     def setUp(self):
         self.expected_file_1 = 'data/SRF_Input_Base_V4.1.csv'
-        self.expected_file_2 = 'test_data/output/year1_2013.csv'
+        self.expected_file_2 = 'test_data/output/forecasted_year_2013.csv'
         return
 
     def test_meet_demand(self):
         # skip this integration test if there is an argument given to
         # the test runner
         if len(sys.argv) > 1:
-            return
+            return unittest.skip('commandline argument given')
 
         result = os.system(COMMANDLINE_INPUT)
         self.assertEqual(result, 0)
