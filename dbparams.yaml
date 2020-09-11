@@ -1,8 +1,0 @@
-# I/O
-#input_filename: "data/preprocessed.csv"
-host: "34.195.124.204"
-database: "sandag_db"
-user: "usrPostgres"
-password: ""
-port: 5432
-mu_schema: "mu_demand"
