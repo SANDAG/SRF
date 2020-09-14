@@ -16,24 +16,26 @@ Real Estate Development Model targeting SANDAG's MGRA level datasets
 
 ### System requirements notes
 
-We will use pyinstaller to create distributable software, the dist files will work with any specific OS, as long as pyinstaller is run on a matching OS. The operating systems listed are those available for us to build on.
+- We will use `pyinstaller` to create distributable software, the dist files will work with any specific OS, as long as `pyinstaller` is run on a matching OS. The operating systems listed are those available for us to build on.
+- We use a `pipenv` virtual environment, [here are instructions for installing `pipenv`](https://medium.com/@mahmudahsan/how-to-use-python-pipenv-in-mac-and-windows-1c6dc87b403e)
 
 ## Installation
 
-- Install dependencies with: `pip install -r requirements.txt`
-- Test with: `python run_tests.py -t`
-- Create distributable folder with: `pyinstaller main.py`
+- Install dependencies with: `pipenv install`
+- Test with: `pipenv run python run_tests.py -t`
+- Create distributable folder with: `pipenv run pyinstaller main.py`
 
 ## Usage
 
 ### Data Folder
 
-Add MGRA level data to the `data` folder
+Up to date data files will be downloaded from the SANDAG database, alternatively you can provide the same files:
 
-- Ensure that the column labels match those found in `labels.yaml`
-  - If the mgra version 4.1 is not found, the program will look for `interpolated_vars.csv` and `SRF_Input_Base_V4.csv` to create one
-  - If adding scheduled development, ensure that there is a compatible sites file; `Sites_MGRAs.dbf`
-  - If exporting to AA, ensure that there is a compatible crosswalk file; `CRE2FSC.csv`
+- Add MGRA level data to the `data` folder
+  - Ensure that the column labels match those found in `labels.yaml`
+- If the mgra version 4.1 is not found, the program will look for `interpolated_vars.csv` and `SRF_Input_Base_V4.csv` to create one
+- If adding scheduled development, ensure that there is a compatible sites file; `Sites_MGRAs.dbf`
+- If exporting to AA, ensure that there is a compatible crosswalk file; `CRE2FSC.csv`
 
 ### Parameter Configuration
 
@@ -41,9 +43,10 @@ Change program inputs parameters in `parameters.yaml`
 
 ### Execution
 
-Run with `python main.py`
+Run with `pipenv run python main.py`
 
 - Alternatively, run the main executable from the pyinstaller dist folder after following installation steps
+- Omit `pipenv run` from commands by first running `pipenv shell`
 
 ## Module Process
 
@@ -51,7 +54,7 @@ Run with `python main.py`
 
 ## Interface
 
-The Supply module accepts a .csv file and expects the following data on each MGRA:
+The Supply module attempts a database download, or accepts a .csv file. In either case, it expects the following data on each MGRA:
 
 ### Input and Output Columns
 
@@ -104,7 +107,7 @@ The Supply module expects these columns and updates them during program executio
 
 ### Additional Inputs
 
-The following inputs are also required, but are not updated:
+The following inputs are also required, but are not changed during execution:
 
 - MGRA | Series 13 MGRA (Master Geographic Reference Area)
 - Shape_Area | area of MGRA object (square footage)
