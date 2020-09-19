@@ -1,6 +1,7 @@
 import pandas
 from tqdm import tqdm
 
+from modeling.filters import generic_filter
 from utils.access_labels import all_product_type_labels, mgra_labels, \
     RedevelopmentLabels
 
@@ -14,10 +15,15 @@ def trim_columns(frame, include_columns=[], remove_columns=[]):
         my_include_columns.extend(labels.list_labels())
     my_include_columns.extend(include_columns)
     frame = frame[my_include_columns]
-    return frame.drop(remove_columns)
+    return frame.drop(remove_columns).copy()
 
 
-def create_candidate_set(mgras, mgras_with_vacant_land):
+def create_candidate_set(mgras):
+    candidates = mgras.copy()
+    mgras_with_vacant_land = mgras.copy()
+    # remove candidates with no vacant land (filters from 23002 to 8802)
+    candidates = generic_filter(candidates, [mgra_labels.VACANT_ACRES]).copy()
+
     candidate_list = []
     redevelopment_labels = RedevelopmentLabels().list_labels()
     product_types = all_product_type_labels()
@@ -58,4 +64,5 @@ def create_candidate_set(mgras, mgras_with_vacant_land):
 
     progress_bar.close()
 
-    return pandas.DataFrame(candidate_list)
+    # save_to_file(candidates, 'data/output', 'candidates.csv')
+    return pandas.DataFrame(candidate_list).copy()

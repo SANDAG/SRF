@@ -3,6 +3,7 @@
 input_filename: "data/SRF_Input_Base_V4.1.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
 
+use_database: false
 database_info_filename: "../dbparams.yaml"
 schema: "srf"
 input_table: "_supply_input"
@@ -12,12 +13,15 @@ aa_crosswalk_table: "_supply_aa_crosswalk"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # set to 1 for verbose output
-debug: 1
+debug: false
 # save debug output to file
-to_file: 0
+to_file: false
 
 # Simulation
 simulation_begin: 2012
+# Choice model scaling factor
+use_choice_model: true
+scale: 1.0
 
 # Filtering
 minimum_units: 5

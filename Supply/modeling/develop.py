@@ -7,6 +7,8 @@ from modeling.filters import apply_filters, generic_filter, acreage_available
 from modeling.dataframe_updates import update_mgra
 from utils.access_labels import all_product_type_labels, \
     mgra_labels
+from utils.interface import parameters
+
 from modeling.candidates import create_candidate_set
 # from utils.interface import save_to_file
 
@@ -35,17 +37,20 @@ def normalize(collection):
     return collection / collection.sum()
 
 
-def combine_weights(profitability, vacancy, scale=1, mnl_choice=True):
+def combine_weights(profitability, vacancy):
     '''
         Uses profitability and total units allowed by vacancy to make
         normalized weights,
-        deference for vacancy, as modified by scale multiplier.
+        deference for vacancy, as modified by parameter scale multiplier.
     '''
+    mnl_choice = parameters['use_choice_model']
+    scale = parameters['scale']
+
     if mnl_choice:
         exponent_profitability = numpy.exp(scale*profitability)
         weights = vacancy * exponent_profitability
     else:
-        # simple weighting
+        # Simple weighting
         weights = vacancy + (scale * profitability)
 
     return normalize(weights)
@@ -122,12 +127,8 @@ def develop(mgras):
     Returns:
         a pandas dataframe with selected MGRA's updated
     """
-    # create candidate set
-    candidates = mgras.copy()
-    # remove candidates with no vacant land ( 23002 to 8802)
-    candidates = generic_filter(candidates, [mgra_labels.VACANT_ACRES])
-    candidates = create_candidate_set(mgras.copy(), candidates)
-    # save_to_file(candidates, 'data/output', 'candidates.csv')
+    # get candidate set
+    candidates = create_candidate_set(mgras)
 
     # prep demand
     labels_demands = []

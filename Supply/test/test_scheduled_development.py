@@ -2,10 +2,10 @@ import unittest
 import os
 import pandas
 import logging
-import sys
 
 from utils.access_labels import increasing_columns, decreasing_columns, \
     ProductTypeLabels
+from utils.interface import parameters
 
 from scheduled_development import pick_labels_with_highest_value, \
     total_for_luz, find_largest_luz_employment_type, \
@@ -29,7 +29,7 @@ class TestMain(unittest.TestCase):
     def test_main(self):
         # skip this integration test if there is an argument given to
         # the test runner
-        if len(sys.argv) > 1:
+        if parameters['omit_integration_tests']:
             return unittest.skip('commandline argument given')
 
         result = os.system(COMMANDLINE_INPUT)

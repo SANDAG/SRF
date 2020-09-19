@@ -34,8 +34,9 @@ def run(mgra_dataframe, planned_sites):
 
 if __name__ == "__main__":
     if parameters is not None:
+        use_database = parameters['use_database']
         # load dataframe(s)
-        mgra_dataframe = open_mgra_io_file(from_database=True)
-        planned_sites = open_sites_file(from_database=True)
+        mgra_dataframe = open_mgra_io_file(from_database=use_database)
+        planned_sites = open_sites_file(from_database=use_database)
         # start simulation
         run(mgra_dataframe, planned_sites)

@@ -18,7 +18,7 @@ def generic_filter(dataframe, columns, filter_nans=True, filter_zeros=True):
             dataframe = dataframe[dataframe[column] != 0]
         if filter_nans:
             dataframe = dataframe[pandas.notnull(dataframe[column])]
-    return dataframe
+    return dataframe.copy()
 
 
 def apply_filters(candidates, product_type_labels):
@@ -46,7 +46,7 @@ def apply_filters(candidates, product_type_labels):
             profitable_count, non_vacant_count, available_count
         ) + ' MGRA\'s with space available')
 
-    return filtered
+    return filtered.copy()
 
 
 def acreage_available(candidates, product_type_labels):
@@ -63,7 +63,7 @@ def acreage_available(candidates, product_type_labels):
         else:
             acres_available.where(pandas.notnull(
                 acres_available), other=candidates[label], inplace=True)
-    return acres_available
+    return acres_available.copy()
 
 
 def filter_product_type(candidates, product_type_labels):
@@ -87,7 +87,7 @@ def filter_product_type(candidates, product_type_labels):
 
     return candidates[
         candidates['units_available'] > parameters['minimum_units']
-    ]
+    ].copy()
 
 
 def filter_by_vacancy(mgra_dataframe, product_type_labels, land_caps=None,
@@ -160,7 +160,7 @@ def construction_multiplier(mgra_dataframe, product_type_labels):
         series.where(pandas.notnull(series), other=redev_series, inplace=True)
 
     # each value should be nonnull
-    return series
+    return series.copy()
 
 
 def filter_by_profitability(candidates, product_type_labels):
@@ -194,10 +194,10 @@ def filter_by_profitability(candidates, product_type_labels):
 
     profit = revenue - amortized_costs
 
-    profitability_criteria = (revenue >= amortized_minimum) | (revenue == 0)
+    profitability_criteria = revenue >= amortized_minimum
 
-    candidates = candidates[profitability_criteria]
+    candidates = candidates[profitability_criteria].copy()
     candidates.loc[:, 'profit_margin'] = profit[profitability_criteria] / \
         revenue[profitability_criteria]
 
-    return candidates
+    return candidates.copy()
