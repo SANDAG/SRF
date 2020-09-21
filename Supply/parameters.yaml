@@ -3,7 +3,7 @@
 input_filename: "data/SRF_Input_Base_V4.1.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
 
-use_database: false
+use_database: true
 database_info_filename: "../dbparams.yaml"
 schema: "srf"
 input_table: "_supply_input"
