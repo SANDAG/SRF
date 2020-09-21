@@ -16,7 +16,7 @@ def sort_by_column(frame, column):
 
 def load_interpolated():
     return sort_by_column(
-        pandas.read_csv('data/interpolated_vars.csv'), mgra_labels.MGRA
+        pandas.read_csv('data/interpolation_results.csv'), mgra_labels.MGRA
     )
 
 
@@ -76,8 +76,6 @@ def create_version_4point1():
     frame_with_job_spaces = add_job_spaces_columns(combined_frame)
     # fix capacity
     frame_with_fixed_capacity = fix_capacity(frame_with_job_spaces)
-
-    # ! add redev and infill in access_labels.all_columns()
     # remove unused columns
     final_frame = frame_with_fixed_capacity[all_columns()]
     save_to_file(final_frame, 'data', 'SRF_Input_Base_V4.1.csv')

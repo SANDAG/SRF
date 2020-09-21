@@ -63,8 +63,14 @@ def calculate_quantity(square_footages, ratios):
 
 
 def luz_dict_from_crosswalk():
+    filepath = os.path.join('data', CROSSWALK_FILENAME)
+    if not os.path.isfile(filepath):
+        extract_csv_from_database(
+            parameters['schema'], parameters['aa_crosswalk_table'],
+            'data', CROSSWALK_FILENAME)
+
     result_dict = {}
-    with open(os.path.join('data', CROSSWALK_FILENAME)) as f:
+    with open(filepath) as f:
         reader = csv.DictReader(f)
         for row in reader:
             luz = int(row["LUZ"])
@@ -89,9 +95,6 @@ def luz_dict_from_crosswalk():
 
 
 def export_luz_data(frame):
-    extract_csv_from_database(
-        parameters['schema'], parameters['aa_crosswalk_table'],
-        'data', CROSSWALK_FILENAME)
     luz_dict = luz_dict_from_crosswalk()
     output_dict = {}
     focus_columns = [

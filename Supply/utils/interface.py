@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os
+import sys
 import shutil
 import yaml
 import argparse
@@ -8,14 +9,17 @@ from simpledbf import Dbf5
 import psycopg2
 import pandas
 import logging
-
+from envyaml import EnvYAML
 
 # This file has became a strange mix of generally useful tools and extremely
 # use case specific methods
 
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--test', dest='test',
+                        default=False, action='store_true')
+    parser.add_argument('-o', '--omit', dest='omit',
                         default=False, action='store_true')
     return parser.parse_args()
 
@@ -59,12 +63,16 @@ def empty_folder(folder):
                     return 1
             return 0
         else:
-            print('Did not empty folder \"{}\", check parameter naming'
-                  .format(folder))
+            if "do_not_empty" not in folder:
+                print('Did not empty folder \"{}\", check parameter naming'
+                      .format(folder))
             return 2
 
 
-def save_to_file(printable, output_directory, filename, as_yaml=False):
+def save_to_file(printable, output_directory, filename,
+                 as_yaml=False, output_status=True):
+    if(output_status):
+        print('saving {} to {} folder'.format(filename, output_directory))
     create_folder_if_needed(output_directory)
     filepath = os.path.join(output_directory, filename)
     # use pandas to_csv function if available
@@ -74,6 +82,8 @@ def save_to_file(printable, output_directory, filename, as_yaml=False):
         if as_yaml:
             printable = yaml.dump(printable)
         print(printable, file=open(filepath, 'w'), end='')
+    if(output_status):
+        print('saved')
 
 
 def configure():
@@ -92,10 +102,17 @@ def configure():
         output_dir = parameters['output_directory']
         empty_folder(output_dir)
         save_to_file(parameters, output_dir,
-                     'parameters_used.yaml', as_yaml=True)
+                     'parameters_used.yaml', as_yaml=True, output_status=False)
         # configure logging level
         if parameters['debug']:
+            if parameters['to_file']:
+                sys.stderr = open(
+                    os.path.join(output_dir, 'debug_output'),
+                    mode='x'
+                )
             logging.basicConfig(level=logging.DEBUG)
+
+        parameters['omit_integration_tests'] = args.omit
     else:
         print('could not load parameters, exiting')
     return parameters
@@ -127,7 +144,7 @@ def open_sites_file(from_database=False):
 
 def connect_to_db(db_param_filename):
     # Set up database connection
-    connection_info = load_yaml(db_param_filename)
+    connection_info = EnvYAML(db_param_filename)
     print(connection_info)
     return psycopg2.connect(
         database=connection_info['database'],
@@ -158,8 +175,6 @@ def extract_csv_from_database(schema, table, output_dir, filename):
 
 
 def open_mgra_io_file(from_database=False):
-    if get_args().test:  # hack to always use local test file when testing
-        from_database = False
     if from_database:
         return open_database_file(
             parameters['schema'], parameters['input_table'])

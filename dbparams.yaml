@@ -3,6 +3,6 @@
 host: "34.195.124.204"
 database: "sandag_db"
 user: "usrPostgres"
-password: ""
+password: $SRF_DB_PASSWORD
 port: 5432
 mu_schema: "mu_demand"

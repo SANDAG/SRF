@@ -1,3 +1,4 @@
+import collections
 from utils.interface import load_yaml, parameters
 
 # parameter names
@@ -117,17 +118,25 @@ class ProductTypeLabels(object):
         return parameters[param_name][self.product_type]
 
 
+def all_product_type_labels():
+    labels_list = []
+    for product_type in product_types():
+        labels_list.append(ProductTypeLabels(product_type))
+    return labels_list
+
+
 class RedevelopmentLabels(object):
     def __init__(self):
         super().__init__()
-        redevelopment_dict = labels_dict['redevelopment']
-        self.multi_family = redevelopment_dict['multi_family'].values()
-        self.employment = redevelopment_dict['employment'].values()
-        self.single_family = redevelopment_dict['single_family'].values()
-        self.industrial = redevelopment_dict['industrial'].values()
-        self.commercial = redevelopment_dict['commercial'].values()
-        self.office = redevelopment_dict['office'].values()
-        self.residential = redevelopment_dict['residential'].values()
+        self.redevelopment_dict = labels_dict['redevelopment']
+        self.multi_family = self.redevelopment_dict['multi_family'].values()
+        self.employment = self.redevelopment_dict['employment'].values()
+        self.single_family = self.redevelopment_dict['single_family'].values()
+        self.industrial = self.redevelopment_dict['industrial'].values()
+        self.commercial = self.redevelopment_dict['commercial'].values()
+        self.office = self.redevelopment_dict['office'].values()
+        self.residential = self.redevelopment_dict['residential'].values()
+        self.infill_dict = labels_dict['infill']
         self.infill = labels_dict['infill'].values()
 
     def list_labels(self):
@@ -141,6 +150,84 @@ class RedevelopmentLabels(object):
         result.extend(self.residential)
         result.extend(self.infill)
         return result
+
+    def applicable_labels_for(self, product_type_labels):
+        # this returns all of the labels for land that could be used to
+        # develop the product_type argument
+        # product type must match redev dict entry labels
+
+        labels = list(self.redev_labels(product_type_labels))
+
+        infill_label = self.infill_label(product_type_labels)
+        if infill_label is not None:
+            labels.append(infill_label)
+
+        labels.append(product_type_labels.vacant_acres)
+        return labels
+
+    def redev_labels(self, product_type_labels):
+        labels = list(getattr(self, product_type_labels.product_type))
+        if product_type_labels.residential:
+            labels.extend(self.residential)
+        else:  # employment, add redev
+            labels.extend(self.employment)
+        return labels
+
+    def infill_label(self, product_type_labels):
+        product_type = product_type_labels.product_type
+        # there is only ever one
+        label = None
+        if product_type == 'single_family':
+            label = self.infill_dict['SINGLE_FAMILY_INFILL_ACRES']
+        elif product_type == 'multi_family':
+            label = self.infill_dict['MULTI_FAMILY_INFILL_ACRES']
+        elif not product_type_labels.residential:
+            label = self.infill_dict['EMPLOYMENT_INFILL_ACRES']
+        return label
+
+    def label_type(self, label):
+        LandType = collections.namedtuple(
+            'LandType',
+            ['infill', 'redev', 'vacant']
+        )
+        land_type = LandType(False, False, False)
+        if label in self.infill:
+            land_type = LandType(True, False, False)
+        elif label in self.list_labels():
+            land_type = LandType(False, True, False)
+        else:
+            land_type = LandType(False, False, True)
+        return land_type
+
+    def get_origin(self, label):
+        '''
+        returns the label corresponding to the original land use
+        type for the redevelopment `label` argument
+        '''
+        # just do it by hand
+        # single family origins
+        if label == "redev_sf_m" or label == "redev_sf_e":
+            return ProductTypeLabels('single_family')
+
+        # mobile home origins # ! we don't have all info for mh available now
+        # if "mh" in label:
+        #     return "dev_mh"
+        # agriculture origins
+        # if "ag" in label:
+        #     # ! would need to re-add this column to tables in the db :\
+        #     return 'dev_ag'
+        # multi family origins
+        if label == "redev_mf_e":
+            return ProductTypeLabels('multi_family')
+        # employment origins
+        if "emp" in label:
+            # ! Pick a product type randomly?
+            return ProductTypeLabels('commercial')
+
+        return None
+
+
+land_origin_labels = RedevelopmentLabels()
 
 
 def increasing_columns():
@@ -187,4 +274,11 @@ def all_columns():
         columns.extend(ProductTypeLabels(product_type).list_labels())
     # also add redevelopment and infill
     columns.extend(RedevelopmentLabels().list_labels())
+
+    # manually keeping other, agriculture, mh acres etc.
+    columns.extend([
+        'hs_mh', 'hh_mh', 'dev_mh', 'vac_mh', 'Cap_HS_MH',
+        'emp_other_', 'dev_oth', 'vac_oth',
+        'dev_ag', 'vac_ag'
+    ])
     return columns
