@@ -12,7 +12,7 @@ aa_crosswalk_table: "_supply_aa_crosswalk"
 
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
-# set to 1 for verbose output
+# set to true for verbose output
 debug: false
 # save debug output to file
 to_file: false
@@ -38,7 +38,6 @@ target_vacancy_rates:
 max_vacant_units:
   # used to allow for new developments
   # based on some of the higher values in the 2013 planned developments
-  # FIXME: this probably should account for local variance
   single_family: 30
   multi_family: 500
   rural_residential: 10
