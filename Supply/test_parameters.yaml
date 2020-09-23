@@ -1,0 +1,90 @@
+---
+# I/O
+input_filename: "data/SRF_Input_Base_V4.1.csv"
+sites_filename: "data/Sites_MGRAs.dbf"
+
+use_database: false
+database_info_filename: "../dbparams.yaml"
+schema: "srf"
+input_table: "_supply_input"
+scheduled_development_table: "_supply_scheduled_sites"
+aa_crosswalk_table: "_supply_aa_crosswalk"
+
+output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
+
+# set to 0 to hide output
+debug: true
+# save debug output to file
+to_file: false
+
+# Simulation
+simulation_begin: 2012
+use_choice_model: true
+# Choice model scaling factor
+scale: 1.0
+
+# Filtering
+minimum_units: 5
+# Vacancy
+target_vacancy_rates:
+  single_family: 0.06 # all vacancy rates in %
+  multi_family: 0.06
+  rural_residential: 0.06
+  mobile_home: 0.06
+  industrial: 0.06
+  commercial: 0.06
+  office: 0.06
+
+max_vacant_units:
+  # used to allow for new developments
+  single_family: 26
+  multi_family: 31
+  rural_residential: 10
+  mobile_home: 300
+  industrial: 100
+  commercial: 100
+  # ! seems a little too high, based on a large development: mira sorrento
+  office: 100
+
+# Profitability
+minimum_redevelopment_age: 20
+profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
+amortization_years: 20
+# used to determine the construction cost
+vacant_cost_multiplier: 1.0
+infill_cost_multiplier: 1.1
+redevelopment_cost_multiplier: 1.25
+
+# Unit averages
+sqft_per_unit:
+  # average result of total square footage columns / total units columns
+  office: 1399.63208231
+  commercial: 2037.9073059
+  industrial: 617.732807
+  multi_family: 2246.69
+  single_family: 2157.18
+
+land_acres_per_unit:
+  # average result of total land acres columns / total units columns
+  office: 0.0614644
+  commercial: 0.701894545
+  industrial: 0.8506631
+  multi_family: 0.038312574
+  single_family: 0.2559981
+
+construction_cost:
+  # Construction Cost/Square Foot by product type
+  # Proposed by SANDAG based on this source: https://ccorpinsights.com/costs-per-square-foot/
+  office: 379.5
+  commercial: 228.5
+  industrial: 261.5
+  multi_family: 192.5
+  single_family: 388
+
+# Demand
+units_per_year:
+  office: 1000
+  commercial: 1000
+  industrial: 1000
+  single_family: 1000
+  multi_family: 1000
