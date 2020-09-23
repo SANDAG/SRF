@@ -58,3 +58,21 @@ class TestDataframeUpdates(unittest.TestCase):
                 random_mgra, 10, self.product_type_labels,
                 scheduled_development=False)
         )
+
+    def test_update_housing_age(self):
+        '''
+            mgra 1: 12 units, 4 new, 3 old, 5 normal
+            mgra 2: 100 units, 2 new, 4 old, 94 normal
+            mgra 3: 56 units, 5 new, 10 old, 41 normal
+            mgra 4: 350 units, 35 new, 175 old, 140 normal
+        '''
+        housing_age_frame = pandas.DataFrame({
+            "MGRA": [1, 2, 3, 4],
+            self.product_type_labels.proportion_new: [0.33, 0.02, 0.0892, 0.1],
+            self.product_type_labels.proportion_old: [0.25, 0.04, 0.1785, 0.5],
+            self.product_type_labels.total_units: [12, 100, 56, 350]
+        })
+        # vacant development, new units should be added to the proportion new
+
+        # infill is the same
+        # redevelopment; units should be taken from the old side?

@@ -69,6 +69,8 @@ class ProductTypeLabels(object):
             self.occupied_units = product_type_dict['HOUSEHOLDS']
             self.total_units = product_type_dict['HOUSING_UNITS']
             self.capacity = product_type_dict['HOUSING_CAPACITY']
+            self.proportion_new = product_type_dict['PERCENT_NEW']
+            self.proportion_old = product_type_dict['PERCENT_OLD']
         else:
             product_type_dict = non_residential_types[product_type]
             self.occupied_units = product_type_dict['EMPLOYMENT']
@@ -85,7 +87,8 @@ class ProductTypeLabels(object):
                   self.developed_acres, self.vacant_acres, self.price
                   ]
         if self.residential:
-            result.append(self.capacity)
+            result.extend(
+                [self.capacity, self.proportion_new, self.proportion_old])
         else:
             result.append(self.job_area)
         return result
