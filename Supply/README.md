@@ -8,7 +8,7 @@ Real Estate Development Model targeting SANDAG's MGRA level datasets
   - Windows 10 64 bit, MacOS 10.15.4 or greater, or a GNU/Linux that can run python 3.6 or higher, `ldd`, `objdump` and `objcopy`
 - Hard Disk Space:
   - 4 times total model file size times the number of simulation years (SSD preferred)
-    - for example: 4 x 300MB model x 35 simulation years = 42GB minimum
+    - For example: 4 x 300MB model x 35 simulation years = 42GB minimum
 - RAM:
   - 8 GB, or 4x total model file size, whichever is greater
 - Processor:
@@ -22,7 +22,8 @@ Real Estate Development Model targeting SANDAG's MGRA level datasets
 ## Installation
 
 - Install dependencies with: `pipenv install`
-- Test with: `pipenv run python run_tests.py -t`
+- Test with: `pipenv run python run_tests.py -t` or `pipenv run ./test_with_coverage.sh`
+  - Note that this step is not required, and tests expect local files by default
 - Create distributable folder with: `pipenv run pyinstaller main.py`
 
 ## Usage
