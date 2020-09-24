@@ -69,8 +69,8 @@ class ProductTypeLabels(object):
             self.occupied_units = product_type_dict['HOUSEHOLDS']
             self.total_units = product_type_dict['HOUSING_UNITS']
             self.capacity = product_type_dict['HOUSING_CAPACITY']
-            self.proportion_new = product_type_dict['PERCENT_NEW']
-            self.proportion_old = product_type_dict['PERCENT_OLD']
+            self.proportion_new = product_type_dict['PROPORTION_NEW']
+            self.proportion_old = product_type_dict['PROPORTION_OLD']
         else:
             product_type_dict = non_residential_types[product_type]
             self.occupied_units = product_type_dict['EMPLOYMENT']
@@ -126,6 +126,11 @@ def all_product_type_labels():
     for product_type in product_types():
         labels_list.append(ProductTypeLabels(product_type))
     return labels_list
+
+
+def residential_labels():
+    all_labels = all_product_type_labels()
+    return [labels for labels in all_labels if labels.is_residential()]
 
 
 class RedevelopmentLabels(object):

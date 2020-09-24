@@ -2,7 +2,7 @@ import unittest
 import pandas
 
 from modeling.dataframe_updates import add_to_columns, reallocate_units, \
-    update_mgra
+    update_mgra, increment_building_ages
 from utils.interface import parameters
 import utils.access_labels as access
 from utils.access_labels import ProductTypeLabels
@@ -50,7 +50,6 @@ class TestDataframeUpdates(unittest.TestCase):
         self.assertEqual(12, mgras['arrivals'].values[0])
 
     def test_update_mgra(self):
-        # print(self.test_mgras.iloc[1223, :])
         random_mgra = self.test_mgras.sample(random_state=19)
         self.assertIsNone(
             update_mgra(
@@ -59,7 +58,10 @@ class TestDataframeUpdates(unittest.TestCase):
                 scheduled_development=False)
         )
 
-    def test_update_housing_age(self):
+    def test_increment_building_ages(self):
+        mgra_label = "MGRA"
+        single_family_labels = self.product_type_labels
+        multi_family_labels = ProductTypeLabels('multi_family')
         '''
             mgra 1: 12 units, 4 new, 3 old, 5 normal
             mgra 2: 100 units, 2 new, 4 old, 94 normal
@@ -67,12 +69,32 @@ class TestDataframeUpdates(unittest.TestCase):
             mgra 4: 350 units, 35 new, 175 old, 140 normal
         '''
         housing_age_frame = pandas.DataFrame({
-            "MGRA": [1, 2, 3, 4],
-            self.product_type_labels.proportion_new: [0.33, 0.02, 0.0892, 0.1],
-            self.product_type_labels.proportion_old: [0.25, 0.04, 0.1785, 0.5],
-            self.product_type_labels.total_units: [12, 100, 56, 350]
+            mgra_label: [1, 2],
+            single_family_labels.proportion_new: [0.33, 0.02],
+            single_family_labels.proportion_old: [0.25, 0.04],
+            single_family_labels.total_units: [12, 100],
+            multi_family_labels.proportion_new: [0.0892, 0.1],
+            multi_family_labels.proportion_old: [0.1785, 0.5],
+            multi_family_labels.total_units: [56, 350]
         })
-        # vacant development, new units should be added to the proportion new
+        increment_building_ages(housing_age_frame)
+        self.assertAlmostEqual(
+            0.297,
+            housing_age_frame.loc[
+                housing_age_frame[mgra_label] ==
+                1, single_family_labels.proportion_new].item()
+        )
+        self.assertAlmostEqual(
+            0.26041666,
+            housing_age_frame.loc[
+                housing_age_frame[mgra_label] ==
+                1, single_family_labels.proportion_old].item(), 2
+        )
+        self.assertAlmostEqual(
+            0.0, housing_age_frame.loc[
+                housing_age_frame[mgra_label] == 2,
+                multi_family_labels.proportion_new].item()
+        )
 
-        # infill is the same
-        # redevelopment; units should be taken from the old side?
+    def test_correct_building_ages(self):
+        pass

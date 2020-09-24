@@ -92,3 +92,10 @@ units_per_year:
   # from population projection of ~ 30,000 per year (62.6% single family)
   single_family: 6636
   multi_family: 3965
+
+# housing age
+# the number of years that a building is considered new
+years_new: 10
+# the number of years before a building is considered old
+years_old: 50
+# this implies a range between years_new and years_old where a building is neither new nor old.
