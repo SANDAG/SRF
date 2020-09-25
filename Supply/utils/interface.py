@@ -145,7 +145,6 @@ def open_sites_file(from_database=False):
 def connect_to_db(db_param_filename):
     # Set up database connection
     connection_info = EnvYAML(db_param_filename)
-    print(connection_info)
     return psycopg2.connect(
         database=connection_info['database'],
         host=connection_info['host'],

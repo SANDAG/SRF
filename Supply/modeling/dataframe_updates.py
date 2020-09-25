@@ -4,6 +4,7 @@ import pandas
 from utils.access_labels import mgra_labels, land_origin_labels, \
     residential_labels
 from utils.interface import parameters
+from utils.pandas_shortcuts import get_item
 
 
 def add_to_columns(mgras, selected_ID, value, columns):
@@ -53,19 +54,80 @@ def candidate_development_type(candidate, product_type_labels):
     return None  # reaching this would signify a bug
 
 
+def previous_proportion_in_units(
+        mgra_row, proportion_label, current_units_label):
+    return mgra_row[proportion_label] * mgra_row[current_units_label]
+
+
+def update_proportion(
+        frame, selected_ID, proportion_column, updated_proportion_units,
+        total_units_after_update):
+    if total_units_after_update == 0:
+        return
+    frame.loc[
+        frame[mgra_labels.MGRA] == selected_ID, proportion_column
+    ] = updated_proportion_units / total_units_after_update
+
+
+def update_housing_ages(mgras, selected_ID, units_to_build,
+                        product_type_labels):
+    '''
+    changes the mgras frame in place so that the proportion of new and old
+    buildings for the product type are accurate based on the number of new
+    units that will be added to the mgra
+    '''
+    # any additional units should be added to the proportion of new units
+    # any negative units should be taken first from the 'old' category, then
+    # the middle aged category
+    # (all proportions need to be updated to maintain accuracy though)
+    row = mgras.loc[mgras[mgra_labels.MGRA] == selected_ID, :]
+    total_units_after_update = get_item(
+        mgras, mgra_labels.MGRA, selected_ID,
+        product_type_labels.total_units) + units_to_build
+    previous_new_units = previous_proportion_in_units(
+        row,
+        product_type_labels.proportion_new,
+        product_type_labels.total_units
+    )
+    previous_old_units = previous_proportion_in_units(
+        row, product_type_labels.proportion_old,
+        product_type_labels.total_units)
+
+    if units_to_build >= 0:
+        # add to proportion new
+        new_units = previous_new_units + units_to_build
+        old_units = previous_old_units
+    else:
+        new_units = previous_new_units
+        # subtract (notice we already have negative units_to_build) from
+        # proportion old
+        old_units = previous_old_units + units_to_build
+
+    if old_units.item() < 0:
+        old_units = 0
+
+    update_proportion(mgras, selected_ID, product_type_labels.proportion_new,
+                      new_units, total_units_after_update)
+    # update proportion old
+    update_proportion(mgras, selected_ID, product_type_labels.proportion_old,
+                      old_units, total_units_after_update)
+
+
 def update_units(mgras, selected_ID, units_to_build, product_type_labels):
     columns_expecting_units = []
     columns_expecting_units.append(product_type_labels.total_units)
     if product_type_labels.is_residential():
         columns_expecting_units.append(mgra_labels.HOUSING_UNITS)
+        update_housing_ages(mgras, selected_ID,
+                            units_to_build, product_type_labels)
     else:  # product type is non-residential
         columns_expecting_units.append(mgra_labels.TOTAL_JOB_SPACES)
     add_to_columns(mgras, selected_ID, units_to_build,
                    columns_expecting_units)
 
 
-def __change_in_proportion(total_units, current_proportion, proportion_range):
-    return total_units * current_proportion / proportion_range / total_units
+def __change_in_proportion(current_proportion, proportion_range):
+    return current_proportion / proportion_range
 
 
 def increment_building_ages(mgras):
@@ -86,28 +148,21 @@ def increment_building_ages(mgras):
     Returns: None, frame is updated in place
     '''
     for labels in residential_labels():
-        # calculate the updated proportion of new housing
-        mgras[labels.proportion_new] -= __change_in_proportion(
-            mgras[labels.total_units], mgras[labels.proportion_new],
-            parameters['years_new']
-        )
-        # calculate the updated proportion of old housing
+        # calculate the proportion of new housing
+        # save in a temp variable to not change the calculations for
+        # proportion old
+        updated_proportion_new = mgras[labels.proportion_new] - \
+            __change_in_proportion(
+            mgras[labels.proportion_new], parameters['years_new'])
+        # update the proportion of old housing
         middle_aged_proportion = 1.0 - \
             mgras[labels.proportion_new] - mgras[labels.proportion_old]
         middle_age_range = parameters['years_old'] - parameters['years_new']
         mgras[labels.proportion_old] += __change_in_proportion(
-            mgras[labels.total_units],
             middle_aged_proportion, middle_age_range
         )
-
-
-def correct_building_ages(mgras, selected_ID, units_to_build,
-                          product_type_labels):
-    '''
-    changes the mgras frame in place so that the proportion of new and old
-    buildings for the product type are accurate based on the number of units
-    that will be added to the mgra
-    '''
+        # now save the calculated proportion of new housing
+        mgras[labels.proportion_new] = updated_proportion_new
 
 
 def simple_update(mgras, selected_ID, units_to_build, product_type_labels):

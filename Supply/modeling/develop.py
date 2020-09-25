@@ -3,14 +3,13 @@ import numpy
 from tqdm import tqdm
 import random
 
-from modeling.filters import apply_filters, generic_filter, acreage_available
-from modeling.dataframe_updates import update_mgra
-from utils.access_labels import all_product_type_labels, \
-    mgra_labels
+from modeling.filters import apply_filters, acreage_available
+from modeling.dataframe_updates import update_mgra, increment_building_ages
+
+from utils.access_labels import all_product_type_labels
 from utils.interface import parameters
 
 from modeling.candidates import create_candidate_set
-# from utils.interface import save_to_file
 
 
 def buildable_units(candidate, product_type_labels, max_units):
@@ -174,4 +173,7 @@ def develop(mgras):
                 progress_bar.update(built_demand)
 
     progress_bar.close()
+    # add to housing age
+    increment_building_ages(mgras)
+
     return mgras

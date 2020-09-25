@@ -11,7 +11,7 @@ from scheduled_development import pick_labels_with_highest_value, \
     total_for_luz, find_largest_luz_employment_type, \
     find_current_employment_type
 
-COMMANDLINE_INPUT = 'python3 scheduled_development.py'
+COMMANDLINE_INPUT = 'python scheduled_development.py -t'
 
 
 class TestMain(unittest.TestCase):
