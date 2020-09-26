@@ -22,6 +22,8 @@ simulation_begin: 2012
 use_choice_model: true
 # Choice model scaling factor
 scale: 1.0
+# number of runs
+runs: 2
 
 # Filtering
 minimum_units: 5
