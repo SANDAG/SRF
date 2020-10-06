@@ -22,6 +22,7 @@ Real Estate Development Model targeting SANDAG's MGRA level datasets
 ## Installation
 
 - Install dependencies with: `pipenv install`
+  - You will need to install [c++ build tools for visual studio](https://visualstudio.microsoft.com/downloads/) if you haven't already
 - Test with: `pipenv run python run_tests.py -t` or `pipenv run ./test_with_coverage.sh`
   - Note that this step is not required, and tests expect local files by default
 - Create distributable folder with: `pipenv run pyinstaller main.py`
