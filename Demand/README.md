@@ -9,12 +9,9 @@ https://github.com/ManhanGroup/Alpaca
 
 Alternatively, contact Manhan Group, LLC (info@manhangroup.com) to obtain a pre-compiled mu-land binary executable for your system.
 
-3. As an alternative to 2), Run the demand model in command prompt window:
-   cd E:\PECAS\SRF\trunk\Demand
-   "C:\Program Files\R\R-4.0.2\bin\R.exe" CMD BATCH .\R\evalDemand.R  
-    Or
-   "C:\Program Files\R\R-4.0.2\bin\Rscript.exe" .\R\evalDemand.R  
-   R must also be installed on your system; version 3.5.0 was used to develop the associated scripts for Demand. You can learn more and download R from:
+However you obtain it, the program "mu-land.exe" must be placed somewhere it can easily be found, i.e. add the folder containing this executable file to your system PATH variable, if it isn't already included.
+
+R must also be installed on your system; version 3.5.0 was used to develop the associated scripts for Demand. You can learn more and download R from:
    https://www.r-project.org/
 
 The following libraries are also required:
