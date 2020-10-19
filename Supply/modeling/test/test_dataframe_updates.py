@@ -10,7 +10,9 @@ from utils.access_labels import ProductTypeLabels
 
 class TestDataframeUpdates(unittest.TestCase):
     def setUp(self):
-        self.test_mgras = pandas.read_csv(parameters['input_filename'])
+        # self.test_mgras = pandas.read_csv(parameters['input_filename'])
+        self.test_mgras = pandas.read_csv('test_data/random_MGRA.csv')
+
         self.product_type_labels = ProductTypeLabels('single_family')
 
     def test_add_to_columns(self):

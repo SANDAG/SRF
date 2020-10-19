@@ -22,7 +22,7 @@ class TestDevelop(unittest.TestCase):
         self.product_type_labels = ProductTypeLabels('single_family')
 
         self.short_mgras = pandas.read_csv('test_data/random_MGRA.csv')
-        self.test_mgras = pandas.read_csv('data/SRF_Input_Base_V4.1.csv')
+        # self.test_mgras = pandas.read_csv('data/SRF_Input_Base_V4.1.csv')
 
         return super().setUp()
 
