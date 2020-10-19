@@ -84,7 +84,7 @@ construction_cost:
 
 # Demand
 units_per_year:
-  # derived from total jobs * growth of 0.96% per year:
+  # placeholders derived from total jobs * growth of 0.96% per year:
   office: 2384
   commercial: 5372
   industrial: 3256

@@ -19,7 +19,7 @@ class TestMeetDemand(unittest.TestCase):
     def test_meet_demand(self):
         # skip this integration test if there is an argument given to
         # the test runner
-        if parameters['omit_integration_tests']:
+        if not parameters['include_integration_tests']:
             return unittest.skip('commandline argument given')
 
         result = os.system(COMMANDLINE_INPUT)
