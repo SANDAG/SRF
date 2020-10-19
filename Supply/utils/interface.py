@@ -19,7 +19,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-t', '--test', dest='test',
                         default=False, action='store_true')
-    parser.add_argument('-o', '--omit', dest='omit',
+    parser.add_argument('-i', '--include-integration', dest='include',
                         default=False, action='store_true')
     return parser.parse_args()
 
@@ -116,7 +116,7 @@ def configure():
                 )
             logging.basicConfig(level=logging.DEBUG)
 
-        parameters['omit_integration_tests'] = args.omit
+        parameters['include_integration_tests'] = args.include
     else:
         print('could not load parameters, exiting')
     return parameters
