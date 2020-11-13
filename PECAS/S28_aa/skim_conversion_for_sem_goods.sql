@@ -46,9 +46,9 @@ drop table if exists {luz_skimtbl};
 create table {luz_skimtbl} 
 as 
 select a.origin_luz as origin, a.destination_luz as destination, 
-case when sum(f."flows")=0 then min(a.dist_da_t_op) else sum(a.dist_da_t_op * f.flows)/sum(f."flows") end as  dist_da_t_op,
-case when sum(f."flows")=0 then min(a.time_da_t_op) else sum(a.time_da_t_op * f.flows)/sum(f."flows") end as time_da_t_op,
-case when sum(f."flows")=0 then min(a.toll_op) else sum(a.toll_op * f.flows)/sum(f."flows") end as toll_op
+case when sum(f."flows")<=0 then min(a.dist_da_t_op) else sum(a.dist_da_t_op * f.flows)/sum(f."flows") end as  dist_da_t_op,
+case when sum(f."flows")<=0 then min(a.time_da_t_op) else sum(a.time_da_t_op * f.flows)/sum(f."flows") end as time_da_t_op,
+case when sum(f."flows")<=0 then min(a.toll_op) else sum(a.toll_op * f.flows)/sum(f."flows") end as toll_op
 from  {taz_skimtbl} a join {middaytbl} f
  on a.origin_taz = f.i and a.destination_taz = f.j
  where a.origin_luz>0 and  a.destination_luz>0

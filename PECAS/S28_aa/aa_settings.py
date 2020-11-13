@@ -62,7 +62,7 @@ resume_run = False
 # This is frequently used when the inputs for a future year have been updated. For instance,
 # if new skims from the travel model are provided for year 2029, you could set the start year to 2030 and
 # rerun your scenario. 
-aa_startyear = 2017
+aa_startyear = 2012
 
 # --- END OF REPLAY FUNCTIONALITY ---
 
@@ -86,7 +86,7 @@ scale_technology_options = False
 # scenario (e.g. because the scenario has already been run up to that point),
 # to prevent the model from re-squeezing them.
 #earliest_squeeze_year = 9999
-earliest_squeeze_year = 2016
+earliest_squeeze_year = 2012
 
 # XVectorConstants are used to adjust the AA constants over time based on changing values
 # in XVector.csv in each year.  The constrained constants from the base year are
@@ -111,7 +111,7 @@ baseyear = 2012
 endyear = 2050
 
 # Years in which new skims are available
-skimyears = [2005,2012,2016]
+skimyears = [2012,2016]
 
 # Years in which AA should run
 aayears = irange(baseyear, endyear)
@@ -255,7 +255,7 @@ emme_format_trips = False
 
 
 # Whether to squeeze skims by TAZ from the travel model up to the LUZ level
-squeeze_skims = True
+squeeze_skims = False
 # The name of the TAZ skim file (if squeeze_skims is True); any copies of "{yr}" will be replaced by the skim year
 taz_skims_fname = "TMSkims"
 
@@ -279,3 +279,5 @@ flItaz = "TAZ"
 flIcommodity = "Commodity"
 flIquantity = "Quantity"
 
+update_techopt = True
+update_inputs = True
