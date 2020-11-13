@@ -1,4 +1,4 @@
-loadDemandInputs <- function(configDir,tables) {
+loadDemandInputs <- function(configDir,year,tables) {
   library(yaml)
   config_file = file.path(configDir, "dbparams.yaml")
   config <- yaml.load_file(config_file)
@@ -12,7 +12,7 @@ loadDemandInputs <- function(configDir,tables) {
   tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input schema doesn't exists!"))
 
   # create vector of necessary tables
-  if (missing(tables)){
+   if (missing(tables)){
   tables <- c("agents",
              "agents_zones",
              "bids_adjustments",
@@ -30,8 +30,16 @@ loadDemandInputs <- function(configDir,tables) {
   # load csv files into inputList
   inputList <- list()
   for (table in tables) {
-    mysql <- paste0("select * from ",inputs_schema,".", table)
+    if (table!="demand" || is.na(year)){
+         mysql <- paste0("select * from ",inputs_schema,".", table)
+    } else {
+         mysql <- paste0('select * from ',inputs_schema,'.demand_', year,' d1 union select d.* from ',
+                         inputs_schema,'.demand d left join ',inputs_schema,'.demand_', year,
+                         ' d1 on d."LUZ"= d1."LUZ" and d."H_IDX"=d1."H_IDX" where d1."LUZ" is null order by "LUZ", "H_IDX";')
+    }
+    #print(mysql)
     d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
+    #print(dim(d))
     inputList[[table]] <- d
 
   }
@@ -61,6 +69,44 @@ loadMGRA <- function(configDir,tname) {
   return(d)
 
 }
+
+loadaa2demandinputs <- function(configDir,tname) {
+  library(yaml)
+  config_file = paste0(configDir, "/dbparams.yaml")
+  config <- yaml.load_file(config_file)
+  
+  library(RPostgreSQL)
+  m <- dbDriver('PostgreSQL')
+  conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
+  on.exit(dbDisconnect(conn))
+  inputs_schema <- config$mu_schema
+  mysql <- paste0("select table_name FROM information_schema.tables WHERE table_schema='", inputs_schema,"' and table_name = '", tname,"';")
+  tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input Table doesn't exists!"))
+  
+  # load data from pg
+  mysql <- paste0('select * from ',inputs_schema,'."', tname,'"')
+  d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
+  
+  return(d)
+  
+}
+
+writeaa2demandoutputs <- function(configDir,tname, mydf) {
+  library(yaml)
+  config_file = paste0(configDir, "/dbparams.yaml")
+  config <- yaml.load_file(config_file)
+  
+  library(RPostgreSQL)
+  m <- dbDriver('PostgreSQL')
+  conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
+  on.exit(dbDisconnect(conn))
+  inputs_schema <- config$mu_schema
+  mytbl <- c(inputs_schema, tname)
+  #if(dbExistsTable(conn, mytbl)){ dbRemoveTable(conn, mytbl)} 
+  sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROM…
+  dbSendQuery(conn, statement=sql_truncate)
+  dbWriteTable(conn, mytbl,mydf, row.names=FALSE, append=TRUE)
+  }
 
 agentCheck <- function(location,targets) {
   require(dplyr)
