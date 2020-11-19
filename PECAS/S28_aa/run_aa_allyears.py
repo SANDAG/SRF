@@ -119,7 +119,9 @@ def main_impl(ps, aa_runner):
         project_code.start_of_year(year, ps=ps)
         
         pre_check(ps, aa_runner, year)
-        project_code.before_aa(year, ps=ps)
+        if year>2012:
+            project_code.before_aa(year, ps=ps)
+        
         # --------------------------------------------------------------------------------------------------------------
         # AA module
         # --------------------------------------------------------------------------------------------------------------
@@ -170,12 +172,11 @@ if __name__ == "__main__":
     args = [arg.lower() for arg in sys.argv]
     resume = _pull(args, "resume")
     if len(args) > 1:
-        ps_name = args[-1]
-        main_ps = importlib.import_module(ps_name)
+        ps_name = args[-1]        
     else:
         ps_name = "aa_settings"
-        # noinspection PyUnresolvedReferences
-        import aa_settings as main_ps
+
+    main_ps = importlib.import_module(ps_name)
 
     if resume:
         main_ps.resume_run = True
