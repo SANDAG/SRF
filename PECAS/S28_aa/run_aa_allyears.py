@@ -119,7 +119,7 @@ def main_impl(ps, aa_runner):
         project_code.start_of_year(year, ps=ps)
         
         pre_check(ps, aa_runner, year)
-        if year>2012:
+        if year>2012 and ps.run_supply:
             project_code.before_aa(year, ps=ps)
         
         # --------------------------------------------------------------------------------------------------------------
@@ -150,7 +150,8 @@ def main_impl(ps, aa_runner):
                             logging.warning(
                                 "Couldn't copy " + str(file) + " from year " + str(year - 1) + " to year " + str(year))
 
-        project_code.after_aa(year, ps=ps)
+        if ps.run_demand:
+            project_code.after_aa(year, ps=ps)
         year = year + 1
     
     if ps.travel_model_input_years:

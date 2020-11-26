@@ -279,5 +279,9 @@ flItaz = "TAZ"
 flIcommodity = "Commodity"
 flIquantity = "Quantity"
 
+run_supply = False
+run_demand = False
+
 update_techopt = True
 update_inputs = True
+

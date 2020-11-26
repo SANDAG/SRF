@@ -1,7 +1,7 @@
 import csv
 import logging
 import os
-from os.path import join, basename
+from os.path import join, basename, exists
 
 from psycopg2 import extras
 
@@ -115,10 +115,10 @@ def dump_pg_tbls(connect, scendir, tbl_schema,tname_pattern):
             flder = join(scendir,flder)
                        
             destfile = join(flder, fname+'.csv')
-            if os.path.exists(destfile):
+            if exists(destfile):
                 pass
             else:
-                if not os.path.exists(flder):
+                if not exists(flder):
                     os.mkdir(flder)
                     
                 sql = 'select * from \"{}\".\"{}\"'.format(tbl_schema,tname)
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     input_schema =  main_ps.aa_schema
 
     pr.set_up_logging()
-    if os.path.exists(join("./AllYears", "Inputs", "TechnologyOptionsI.csv")):
+    if exists(join("./AllYears", "Inputs", "TechnologyOptionsI.csv")):
         pass
     else:
         #write_techopt_header(main_ps.scendir)
