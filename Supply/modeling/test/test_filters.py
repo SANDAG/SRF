@@ -107,9 +107,10 @@ class TestFilters(unittest.TestCase):
     def test_apply_filters(self):
         self.assertIsNotNone(apply_filters(
             self.combined_frame, self.product_type_labels))
-        candidates = create_candidate_set(self.mgras)
-        self.assertIsNotNone(apply_filters(
-            candidates, self.product_type_labels))
+        # uncomment to test behavior on actual candidates
+        # candidates = create_candidate_set(self.mgras)
+        # self.assertIsNotNone(apply_filters(
+        #     candidates, self.product_type_labels))
 
     def test_acreage_available(self):
         # adding coverage

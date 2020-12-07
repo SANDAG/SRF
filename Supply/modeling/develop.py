@@ -1,16 +1,19 @@
 import logging
 import numpy
-from tqdm import tqdm
+# from tqdm import tqdm
 import random
-
-from modeling.filters import apply_filters, generic_filter, acreage_available
-from modeling.dataframe_updates import update_mgra
-from utils.access_labels import all_product_type_labels, \
-    mgra_labels
-from utils.interface import parameters
+from multiprocessing import Pool, cpu_count
+import copy
+import math
+import time
 
 from modeling.candidates import create_candidate_set
-# from utils.interface import save_to_file
+from modeling.filters import apply_filters, acreage_available
+from modeling.dataframe_updates import update_mgra, increment_building_ages
+
+from utils.access_labels import all_product_type_labels
+from utils.interface import parameters
+from utils.pandas_shortcuts import running_average
 
 
 def buildable_units(candidate, product_type_labels, max_units):
@@ -83,7 +86,7 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
                                           buildable_count, product_type_labels,
                                           scheduled_development=False)
 
-    return mgras, buildable_count, removed_units_reference
+    return buildable_count, removed_units_reference
 
 
 def demand_unsatisfied(demand):
@@ -118,60 +121,128 @@ def find_product_type_in_labels_demand(labels_demand_list, product_type):
     return None
 
 
-def develop(mgras):
-    """
-    Arguments
-        mgras:
-            A pandas dataframe of mgra's that will be updated with new values
-            based on demand inputs found in parameters.yaml
-    Returns:
-        a pandas dataframe with selected MGRA's updated
-    """
-    # get candidate set
-    candidates = create_candidate_set(mgras)
+def subtract_from_fulfilled_demand(labels_demands, removed_units_reference):
+    index_to_subtract_from = \
+        find_product_type_in_labels_demand(
+            labels_demands,
+            removed_units_reference[0].product_type
+        )
+    labels_demands[index_to_subtract_from] = \
+        update_labels_demand(
+        labels_demands[index_to_subtract_from][0],
+        labels_demands[index_to_subtract_from][1],
+        removed_units_reference[1]
+    )
+    return labels_demands
 
-    # prep demand
+
+def prep_demand():
     labels_demands = []
     for product_type_labels in all_product_type_labels():
         units_required = product_type_labels.units_per_year_parameter()
         if units_required < 0:
             units_required = 0
+        # nested tuple with (appropriate labels for the product type,
+        # (amount of demand fulfilled,
+        # number of units needed total to fulfill demand))
         labels_demands.append((
             product_type_labels,
             (0, units_required)
         ))
+    return labels_demands
 
-    progress_bar = tqdm(total=sum_demand(labels_demands))
-    progress_bar.set_description(
-        'allocating units by alternating through each product type')
+
+def simulation_process(mgras, candidates, labels_demands):
+    # progress_bar = tqdm(total=sum_demand(labels_demands))
+    # progress_bar.set_description(
+    # 'allocating units by alternating through each product type')
     # select one build candidate at a time for each product type
     while demands_unsatisfied(labels_demands):
         random.shuffle(labels_demands)
         for index, (labels, demand) in enumerate(labels_demands):
             if demand_unsatisfied(demand):
-                mgras, built_demand, removed_units_reference = \
+                built_demand, removed_units_reference = \
                     choose_candidate(
                         candidates,
                         mgras, labels, demand[1] - demand[0]
                     )
                 if removed_units_reference is not None:
-                    # redevelopment removed units, subtract that value from
-                    # the appropriate demand
-                    index_to_subtract_from = \
-                        find_product_type_in_labels_demand(
-                            labels_demands,
-                            removed_units_reference[0].product_type
-                        )
-                    labels_demands[index_to_subtract_from] = \
-                        update_labels_demand(
-                        labels_demands[index_to_subtract_from][0],
-                        labels_demands[index_to_subtract_from][1],
-                        removed_units_reference[1]
-                    )
-                    progress_bar.update(removed_units_reference[1])
+                    # redevelopment removed units, subtract from
+                    # the appropriate demand progress
+                    labels_demands = subtract_from_fulfilled_demand(
+                        labels_demands, removed_units_reference)
+                    # progress_bar.update(removed_units_reference[1])
+
                 labels_demands[index] = update_labels_demand(
                     labels, demand, built_demand)
-                progress_bar.update(built_demand)
-
-    progress_bar.close()
+                # progress_bar.update(built_demand)
     return mgras
+    # progress_bar.close()
+
+
+def guesstimate_simulation_runtime(normal_runtime, runs, expected_threads):
+    '''
+    expects positive numbers for each argument.
+    '''
+    estimated_runtime = normal_runtime
+    multiplier = math.ceil(runs / expected_threads)
+    return estimated_runtime * multiplier
+
+
+def develop(mgras, runs=1):
+    """
+    Arguments
+        mgras:
+            A pandas dataframe of mgra's that will be allocated new units
+            based on demand inputs found in parameters.yaml
+    Returns:
+        a pandas dataframe with selected MGRA's updated
+    """
+    runs = parameters['runs']
+    current_results = None
+    shared_candidates = create_candidate_set(mgras)
+
+    arg_lists = []
+    for i in range(runs):
+        arg_lists.append(
+            (
+                mgras.copy(), shared_candidates.copy(),
+                copy.deepcopy(prep_demand())
+            )
+        )
+    normal_runtime = 60  # seconds
+    eta = guesstimate_simulation_runtime(normal_runtime, runs, cpu_count())
+    print(
+        'queueing {} simulation runs on {}(?) cpu\'s. ETA: {} seconds...'
+        .format(
+            runs, cpu_count(), eta))
+    with Pool() as pool:
+        result = pool.starmap_async(simulation_process, arg_lists)
+        slept = 0
+        while not result.ready():
+            sleep_time = 10
+            time.sleep(sleep_time)
+            slept += sleep_time
+            print('time elapsed: {} seconds.'.format(slept))
+        results = result.get(eta*3)
+
+        pool.close()
+        pool.join()
+
+    i = 0
+    for result in results:
+
+        if current_results is None:
+            current_results = result.copy()
+            i = 1
+        else:
+            current_results, _ = running_average(
+                current_results.copy(), i, result)
+            i += 1
+
+    # make mgra and luz ids integers again
+    current_results = current_results.astype({'MGRA': 'int32', 'LUZ': 'int32'})
+    # add to housing age
+    increment_building_ages(current_results)
+
+    return current_results

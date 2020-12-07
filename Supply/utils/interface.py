@@ -73,8 +73,12 @@ def save_to_file(printable, output_directory, filename,
                  as_yaml=False, output_status=True):
     if(output_status):
         print('saving {} to {} folder'.format(filename, output_directory))
-    create_folder_if_needed(output_directory)
     filepath = os.path.join(output_directory, filename)
+    if(os.path.isfile(filepath)):
+        if(output_status):
+            print('file exists, skipping')
+        return
+    create_folder_if_needed(output_directory)
     # use pandas to_csv function if available
     if hasattr(printable, 'to_csv'):
         printable.to_csv(filepath, index=False)
@@ -145,7 +149,6 @@ def open_sites_file(from_database=False):
 def connect_to_db(db_param_filename):
     # Set up database connection
     connection_info = EnvYAML(db_param_filename)
-    print(connection_info)
     return psycopg2.connect(
         database=connection_info['database'],
         host=connection_info['host'],

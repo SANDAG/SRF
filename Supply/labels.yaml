@@ -33,6 +33,8 @@ product_types:
       MEAN_PRICE: "valueSFmea"
       HOUSING_CAPACITY: "Cap_HS_SF"
       SQUARE_FEET_PER_UNIT: "sfduSFmean"
+      PROPORTION_NEW: "sf_new_mea"
+      PROPORTION_OLD: "sf_old_mea"
     multi_family:
       HOUSING_UNITS: "hs_mf" # Multiple-family housing units
       HOUSEHOLDS: "hh_mf"
@@ -42,7 +44,9 @@ product_types:
       MEAN_PRICE: "valueMFmea"
       HOUSING_CAPACITY: "Cap_HS_MF"
       SQUARE_FEET_PER_UNIT: "sfduMFmean"
-
+      PROPORTION_NEW: "mf_new_mea"
+      PROPORTION_OLD: "mf_old_mea"
+    # not implemented
     # rural_residential:
     #   HOUSING_UNITS: "hs_ldsf"
     #   HOUSEHOLDS: "hh_ldsf"
@@ -83,7 +87,7 @@ product_types:
       VACANT_ACRES: "vac_office"
       MEAN_PRICE: "valueOFCme"
       JOB_AREA: "ofcSFEmean"
-
+    # not implemented
     # other:
     #   EMPLOYMENT: "emp_other"
 

@@ -22,6 +22,8 @@ simulation_begin: 2012
 use_choice_model: true
 # Choice model scaling factor
 scale: 1.0
+# number of runs
+runs: 2
 
 # Filtering
 minimum_units: 5
@@ -87,3 +89,10 @@ units_per_year:
   industrial: 1000
   single_family: 1000
   multi_family: 1000
+
+# housing age
+# the number of years that a building is considered new
+years_new: 10
+# the number of years before a building is considered old
+years_old: 50
+# this implies a range between years_new and years_old where a building is neither new nor old.
