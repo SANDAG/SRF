@@ -47,10 +47,10 @@ drop table if exists {luz_skimtbl};
 create table {luz_skimtbl} 
 as
 select a.origin_luz as origin, a.destination_luz as destination,
-case when sum(f."flows")=0 then min(a.am_allpen_totalivtt) else sum(a.am_allpen_totalivtt * f.flows)/sum(f."flows") end as am_allpen_totalivtt,
-case when sum(f."flows")=0 then min(a.am_allpen_totalwait) else sum(a.am_allpen_totalwait * f.flows)/sum(f."flows") end as am_allpen_totalwait,
-case when sum(f."flows")=0 then min(a.am_allpen_totalwalk) else sum(a.am_allpen_totalwalk * f.flows)/sum(f."flows") end as am_allpen_totalwalk,
-case when sum(f."flows")=0 then min(a.am_allpen_xfers) else sum(a.am_allpen_xfers * f.flows)/sum(f."flows") end  as am_allpen_xfers
+case when sum(f."flows")<=0 then min(a.am_allpen_totalivtt) else sum(a.am_allpen_totalivtt * f.flows)/sum(f."flows") end as am_allpen_totalivtt,
+case when sum(f."flows")<=0 then min(a.am_allpen_totalwait) else sum(a.am_allpen_totalwait * f.flows)/sum(f."flows") end as am_allpen_totalwait,
+case when sum(f."flows")<=0 then min(a.am_allpen_totalwalk) else sum(a.am_allpen_totalwalk * f.flows)/sum(f."flows") end as am_allpen_totalwalk,
+case when sum(f."flows")<=0 then min(a.am_allpen_xfers) else sum(a.am_allpen_xfers * f.flows)/sum(f."flows") end  as am_allpen_xfers
 from {taz_skimtbl} a join {middaytbl} f
 on a.origin_taz = f.i and a.destination_taz = f.j
 where a.origin_luz>0 and a.destination_luz>0

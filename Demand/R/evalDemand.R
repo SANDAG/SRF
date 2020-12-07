@@ -13,6 +13,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ## global parameters
 configDir = args[1]
 scenario = args[2]
+year = ifelse(is.null(args[3]),NA,args[3])
 ## check results if updated to latest tidyverse library
 library(dplyr)
 dplyr.summarise.inform = FALSE
@@ -26,7 +27,7 @@ MGRAs <- loadMGRA(configDir,'mgra')
 data_frames <- c("agents_zones","bids_adjustments","demand_exogenous_cutoff","rent_adjustments","subsidies","supply","zones","real_estates_zones")
 # calls function from helperFunctions to pull data from the database
 # the configDir is currently the parent folder, where the file dbparams.yaml lives
-master_data <- loadDemandInputs(configDir)
+master_data <- loadDemandInputs(configDir,year)
 if (!dir.exists(scenario)) {
   dir.create(scenario)
 }
