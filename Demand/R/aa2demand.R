@@ -3,7 +3,7 @@ library(reshape2)
 library(mipfp)
 args <- commandArgs(trailingOnly = TRUE)
 
-#setup connection to the PostgreSQL 
+#setup connection to the PostgreSQL
 source(file.path("R","helperFunctions.R"))
 
 
@@ -51,9 +51,10 @@ hh_4demand <- cbind(select(hh_aa2demand_base,LUZ,aa_inc_cat,aa_siz_cat),
 jobs_4demand <- left_join(ActivityLocations,AA_Demand_Emp_Key,
                           by=c("Activity"="Activity")) %>%
   filter(is.na(Demand_ID)==FALSE) %>%
+  mutate(Jobs=Quantity/Output_Job) %>%
   select(LUZ=ZoneNumber,IDAGENT=Demand_ID,Quantity) %>%
   group_by(LUZ,IDAGENT) %>%
-  summarise(NAGENT=min(sum(Quantity),1000000))
+  summarise(NAGENT=min(sum(Jobs),1000000))
 demand_input <- rbind(as.data.frame(hh_4demand),as.data.frame(jobs_4demand)) %>%
   filter(LUZ<=229) %>%
   arrange(LUZ,IDAGENT) %>% mutate(NAGENT=as.integer(NAGENT))
