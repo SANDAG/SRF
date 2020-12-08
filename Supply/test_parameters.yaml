@@ -1,25 +1,32 @@
 ---
 # I/O
-input_filename: "test_data/random_MGRA.csv"
+input_filename: "data/SRF_Input_Base_V4.1.csv"
 sites_filename: "data/Sites_MGRAs.dbf"
 
-# aa_host: "localhost"
-# aa_database: "sandag_db"
-# aa_user: "usrPostgres"
-# aa_password: ""
-# aa_port: 5432
-# srf_schema: "srf"
-# srf_inputtbl: "_data_preprocessed"
+use_database: true
+database_info_filename: "../dbparams.yaml"
+schema: "srf"
+input_table: "_supply_input"
+scheduled_development_table: "_supply_scheduled_sites"
+aa_crosswalk_table: "_supply_aa_crosswalk"
 
 output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
-# set to 0 to hide output
-debug: 1
+# set to false to hide output
+debug: true
+# save debug output to file
+to_file: false
 
 # Simulation
-simulation_years: 1
 simulation_begin: 2012
+use_choice_model: true
+# Choice model scaling factor
+scale: 1.0
+# number of runs
+runs: 2
 
+# Filtering
+minimum_units: 5
 # Vacancy
 target_vacancy_rates:
   single_family: 0.06 # all vacancy rates in %
@@ -38,13 +45,16 @@ max_vacant_units:
   mobile_home: 300
   industrial: 100
   commercial: 100
-  # ! seems a little too high, based on a large development: mira sorrento
   office: 100
 
 # Profitability
 minimum_redevelopment_age: 20
 profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
+# used to determine the construction cost
+vacant_cost_multiplier: 1.0
+infill_cost_multiplier: 1.1
+redevelopment_cost_multiplier: 1.25
 
 # Unit averages
 sqft_per_unit:
@@ -74,8 +84,15 @@ construction_cost:
 
 # Demand
 units_per_year:
-  office: 10
-  commercial: 10
-  industrial: 10
-  single_family: 10
-  multi_family: 10
+  office: 1000
+  commercial: 1000
+  industrial: 1000
+  single_family: 1000
+  multi_family: 1000
+
+# housing age
+# the number of years that a building is considered new
+years_new: 10
+# the number of years before a building is considered old
+years_old: 50
+# this implies a range between years_new and years_old where a building is neither new nor old.

@@ -542,7 +542,10 @@ fsRun <- function(inputList, workDir, createDir=TRUE, endogFn=nullEndogFn,
     
     # if the maximum APE is less than the tolerance parameter
     # then the run has converged and the MuLand ouput list is returned
-    if(WAAPE < tol) {
+    if(is.nan(WAAPE)){
+      print("WAAPE is null, exiting...")
+      break
+    } else if (WAAPE < tol) {
       print("Run converged, exiting...")
       break
     } else if (changePct < changeTol) {
@@ -580,7 +583,8 @@ fsRun <- function(inputList, workDir, createDir=TRUE, endogFn=nullEndogFn,
         dplyr::transmute(H_IDX = H_IDX,
                          V_IDX = V_IDX,
                          I_IDX = I_IDX,
-                         BIDADJ = BIDADJ + Value)
+                         BIDADJ = BIDADJ + Value)  #%>%
+       #dplyr::mutate(BIDADJ = ifelse(is.nan(BIDADJ),0,BIDADJ))
       
       # apply scenario-specific input list adjustments
       inputList <- endogFn(inputList, outputList)

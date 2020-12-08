@@ -30,16 +30,23 @@ product_types:
       TOTAL_SQUARE_FOOTAGE: "SqFt_SF"
       DEVELOPED_ACRES: "dev_sf"
       VACANT_ACRES: "vac_sf"
-      MEAN_PRICE: "SF_mean"
+      MEAN_PRICE: "valueSFmea"
       HOUSING_CAPACITY: "Cap_HS_SF"
+      SQUARE_FEET_PER_UNIT: "sfduSFmean"
+      PROPORTION_NEW: "sf_new_mea"
+      PROPORTION_OLD: "sf_old_mea"
     multi_family:
       HOUSING_UNITS: "hs_mf" # Multiple-family housing units
       HOUSEHOLDS: "hh_mf"
       TOTAL_SQUARE_FOOTAGE: "SqFt_MF"
       DEVELOPED_ACRES: "dev_mf"
       VACANT_ACRES: "vac_mf"
-      MEAN_PRICE: "MFmean"
+      MEAN_PRICE: "valueMFmea"
       HOUSING_CAPACITY: "Cap_HS_MF"
+      SQUARE_FEET_PER_UNIT: "sfduMFmean"
+      PROPORTION_NEW: "mf_new_mea"
+      PROPORTION_OLD: "mf_old_mea"
+    # not implemented
     # rural_residential:
     #   HOUSING_UNITS: "hs_ldsf"
     #   HOUSEHOLDS: "hh_ldsf"
@@ -61,24 +68,26 @@ product_types:
       TOTAL_SQUARE_FOOTAGE: "Ind_SqFt"
       DEVELOPED_ACRES: "dev_indus"
       VACANT_ACRES: "vac_indus"
-      MEAN_PRICE: "INDmean"
-      JOB_AREA: "sf_indmean"
+      MEAN_PRICE: "valueINDme"
+      JOB_AREA: "indSFEmean"
     commercial:
       EMPLOYMENT: "emp_comm_l"
       JOB_SPACES: "commercial_js"
       TOTAL_SQUARE_FOOTAGE: "Ret_SqFt"
       DEVELOPED_ACRES: "dev_comm"
       VACANT_ACRES: "vac_comm"
-      MEAN_PRICE: "RETmean"
-      JOB_AREA: "sf_commean"
+      MEAN_PRICE: "valueCOMme"
+      JOB_AREA: "comSFEmean"
+
     office:
       EMPLOYMENT: "emp_office"
       JOB_SPACES: "office_js"
       TOTAL_SQUARE_FOOTAGE: "Ofc_SqFt"
       DEVELOPED_ACRES: "dev_office"
       VACANT_ACRES: "vac_office"
-      MEAN_PRICE: "OFCmean"
-      JOB_AREA: "sf_ofcmean"
+      MEAN_PRICE: "valueOFCme"
+      JOB_AREA: "ofcSFEmean"
+    # not implemented
     # other:
     #   EMPLOYMENT: "emp_other"
 

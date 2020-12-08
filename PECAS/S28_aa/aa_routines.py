@@ -248,8 +248,12 @@ def write_floorspace_i(year, ps=_ps):
         floor_d_out.close()
     else:
         # Copy from previous year
-        shutil.copyfile(ps.scendir + "/" + str(year - 1) + "/FloorspaceDelta.csv",
-                        ps.scendir + "/" + str(year) + "/FloorspaceDelta.csv")
+        FPDelta_file = ps.scendir + "/" + str(year) + "/FloorspaceDelta.csv"
+        if (os.path.exists(FPDelta_file)):
+            pass
+        else:
+            shutil.copyfile(ps.scendir + "/" + str(year - 1) + "/FloorspaceDelta.csv",
+                       FPDelta_file )
 
     # Read floorspace Delta
     floor_d_in = open(ps.scendir + str(year) + "/FloorspaceDelta.csv", "r")
@@ -278,7 +282,9 @@ def write_floorspace_i(year, ps=_ps):
         key_list = list(floor_d_dict.keys())
         key_list.sort()
         for key in key_list:
-            if key in floor_o_dict:
+            if key[1] == 'Dump Space':
+                continue
+            elif key in floor_o_dict:
                 net = floor_d_dict[key] + floor_o_dict[key]
                 if net < 0:
                     logging.debug("Negative value for floorspace in %s", key)
@@ -295,7 +301,7 @@ def write_floorspace_i(year, ps=_ps):
         # Add in ODict values not in DDict; set net to ODict value
         key_list = list(floor_o_dict.keys())
         for key in key_list:
-            if key in floor_d_dict:
+            if key in floor_d_dict or key[1] == 'Dump Space':
                 pass
             else:
                 net = floor_o_dict[key]
@@ -345,17 +351,17 @@ def connect_to_aa(ps=_ps):
     parameters  = load_parameters("../../"+ps.db_param_files)
 
     return psycopg2.connect(
-        database=parameters['aa_database'],
-        host=parameters['aa_host'],
-        port=parameters['aa_port'],
-        user=parameters['aa_user'],
-        password=parameters['aa_password'])
+        database=parameters['database'],
+        host=parameters['host'],
+        port=parameters['port'],
+        user=parameters['user'],
+        password=parameters['password'])
 
 def db_user(ps=_ps):
 
     ## Set up database connection parameters
     parameters  = load_parameters("../../"+ps.db_param_files)
-    user = parameters['aa_user']
+    user = parameters['user']
     return user
 
 def aa_querier(ps=_ps):

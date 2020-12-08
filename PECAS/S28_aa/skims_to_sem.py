@@ -11,7 +11,7 @@ import csvutil as cu
 
 # To run on the command line:
 # python skims_to_sem.py <skim year>
-
+import numpy as np
 import numexpr as ne
 #HERE: reset number of vml-threads
 ne.set_vml_num_threads(16)
@@ -30,14 +30,16 @@ def main(year, ps=_ps):
         taz_skims_fname="TazSkimsSOV.csv",
         luz_skims_fname="SkimsISOV.csv",
         omx_fname="traffic_skims_AM.omx",
+        omx_mdflow_fname="trip_md.omx" if year==2012 else None,
         table_suffix="sov",
         check_skim="AM_SOV_TR_M_TIME",
         externals=externals,
     )
     
+   
     transit_access = TransitAccess(
         ps, year,
-        stations_tname="TapToTaz",
+        stations_tname="TapToTaz" if year==2016 else "TapToTaz_2012",
         access_skim_fname="TazSkimsSOV.csv",
         access_skim_names=[
             "AM_SOV_TR_M_DIST",
@@ -62,6 +64,7 @@ def main(year, ps=_ps):
         taz_skims_fname="TazSkimsTransit.csv",
         luz_skims_fname="SkimsITransit.csv",
         omx_fname="transit_skims.omx",
+        omx_mdflow_fname="trip_md.omx" if year==2012 else None,
         table_suffix="transit",
         remove_if="am_allpen_totalivtt = 0",
         check_skim="AM_ALLPEN_TOTALIVTT",
@@ -84,18 +87,23 @@ def main(year, ps=_ps):
         taz_skims_fname="TazSkimsGoods.csv",
         luz_skims_fname="SkimsIGoods.csv",
         omx_fname="traffic_skims_MD.omx",
+        omx_mdflow_fname="trip_md.omx" if year==2012 else None, 
         table_suffix="goods",
         check_skim="MD_TRK_M_TIME",
         externals=externals,
     )
     
+    comb_skim_fpath = join(ps.scendir, str(year), ps.skim_fname.format(yr=year) + ".csv")
+    comb_skim_tbl = "\"{}\".\"{}_SkimsI\"".format(ps.aa_schema, str(year))
     combine(
-        join(ps.scendir, str(year), ps.skim_fname.format(yr=year) + ".csv"),
+        comb_skim_fpath,
         join(ps.scendir, str(year), "SkimsIGoods.csv"),
         join(ps.scendir, str(year), "SkimsISOV.csv"),
         join(ps.scendir, str(year), "SkimsITransit.csv"),
         available_flags=[None, None, "transit_available"]
     )
+
+    upload_2_pg(ps, comb_skim_fpath,comb_skim_tbl)
 
 
 class TransitAccess:
@@ -122,7 +130,7 @@ class TransitAccess:
         ps = self.ps
         
         def schemify(name):
-            return "{}.zz_transit_access_{}".format(ps.sd_schema, name)
+            return "\"{}\".\"zz_transit_access_{}\"".format(ps.sd_schema, name)
         
         station_tblname = schemify("stations")
         access_skim_tblname = schemify("access_skims")
@@ -183,9 +191,8 @@ class TransitAccess:
             tr.query("alter table {station_skimtbl} add primary key(origin_station, destination_station)")
 
             tr.query("analyze {access_skimtbl}")
-            tr.query("analyze {station_skimtbl}")
-         
-        with querier.transaction(**args) as tr:   
+            tr.query("analyze {station_skimtbl}")         
+          
             tr.query_external("transit_access.sql")
             tr.dump_to_csv("select * from {taz_skimtbl}", taz_skims_path)
     
@@ -203,6 +210,7 @@ def convert_skims(
     taz_skims_fname=None,
     luz_skims_fname=None,
     omx_fname=None,
+    omx_mdflow_fname=None,
     table_suffix=None,
     remove_if="false",
     check_skim=None,
@@ -236,13 +244,16 @@ def convert_skims(
 
     def schemify(name):
         suffix = "" if table_suffix is None else "_" + table_suffix
-        return "{}.zz_skim_squeeze{}_{}".format(ps.sd_schema, suffix, name)
+        return "\"{}\".\"zz_skim_squeeze{}_{}\"".format(ps.sd_schema, suffix, name)
 
     taz_tblname = schemify("tdm_zones")
     #world_tblname = schemify("world_zone_skims")
     #midday_tblname = schemify("midday_flows")
     world_tblname = '{}.\"{}\"'.format(ps.aa_schema, "world_zone_skims")
-    midday_tblname = '{}.\"{}\"'.format(ps.aa_schema, "MiddayFlows")
+    if omx_mdflow_fname is not None:
+        midday_tblname = '{}.\"{}_{}\"'.format(ps.aa_schema, "MiddayFlows",year)
+    else:
+        midday_tblname = '{}.\"{}\"'.format(ps.aa_schema, "MiddayFlows")
     tdm_skim_tblname = schemify("tdm_skims")
     taz_skim_tblname = schemify("taz_skims")
     luz_skim_tblname = schemify("luz_skims")
@@ -255,6 +266,7 @@ def convert_skims(
     )
 
     with querier.transaction(**args) as tr:
+        tr.query("set work_mem='1GB';")
         skim_fields = skim_fields_for_query(target_skim_names)
         
         logging.info("Loading zone info")
@@ -274,11 +286,14 @@ def convert_skims(
         ##    ")"
         #)
         #tr.load_from_csv(world_tblname, join(ps.inputpath, "WorldZoneSkims.csv"))
-
-        #tr.query("drop table if exists {middaytbl}")
-        #tr.query("create table {middaytbl} (i integer, j integer, flows double precision, primary key (i, j))")
-        #tr.query("Alter table {middaytbl} add primary key (i, j)")
-        #tr.load_from_csv(midday_tblname, join(ps.inputpath, "MiddayFlows.csv"))
+        if omx_mdflow_fname is not None and omx_fname=="traffic_skims_AM.omx":
+            md_flow_path=join(ps.scendir, str(year), "MiddayFlows.csv")
+            mdflow_omx_path=join(ps.scendir, str(year), omx_mdflow_fname)
+            extract_middayflows_omx(mdflow_omx_path, transport_zones_path,md_flow_path,ps)
+            tr.query("drop table if exists {middaytbl}")
+            tr.query("create table {middaytbl} (i integer, j integer, flows double precision, primary key (i, j))")
+            #tr.query("Alter table {middaytbl} add primary key (i, j)")
+            tr.load_from_csv(midday_tblname, md_flow_path)
 
         tr.query("drop table if exists {tdm_skimtbl}")
 
@@ -296,8 +311,7 @@ def convert_skims(
         tr.query("delete from {tdm_skimtbl} where " + remove_if)
         tr.query("create index on {tdm_skimtbl} (origin,destination)")
         tr.query("analyze {tdm_skimtbl}")
-
-    with querier.transaction(**args) as tr:          
+        
         logging.info("Adding externals")
         
         tr.query_external(sql_fname, end="BREAK")
@@ -306,7 +320,7 @@ def convert_skims(
         
         tr.query("analyze {taz_skimtbl}")
  
-    with querier.transaction(**args) as tr:         
+         
         logging.info("Squeezing skims")
         tr.query_external(sql_fname, start="BREAK")
         check_capping(tr, target_skim_names[skim_names.index(check_skim)], externals=externals)
@@ -317,29 +331,78 @@ def convert_skims(
             "select * from {luz_skimtbl} order by origin, destination",
             join(ps.scendir, str(year), luz_skims_fname)
         )
+        
+        tr.query('RESET work_mem;')
 
 
-def extract_from_omx(omx_fname, skim_names, transport_zones_path, taz_skims_path,ps):
+def extract_from_omx(omx_mdflow_fname, skim_names, transport_zones_path, taz_skims_path,ps):
     import openmatrix as omx
-    import numpy as np
-    logging.info("Extracting skims from {}".format(omx_fname))
-    f = omx.open_file(omx_fname)
+    #import numpy as np
+    logging.info("Extracting skims from {}".format(omx_mdflow_fname))
+    f = omx.open_file(omx_mdflow_fname)
     try:
         zones = read_zones_pg(transport_zones_path,ps)
         
-        matrices = [np.array(f[name]) for name in skim_names]
-        
+        matrices=[np.where(np.array(f[name])<0, 0,np.array(f[name])) for name in skim_names]
+
+                
         result = [["i", "j"] + skim_names]
         for i_idx, i in enumerate(zones):
             for j_idx, j in enumerate(zones):
                 result.append([i, j] + [matrix[i_idx, j_idx] for matrix in matrices])
         
         write_skims(taz_skims_path, result)
-            
+    except Exception as e:
+        import re
+        if (re.search('does not have a child named.+AM_ALLPEN_TOTALWAIT',str(e))):
+            alt_wait_time=['Initial Wait Time', 'Transfer Wait Time']
+            if (all(m in f.list_matrices() for m in alt_wait_time)):
+                zones = read_zones_pg(transport_zones_path,ps)
+                p=skim_names.index('AM_ALLPEN_TOTALWAIT')
+                matrices = [np.where(np.array(f[name])<0, 0,np.array(f[name])) for name in skim_names[:p]] 
+                tw = np.add(np.where(np.array(f[alt_wait_time[0]])<0, 0,np.array(f[alt_wait_time[0]])),
+                    np.where(np.array(f[alt_wait_time[1]])<0, 0,np.array(f[alt_wait_time[1]])))
+               
+                matrices += [tw]
+                matrices += [np.where(np.array(f[name])<0, 0,np.array(f[name])) for name in 
+                            skim_names[p+1:] ]
+                
+                #for i in range(len(matrices)):
+                    #where_are_inf = np.isinf(matrices[i])
+                    #matrices[i][where_are_inf] = '-Infinity'
+                    #matrices[i][matrices[i]<0] = 0
+                result = [["i", "j"] + skim_names]
+                for i_idx, i in enumerate(zones):
+                    for j_idx, j in enumerate(zones):
+                        result.append([i, j] + [matrix[i_idx, j_idx] for matrix in matrices])
+                write_skims(taz_skims_path, result)
     finally:
         f.close()
 
-
+def extract_middayflows_omx(mdflow_omx_path, transport_zones_path,md_flow_path,ps):
+    import openmatrix as omx
+    #import numpy as np
+    logging.info("Extracting midday flows from {}".format(mdflow_omx_path))
+    f = omx.open_file(mdflow_omx_path)
+    mnames = f.list_matrices()
+    try:
+        zones = read_zones_pg(transport_zones_path,ps)
+        
+        mflow=sum([np.where(np.array(f[name])<0, 0,np.array(f[name])) for name in mnames])
+        where_are_NaNs = np.isnan(mflow)
+        mflow[where_are_NaNs] = 0
+        mflow[mflow<=0] = 0
+        
+        result = [["i", "j", "flows"] ]
+        for i_idx, i in enumerate(zones):
+            for j_idx, j in enumerate(zones):
+                result.append([i, j, mflow[i_idx, j_idx]])
+        
+        
+        write_skims(md_flow_path, result)
+    finally:
+        f.close()
+        
 def read_zones(path):
     with open(path, "r") as f:
         reader = csv.reader(f)
@@ -422,7 +485,23 @@ def check_capping(tr, skim_name, externals):
             logging.error("Found {} bad skims from origin {}".format(row[1], row[0]))
         raise AssertionError()
 
+def upload_2_pg(ps, fpath,tname):
+    querier = pr.aa_querier(ps=ps)
+    args = dict(
+        fpath=fpath,
+        tname = tname
+    )
 
+    with querier.transaction(**args) as tr:
+        tr.query('create table if not exists{tname}() inherits(s28.\"2016_SkimsI\");')
+        try:
+            tr.query('alter table {tname} no inherit s28.\"2016_SkimsI\";')
+        except Exception as e:
+            print(str(e))
+            pass
+        tr.query('truncate table {tname}')
+        tr.load_from_csv("{tname}", fpath)
+        
 if __name__ == "__main__":
     import sys
     import aa_settings as ps
