@@ -1,13 +1,9 @@
 ---
 # I/O
-input_filename: "data/SRF_Input_Base_V4.1.csv"
-sites_filename: "data/Sites_MGRAs.dbf"
+
 
 use_database: true
-database_info_filename: "../dbparams.yaml"
-schema: "srf"
-input_table: "_supply_input"
-scheduled_development_table: "_supply_scheduled_sites"
+
 aa_crosswalk_table: "_supply_aa_crosswalk"
 
 output_directory: "test_data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
@@ -18,7 +14,7 @@ debug: true
 to_file: false
 
 # Simulation
-simulation_begin: 2012
+simulation_year: 2013
 use_choice_model: true
 # Choice model scaling factor
 scale: 1.0

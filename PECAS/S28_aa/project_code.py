@@ -37,10 +37,14 @@ def start_of_year(year,ps=_ps):
     
 def before_aa(year,ps=_ps):
     import sys, pandas
+    import subprocess
+
     os.chdir('..\\..\\Supply')
     sys.path.insert(0, '')
-    from main import open_sites_file, open_mgra_io_file, run as supply_run
-    
+
+    from utils.interface import save_to_file
+    from main import open_mgra_io_file
+
     # load dataframe(s)
     combined_rent = '..\\Demand\\{}\\combined_rents.csv'.format(year-1)
     old_supply_input = 'data\\forecasted_year_{}.csv'.format(year-1)
@@ -54,14 +58,16 @@ def before_aa(year,ps=_ps):
     else:
         mgra_dataframe = open_mgra_io_file(from_database=True)
             
-    planned_sites = open_sites_file(from_database=True)
+    new_filename = 'data/current_mgra_input.csv'
+    save_to_file(mgra_dataframe, '.', new_filename)
+
     # start simulation
-    supply_run(mgra_dataframe, planned_sites, year)
+    completed = subprocess.run(args=['pipenv', 'run', 'python', 'main.py', '-f', new_filename, '-y', str(year)])
         
     cmd = 'copy /Y data\\output\\aa_export.csv ..\\PECAS\\S28_aa\\{}\\FloorspaceO.csv'.format(year)
     print(cmd)
     os.system(cmd)
-    os.chdir('..\\PECAS\\S28_aa') 
+    os.chdir('..\\PECAS\\S28_aa')
 
 # Called after the AA module finishes.
 def after_aa(year, ps):
