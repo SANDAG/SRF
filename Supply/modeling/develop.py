@@ -1,6 +1,5 @@
 import logging
 import numpy
-# from tqdm import tqdm
 import random
 from multiprocessing import Pool, cpu_count
 import copy
@@ -12,7 +11,7 @@ from modeling.filters import apply_filters, acreage_available
 from modeling.dataframe_updates import update_mgra, increment_building_ages
 
 from utils.access_labels import all_product_type_labels
-from utils.interface import parameters
+from utils.parameter_access import parameters
 from utils.pandas_shortcuts import running_average
 
 
@@ -199,6 +198,8 @@ def develop(mgras, runs=1):
         a pandas dataframe with selected MGRA's updated
     """
     runs = parameters['runs']
+    if runs > cpu_count():
+        runs = cpu_count()
     current_results = None
     shared_candidates = create_candidate_set(mgras)
 

@@ -3,7 +3,7 @@ import pandas
 
 from utils.access_labels import mgra_labels, land_origin_labels, \
     residential_labels
-from utils.interface import parameters
+from utils.parameter_access import parameters
 from utils.pandas_shortcuts import get_item
 
 
