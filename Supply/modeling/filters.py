@@ -2,7 +2,7 @@ import logging
 import numpy
 import pandas
 
-from utils.parameter_access import parameters
+from utils.interface import parameters
 from utils.access_labels import mgra_labels, land_origin_labels
 from utils.converter import x_per_acre_to_x_per_square_foot
 

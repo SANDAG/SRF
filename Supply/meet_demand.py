@@ -1,6 +1,5 @@
 from modeling.develop import develop
-from utils.interface import save_to_file, open_mgra_io_file
-from utils.parameter_access import parameters
+from utils.interface import save_to_file, open_mgra_io_file, parameters
 
 
 def run(mgra_dataframe):

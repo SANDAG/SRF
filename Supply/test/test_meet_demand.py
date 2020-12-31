@@ -4,7 +4,7 @@ import pandas
 import logging
 
 from utils.access_labels import increasing_columns, decreasing_columns
-from utils.parameter_access import parameters
+from utils.interface import parameters
 
 COMMANDLINE_INPUT = 'python meet_demand.py -t'
 
