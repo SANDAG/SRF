@@ -52,7 +52,7 @@ jobs_4demand <- left_join(ActivityLocations,AA_Demand_Emp_Key,
                           by=c("Activity"="Activity")) %>%
   filter(is.na(Demand_ID)==FALSE) %>%
   mutate(Jobs=Quantity/Output_Job) %>%
-  select(LUZ=ZoneNumber,IDAGENT=Demand_ID,Quantity) %>%
+  select(LUZ=ZoneNumber,IDAGENT=Demand_ID,Jobs) %>%
   group_by(LUZ,IDAGENT) %>%
   summarise(NAGENT=min(sum(Jobs),1000000))
 demand_input <- rbind(as.data.frame(hh_4demand),as.data.frame(jobs_4demand)) %>%
