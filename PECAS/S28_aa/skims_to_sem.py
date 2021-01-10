@@ -493,12 +493,14 @@ def upload_2_pg(ps, fpath,tname):
     )
 
     with querier.transaction(**args) as tr:
-        tr.query('create table if not exists{tname}() inherits(s28.\"2016_SkimsI\");')
-        try:
-            tr.query('alter table {tname} no inherit s28.\"2016_SkimsI\";')
-        except Exception as e:
-            print(str(e))
-            pass
+        tr.query('create table if not exists{tname}(origin integer, \
+                  destination integer, dist_da_t_op numeric, \
+                 time_da_t_op numeric,  toll_op numeric, \
+                  am_sov_tr_m_dist numeric, am_sov_tr_m_time numeric, \
+                  am_sov_tr_m_tollcost numeric, transit_available text COLLATE pg_catalog."default", \
+                  am_allpen_totalivtt numeric,  am_allpen_totalwait numeric, \
+                  am_allpen_totalwalk numeric, am_allpen_xfers numeric);')
+                
         tr.query('truncate table {tname}')
         tr.load_from_csv("{tname}", fpath)
         
