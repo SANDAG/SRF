@@ -44,20 +44,20 @@ def before_aa(year,ps=_ps):
     # load dataframe(s)
     combined_rent = '..\\Demand\\{}\\combined_rents.csv'.format(year-1)
     old_supply_input = 'data\\forecasted_year_{}.csv'.format(year-1)
-   
+    new_supply_input = 'data\\new_supply_input_{}.csv'.format(year)
+
     if os.path.exists(combined_rent) and os.path.exists(old_supply_input) :
         from rents2supply import importRents
-        mgra_dataframe = importRents(combined_rent,old_supply_input)
-        #mgra_dataframe = pandas.read_csv(old_supply_input)
+        importRents(combined_rent,old_supply_input, new_supply_input)
+        cmd='python main.py -f {} -y {}'.format(new_supply_input,year)
     elif os.path.exists(old_supply_input):
-        mgra_dataframe = pandas.read_csv(old_supply_input)
+        cmd='python main.py -f {} -y {}'.format(old_supply_input,year)
     else:
-        mgra_dataframe = open_mgra_io_file(from_database=True)
-            
-    planned_sites = open_sites_file(from_database=True)
-    # start simulation
-    supply_run(mgra_dataframe, planned_sites, year)
-        
+        cmd='python main.py -y {}'.format(year)
+ 
+    print(cmd)
+    os.system(cmd)
+    
     cmd = 'copy /Y data\\output\\aa_export.csv ..\\PECAS\\S28_aa\\{}\\FloorspaceO.csv'.format(year)
     print(cmd)
     os.system(cmd)
