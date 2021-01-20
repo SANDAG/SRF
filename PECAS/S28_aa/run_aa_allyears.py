@@ -149,16 +149,16 @@ def main_impl(ps, aa_runner):
                         except IOError:
                             logging.warning(
                                 "Couldn't copy " + str(file) + " from year " + str(year - 1) + " to year " + str(year))
+        if ps.travel_model_input_years:
+            aa_runner.popsyn.push(None)
+            logging.info("Waiting for the employment/population synthesizer thread")
+            aa_runner.popsyn.join()
+            logging.info("Employment/population synthesizer thread finished")
 
         if ps.run_demand:
             project_code.after_aa(year, ps=ps)
         year = year + 1
-    
-    if ps.travel_model_input_years:
-        aa_runner.popsyn.push(None)
-        logging.info("Waiting for the employment/population synthesizer thread")
-        aa_runner.popsyn.join()
-        logging.info("Employment/population synthesizer thread finished")
+
 
 
 def _pull(seq: List[str], item: str) -> bool:
