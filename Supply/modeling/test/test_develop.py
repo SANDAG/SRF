@@ -2,7 +2,7 @@ import unittest
 import pandas
 
 from modeling.develop import buildable_units, normalize, combine_weights, \
-    develop, choose_candidate
+    develop, choose_candidate, simulation_process
 from modeling.candidates import create_candidate_set
 from utils.access_labels import ProductTypeLabels
 
@@ -18,6 +18,11 @@ class TestDevelop(unittest.TestCase):
             "redev_ag_r": [None],
             "redev_ag_l": [None],
             "infill_sf": [None],
+            "Cap_HS_SF": [0],
+            "hs_sf": [10],
+            "hh_sf": [10],
+            "Land_Cost": [10000],
+            "valueSFmea": [300],
         })
         self.product_type_labels = ProductTypeLabels('single_family')
 
@@ -47,6 +52,35 @@ class TestDevelop(unittest.TestCase):
         result = combine_weights(profitability, vacancy)
         # print(result)
         self.assertIsNotNone(result)
+
+    def test_simulation_process(self):
+
+        # Test that input with no workable candidates returns correctly (unchanged)
+        bad_frame = pandas.DataFrame(
+            {
+                "MGRA": [1],
+                "vac_sf": [20],
+                "redev_mh_s": [None],
+                "redev_ag_s": [None],
+                "redev_emp1": [None],
+                "redev_ag_r": [None],
+                "redev_ag_l": [None],
+                "infill_sf": [None],
+                "Land_Cost": [10000],
+                self.product_type_labels.price: [100],
+                self.product_type_labels.capacity: [100],
+                self.product_type_labels.total_units: [50],
+                "hs_sf": [20],
+                "hh_sf": [200],
+                "units_available": [0]
+            }
+        )
+
+        label_demand_tuple = [(self.product_type_labels, (0, 10))]
+        print('\nthe next test has i/o side effects, errors/warnings indicate it is working:')
+        result = simulation_process(bad_frame, self.candidate, label_demand_tuple)
+        print('end of expected error messages')
+        self.assertTrue(bad_frame.equals(result))
 
     # def test_choose_candidate(self):
     #     candidates = create_candidate_set(self.short_mgras)

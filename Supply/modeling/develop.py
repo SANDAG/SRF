@@ -64,10 +64,11 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
     filtered = apply_filters(
         candidates, product_type_labels)
     if len(filtered) < 1:
-        print('out of suitable mgras for product type {}'.format(
+        logging.error('out of suitable mgra candidates for product type {}'.format(
             product_type_labels.product_type))
-        print('evaluate filtering methods...\nexiting')
-        return None
+        logging.error('evaluate input data and/or filtering methods...')
+        logging.error('setting remaining demand for {} to zero'.format(product_type_labels.product_type))
+        return None, None
 
     # !
     # save_to_file(filtered, 'data/output', 'filtered_candidates.csv')
@@ -108,13 +109,17 @@ def sum_demand(labels_demands):
 
 
 def update_labels_demand(labels, demand, difference):
+    if difference is None:
+        # we ran out of suitable candidates, stop trying to allocate by 
+        # setting demand to the amount built.
+        return (labels, (demand[0], demand[0]))
     return (
         labels, (demand[0] + difference, demand[1])
     )
 
 
 def find_product_type_in_labels_demand(labels_demand_list, product_type):
-    for index, (labels, demand) in enumerate(labels_demand_list):
+    for index, (labels, _) in enumerate(labels_demand_list):
         if labels.product_type == product_type:
             return index
     print('could not find product type: {}'.format(product_type))
