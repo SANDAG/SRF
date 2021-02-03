@@ -2,22 +2,22 @@ from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
 from utils.interface import save_to_file, open_mgra_io_file, open_sites_file, \
     parameters
-from utils.aa_luz_export import export_luz_data
+from utils.aa_floorspace_update import update_floorspace
 
 
-def run(mgra_dataframe, planned_sites,forecast_year):
+def run(mgra_dataframe, planned_sites, forecast_year):
     output_dir = parameters['output_directory']
     simulation_begin = parameters['simulation_begin']
-    
+
     if forecast_year is None:
         forecast_year = simulation_begin + 1
-    
+
     # add scheduled development if available
     if planned_sites is not None:
         print('adding scheduled development:')
         add_scheduled_development(
             mgra_dataframe, planned_sites, year=forecast_year)
-           # year=simulation_begin)
+        # year=simulation_begin)
     # finish meeting demand as needed
     print('developing to meet remaining demand:')
     mgra_dataframe = develop(mgra_dataframe)
@@ -26,12 +26,11 @@ def run(mgra_dataframe, planned_sites,forecast_year):
         return
     # save output file
     from os import path
-    save_to_file(mgra_dataframe, path.dirname(output_dir) ,
+    save_to_file(mgra_dataframe, path.dirname(output_dir),
                  'forecasted_year_{}.csv'.format(forecast_year))
     # create aa export if crosswalk is available
-    print('creating AA commodity export file ...')
-
-    export_luz_data(mgra_dataframe)
+    print('updating AA floorspace file ...')
+    update_floorspace(mgra_dataframe, forecast_year)
     return
 
 

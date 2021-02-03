@@ -70,11 +70,11 @@ def empty_folder(folder):
 
 
 def save_to_file(printable, output_directory, filename,
-                 as_yaml=False, output_status=True):
+                 as_yaml=False, output_status=True, force=False):
     if(output_status):
         print('saving {} to {} folder'.format(filename, output_directory))
     filepath = os.path.join(output_directory, filename)
-    if(os.path.isfile(filepath)):
+    if(os.path.isfile(filepath) and not force):
         if(output_status):
             print('file exists, skipping')
         return

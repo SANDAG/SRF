@@ -131,7 +131,8 @@ def export_luz_data(frame):
                         ]['Quantity'] += quantity
     output_frame = pandas.DataFrame(output_dict.values())
     output_frame.sort_values(by=['Commodity', 'TAZ'], inplace=True)
-    save_to_file(output_frame, 'data/output', 'aa_export.csv')
+    return output_frame
+    # save_to_file(output_frame, 'data/output', 'aa_export.csv')
 
 
 if __name__ == "__main__":
