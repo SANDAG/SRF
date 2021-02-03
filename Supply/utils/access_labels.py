@@ -1,5 +1,6 @@
 import collections
-from utils.interface import load_yaml, parameters
+from utils.interface import load_yaml
+from utils.parameter_access import parameters
 
 # parameter names
 UNITS_PER_YEAR = 'units_per_year'

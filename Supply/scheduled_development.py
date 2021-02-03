@@ -1,7 +1,7 @@
 from tqdm import tqdm
 
-from utils.interface import save_to_file, open_mgra_io_file, open_sites_file, \
-    parameters
+from utils.interface import save_to_file, open_mgra_io_file, open_sites_file
+from utils.parameter_access import parameters
 from modeling.dataframe_updates import update_mgra
 
 from utils.access_labels import ProductTypeLabels, mgra_labels, UNITS_PER_YEAR

@@ -3,25 +3,11 @@ import os
 import sys
 import shutil
 import yaml
-import argparse
 import matplotlib.pyplot as plt
 from simpledbf import Dbf5
 import psycopg2
 import pandas
-import logging
 from envyaml import EnvYAML
-
-# This file has became a strange mix of generally useful tools and extremely
-# use case specific methods
-
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--test', dest='test',
-                        default=False, action='store_true')
-    parser.add_argument('-i', '--include-integration', dest='include',
-                        default=False, action='store_true')
-    return parser.parse_args()
 
 
 def load_yaml(filename):
@@ -90,39 +76,6 @@ def save_to_file(printable, output_directory, filename,
         print('saved')
 
 
-def configure():
-    args = get_args()
-    try:
-        if args.test:
-            # only meet_demand.py should use a test argument
-            parameters = load_yaml('test_parameters.yaml')
-        else:
-            parameters = load_yaml('parameters.yaml')
-    except(FileNotFoundError):
-        parameters = None
-
-    if parameters is not None:
-        # prep output directory
-        output_dir = parameters['output_directory']
-        empty_folder(output_dir)
-        save_to_file(parameters, output_dir,
-                     'parameters_used.yaml', as_yaml=True, output_status=False)
-        # configure logging level
-        if parameters['debug']:
-            if parameters['to_file']:
-                sys.stderr = open(
-                    os.path.join(output_dir, 'debug_output'),
-                    mode='x'
-                )
-            logging.basicConfig(level=logging.DEBUG)
-
-        parameters['include_integration_tests'] = args.include
-    else:
-        print('could not load parameters, exiting')
-    return parameters
-
-
-parameters = configure()
 
 
 def plot_data(data, output_dir='data/output', image_name='plot.png'):
@@ -130,20 +83,27 @@ def plot_data(data, output_dir='data/output', image_name='plot.png'):
     plt.savefig(os.path.join(output_dir, image_name))
     plt.close()
 
+input_filename = "data/SRF_Input_Base_V4.1.csv"
+sites_filename = "data/Sites_MGRAs.dbf"
+
+
+schema = "srf"
+database_info_filename = "../dbparams.yaml"
+input_table = "_supply_input"
+scheduled_development_table = "_supply_scheduled_sites"
 
 def open_dbf(filepath):
     dbf = Dbf5(filepath)
     return dbf.to_dataframe()
 
 
-def open_sites_file(from_database=False):
+def open_sites_file(from_database=True):
     if from_database:
         return open_database_file(
-            parameters['schema'],
-            parameters['scheduled_development_table']
+            schema, scheduled_development_table
         )
     else:
-        return open_dbf(parameters['sites_filename'])
+        return open_dbf(sites_filename)
 
 
 def connect_to_db(db_param_filename):
@@ -160,7 +120,7 @@ def connect_to_db(db_param_filename):
 def open_database_file(schema, table):
     print('connecting to database...')
     with connect_to_db(
-        parameters['database_info_filename']
+        database_info_filename
     ) as connection:
         print(connection)
         sql_statement = 'select * from {}.\"{}\"'.format(
@@ -177,9 +137,11 @@ def extract_csv_from_database(schema, table, output_dir, filename):
     save_to_file(dataframe, output_dir, filename)
 
 
-def open_mgra_io_file(from_database=False):
+def open_mgra_io_file(from_database=False, filename=None):
     if from_database:
         return open_database_file(
-            parameters['schema'], parameters['input_table'])
-    else:  # load from file
-        return pandas.read_csv(parameters['input_filename'])
+        schema, input_table)
+    elif filename is not None:  # load from file
+        return pandas.read_csv(filename)
+    else:
+        print('could not load file')

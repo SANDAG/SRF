@@ -4,7 +4,7 @@ import numpy as np
 
 from utils.constants import OFFICE_PRICE, COMMERCIAL_PRICE, INDUSTRIAL_PRICE, \
     SINGLE_FAMILY_PRICE, MULTI_FAMILY_PRICE
-from utils.interface import parameters
+from utils.parameter_access import parameters
 
 
 def fill_in_price_data(dataframe):

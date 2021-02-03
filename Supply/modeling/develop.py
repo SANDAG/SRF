@@ -12,7 +12,7 @@ from modeling.filters import apply_filters, acreage_available
 from modeling.dataframe_updates import update_mgra, increment_building_ages
 
 from utils.access_labels import all_product_type_labels
-from utils.interface import parameters
+from utils.parameter_access import parameters
 from utils.pandas_shortcuts import running_average
 
 
