@@ -187,7 +187,7 @@ aa_group_bounds = False
 stop_on_constraint_mismatch = True
 # This is whether to use LUZs (false) or TAZs (set to true) in FloorspaceI and ActivityConstraintsI,
 # and also whether to produce an ActivityLocations2.csv output file which has activity by TAZ
-use_floorspace_zones = True
+use_floorspace_zones = False
 # Whether to update size terms for imports and exports every year
 calculate_import_export_size = False
 
