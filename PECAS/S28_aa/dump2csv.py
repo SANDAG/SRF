@@ -125,7 +125,13 @@ def dump_pg_tbls(connect, scendir, tbl_schema,tname_pattern):
                 dump_2_csv(tr, sql, destfile)
     
       
-
+def dump_a_table(connect, tbl_schema,tname,destfile):
+    tr = set_tr(connect)    
+    
+    with tr:
+        sql = 'select * from \"{}\".\"{}\"'.format(tbl_schema,tname)
+        dump_2_csv(tr, sql, destfile)
+                
 
 if __name__ == "__main__":
     import aa_settings as main_ps

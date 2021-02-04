@@ -8,7 +8,8 @@ import os
 import pandas
 import csv
 
-from utils.interface import save_to_file, extract_csv_from_database, parameters
+from utils.interface import extract_csv_from_database
+from utils.parameter_access import parameters
 from utils.access_labels import mgra_labels, ProductTypeLabels
 
 CROSSWALK_FILENAME = 'aa_crosswalk.csv'

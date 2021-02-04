@@ -5,7 +5,7 @@ import logging
 
 from utils.access_labels import increasing_columns, decreasing_columns, \
     ProductTypeLabels
-from utils.interface import parameters
+from utils.parameter_access import parameters
 
 from scheduled_development import pick_labels_with_highest_value, \
     total_for_luz, find_largest_luz_employment_type, \

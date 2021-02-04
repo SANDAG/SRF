@@ -3,7 +3,7 @@ import pandas
 
 from modeling.dataframe_updates import add_to_columns, reallocate_units, \
     update_mgra, increment_building_ages, update_units
-from utils.interface import parameters
+from utils.parameter_access import parameters
 import utils.access_labels as access
 from utils.access_labels import ProductTypeLabels
 from utils.pandas_shortcuts import get_item

@@ -1,11 +1,6 @@
 # This takes an aa floorspace compatible, luz oriented file and adds any
 # updates that are found in a supply compatible mgra based input/output file
 
-# implemenation brainstorming:
-# the aa_luz_export.py code already creates most of the expected output in the
-# correct format. it could be easiest to run aa_luz_export, followed by some
-# code here that consolidates the floorspaceI file and the output from
-# aa_luz_export.
 import os
 import pandas
 
@@ -14,30 +9,35 @@ from utils.interface import save_to_file
 from utils.access_labels import ProductTypeLabels, mgra_labels
 
 
-single_family_subtypes = [
-    "Spaced Rural Residential Economy",
-    "Spaced Rural Residential Luxury",
-    "Single Family Detached Residential Economy",
-    "Single Family Detached Residential Luxury",
-    "Single Family Attached Residential Economy",
-    "Single Family Attached Residential Luxury",
-    # these two might need to get disabled if not applicable
-    "Mobile Home Residential",
-    "Military Residential(Non GQ)",
-]
-multi_family_subtypes = [
-    "Multi-Family Residential Economy",
-    "Multi-Family Residential Luxury",
-]
+single_family_subtypes = {
+    "Spaced Rural Residential Economy": 0.06252183481,
+    "Spaced Rural Residential Luxury": 0.02702450363,
+    "Single Family Detached Residential Economy": 0.5718136716,
+    "Single Family Detached Residential Luxury": 0.1953280044,
+    "Single Family Attached Residential Economy": 0.1040184543,
+    "Single Family Attached Residential Luxury": 0.03929353122,
+}
+multi_family_subtypes = {
+    "Multi-Family Residential Economy": 0.656242618932389,
+    "Multi-Family Residential Luxury": 0.221331960648503,
+    "Mobile Home Residential": 0.122425420419106,
+}
 
 
 def combine_frames(a, b):
     # combines two pandas frames containing aa floorspace input data
-    # keeping the max quantity for each taz and commodity pair
-    combined = pandas.merge(a, b, how='outer', on=['TAZ', 'Commodity'])
-    combined['Quantity'] = combined[['Quantity_x', 'Quantity_y']].max(axis=1)
-    combined = combined[['TAZ', 'Commodity', 'Quantity']]
-    return combined
+    # keeps all non-duplicates (unique TAZ and commodity) from each frame
+    # for duplicates: keeps the entry from a and ignores the entry from b
+    if len(a) == 0:
+        return b
+    elif len(b) == 0:
+        return a
+    else:
+        combined = pandas.merge(a, b, how='outer', on=['TAZ', 'Commodity'])
+        combined['Quantity'] = combined['Quantity_x'].fillna(
+            combined['Quantity_y'])
+        combined = combined[['TAZ', 'Commodity', 'Quantity']]
+        return combined
 
 
 def luz_squarefootages(frame, product_squarefootage_label):
@@ -63,21 +63,29 @@ def luz_subtype_ratios(floorspace, subtypes):
     return luz_ratios
 
 
-def add_floorspace_entry(entry, ratios, output):
+def add_floorspace_entry(entry, ratios, output, subtypes):
     luz = entry[0]
     total_squarefootage = entry[1]
-    if luz not in ratios:
-        # there is no previous allocation of subtypes available, use the
-        # average distribution from the region?
-        # reaching this point too often would probably be an indicator of inaccurate behavior.
+    if total_squarefootage == 0:
         return
-    luz_ratios = ratios[luz]
-    type_total = sum(luz_ratios.values())
-    for subtype in luz_ratios.items():
-        commodity = subtype[0]
-        quantity = subtype[1]
+    if luz in ratios:
+        luz_ratios = ratios[luz]
+        type_total = sum(luz_ratios.values())
+        if type_total > 0:
+            for subtype in luz_ratios.items():
+                commodity = subtype[0]
+                quantity = subtype[1]
+                output.append(create_row(
+                    luz, commodity,
+                    total_squarefootage * (quantity / type_total)
+                ))
+            return
+    # there is no previous allocation of subtypes available, use the
+    # average distribution from the region.
+    for subtype in subtypes.items():
         output.append(create_row(
-            luz, commodity, total_squarefootage * (quantity / type_total)))
+            luz, subtype[0], total_squarefootage * subtype[1]))
+    return
 
 
 def floorspace_for_product_type(
@@ -90,7 +98,7 @@ def floorspace_for_product_type(
     # allocate the sqft from the mgra_frame to the subtypes based on the
     # ratios for each luz
     for entry in square_footages.items():
-        add_floorspace_entry(entry, luz_ratios, output)
+        add_floorspace_entry(entry, luz_ratios, output, subtypes)
 
 
 def calculate_residential_floorspace(mgra_frame, floorspace_input):
@@ -128,13 +136,13 @@ def update_floorspace(mgra_frame, forecast_year):
             export_luz_data(mgra_frame),  # this is the non-residential data
             calculate_residential_floorspace(mgra_frame, floorspace_frame)
         )
-        floorspace_frame = combine_frames(floorspace_frame, supply_exports)
+        floorspace_frame = combine_frames(supply_exports, floorspace_frame)
     else:
         print('could not find aa floorspaceI file.')
         print('continuing with non-residential export, ')
         print('aa may bog down on the missing data.')
         floorspace_frame = export_luz_data(mgra_frame)
 
-    save_to_file(floorspace_frame, floorspace_directory,
+    save_to_file(floorspace_frame, 'data/output',
                  floorspace_filename, force=True)
     return

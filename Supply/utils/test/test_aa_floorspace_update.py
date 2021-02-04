@@ -3,10 +3,19 @@ import pandas
 import logging
 
 from utils.aa_floorspace_update import combine_frames, luz_squarefootages, \
-    luz_subtype_ratios, calculate_residential_floorspace, add_floorspace_entry
+    luz_subtype_ratios, calculate_residential_floorspace, \
+    add_floorspace_entry, update_floorspace
 
 
 class TestAAFloorspaceUpdate(unittest.TestCase):
+
+    def setUp(self):
+        self.simple_mgra_frame = pandas.DataFrame({
+            'LUZ': [1, 1, 1],
+            'SqFt_SF': [200, 500, 500],
+            'SqFt_MF': [100, 200, 300]
+        })
+
     def test_combine_frames(self):
         frame_1 = pandas.DataFrame({
             'TAZ': [1, 2],
@@ -21,7 +30,7 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
         expected_answer = pandas.DataFrame({
             'TAZ': [1, 2, 3],
             'Commodity': ['single_family', 's', 's'],
-            'Quantity': [2, 2, 1]
+            'Quantity': [2, 1, 1]
         })
 
         answer = combine_frames(frame_1, frame_2)
@@ -29,6 +38,8 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
         for i in range(len(expected_answer)):
             logging.debug(answer.iloc[i])
             self.assertTrue(expected_answer.iloc[i].equals(answer.iloc[i]))
+        empty_frame = pandas.DataFrame({})
+        self.assertEqual(len(combine_frames(frame_1, empty_frame)), 2)
 
     def test_luz_squarefootages(self):
         mgra_frame = pandas.DataFrame({
@@ -45,11 +56,7 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
         self.assertEqual(expected_answer, luz_squarefootages(
             mgra_frame, multi_family_label))
 
-        mgra_frame = pandas.DataFrame({
-            'LUZ': [1, 1, 1],
-            'SqFt_SF': [200, 500, 500],
-            'SqFt_MF': [100, 200, 300]
-        })
+        # ... also test with self.simple_mgra_frame
 
     def test_luz_subtype_ratios(self):
         floorspace = pandas.DataFrame({
@@ -66,13 +73,15 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
         entry = (1, 100)
         # equal to the luz_subtype_ratios output
         ratios = {1: {single_family_commodity: 100}}
+        subtypes = {"Single Family Detached Residential Economy": 1.0}
         output = []
         # an array of aa_luz_export.create_row return values
         expected_output = [{"TAZ": 1,
                             "Commodity": single_family_commodity,
                             "Quantity": 100}]
+
         # modifies output in place
-        add_floorspace_entry(entry, ratios, output)
+        add_floorspace_entry(entry, ratios, output, subtypes)
         self.assertEqual(expected_output, output)
         # tests with ratios
         entry = (1, 100)
@@ -85,37 +94,34 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
         expected_output = [
             {"TAZ": 1,
              "Commodity": single_family_commodity,
-             "Quantity": 50},
+             "Quantity": 50.0},
             {"TAZ": 1,
              "Commodity": single_family_subtype_2,
-             "Quantity": 50}
+             "Quantity": 50.0}
         ]
-        add_floorspace_entry(entry, ratios, output)
+        add_floorspace_entry(entry, ratios, output, subtypes)
         self.assertEqual(expected_output, output)
 
     def test_calculate_residential_floorspace(self):
-        mgra_frame = pandas.DataFrame({
-            'LUZ': [1, 1, 1],
-            'SqFt_SF': [200, 500, 500],
-            'SqFt_MF': [100, 200, 300]
-        })
+        mgra_frame = self.simple_mgra_frame
         floorspace_frame = pandas.DataFrame({
-            'TAZ': [1, 2],
+            'TAZ': [1, 2, 1],
             'Commodity': [
                 "Single Family Detached Residential Economy",
-                "Single Family Detached Residential Luxury"
+                "Single Family Detached Residential Economy",
+                "Multi-Family Residential Economy"
             ],
-            'Quantity': [3000, 4000]
+            'Quantity': [3000, 4000, 100]
         })
 
         expected_answer = pandas.DataFrame({
-            'TAZ': [1],
-            'Commodity': ['Single Family Detached Residential Economy'],
-            'Quantity': [1200.0]
+            'TAZ': [1, 1],
+            'Commodity': [
+                'Single Family Detached Residential Economy',
+                'Multi-Family Residential Economy'],
+            'Quantity': [1200.0, 600.0]
         })
         answer = calculate_residential_floorspace(mgra_frame, floorspace_frame)
-        print(answer)
-        print(expected_answer)
         self.assertTrue(expected_answer.equals(answer))
 #         luz_10013 = pandas.DataFrame({
 #             10013,Single Family Attached Residential Luxury,1.2
@@ -125,6 +131,10 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
 # 10013,Spaced Rural Residential Luxury,2121.01975
 #         })
 
+    def test_update_floorspace(self):
+        update_floorspace(pandas.read_csv('test_data/random_MGRA.csv'), 2013)
+
 # TODO:
 # add the cases where:
-# there are no floorspace entries for a subtype on an luz, but there needs to be a ratio for allocating to the subtypes
+# there are no floorspace entries for a subtype on an luz, but there needs to
+# be a ratio for allocating to the subtypes
