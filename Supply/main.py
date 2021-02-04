@@ -1,5 +1,3 @@
-from os import path
-
 from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
 from utils.interface import save_to_file, open_mgra_io_file, open_sites_file
