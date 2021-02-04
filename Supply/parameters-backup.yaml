@@ -50,7 +50,7 @@ max_vacant_units:
 
 # Profitability
 minimum_redevelopment_age: 20
-profit_multiplier: 1.10 # used to calculate minimum acceptable profit margin
+profit_multiplier: 1.25 # used to calculate minimum acceptable profit margin
 amortization_years: 20
 # used to determine the construction cost
 vacant_cost_multiplier: 1.0
