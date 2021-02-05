@@ -8,7 +8,7 @@ from utils.aa_luz_export import export_luz_data, create_row
 from utils.interface import save_to_file
 from utils.access_labels import ProductTypeLabels, mgra_labels
 
-
+output_row_id_label = 'LUZ'
 single_family_subtypes = {
     "Spaced Rural Residential Economy": 0.06252183481,
     "Spaced Rural Residential Luxury": 0.02702450363,
@@ -33,10 +33,11 @@ def combine_frames(a, b):
     elif len(b) == 0:
         return a
     else:
-        combined = pandas.merge(a, b, how='outer', on=['TAZ', 'Commodity'])
+        combined = pandas.merge(a, b, how='outer', on=[
+                                output_row_id_label, 'Commodity'])
         combined['Quantity'] = combined['Quantity_x'].fillna(
             combined['Quantity_y'])
-        combined = combined[['TAZ', 'Commodity', 'Quantity']]
+        combined = combined[[output_row_id_label, 'Commodity', 'Quantity']]
         return combined
 
 
@@ -56,10 +57,12 @@ def luz_subtype_ratios(floorspace, subtypes):
     for row in floorspace.itertuples(index=False):
         row = row._asdict()
         if row['Commodity'] in subtypes:
-            if row['TAZ'] not in luz_ratios:
-                luz_ratios[row['TAZ']] = {row['Commodity']: row['Quantity']}
+            if row[output_row_id_label] not in luz_ratios:
+                luz_ratios[row[output_row_id_label]] = {
+                    row['Commodity']: row['Quantity']}
             else:
-                luz_ratios[row['TAZ']][row['Commodity']] = row['Quantity']
+                luz_ratios[row[output_row_id_label]
+                           ][row['Commodity']] = row['Quantity']
     return luz_ratios
 
 
@@ -142,6 +145,8 @@ def update_floorspace(mgra_frame, forecast_year):
         print('continuing with non-residential export, ')
         print('aa may bog down on the missing data.')
         floorspace_frame = export_luz_data(mgra_frame)
+    floorspace_frame.sort_values(
+        by=[output_row_id_label, 'Commodity'], inplace=True)
 
     save_to_file(floorspace_frame, 'data/output',
                  floorspace_filename, force=True)

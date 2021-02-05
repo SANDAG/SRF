@@ -85,7 +85,7 @@ TAZ,Commodity,Quantity
 
 
 # def get_mgra_info(mgra_dataframe, mgra_id, columns):
-#     # returns a list containing the items in columns for the mgra specified by
+#  # returns a list containing the items in columns for the mgra specified by
 #     # mgra_id
 #     # ! only works if the mgras match the frame index - 1
 #     row = mgra_dataframe.loc[mgra_dataframe[MGRA] == mgra_id, columns]
