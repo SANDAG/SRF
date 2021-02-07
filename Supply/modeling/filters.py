@@ -77,10 +77,16 @@ def filter_product_type(candidates, product_type_labels):
     vacant_land = acreage_available(candidates, product_type_labels)
     units_available = vacant_land // acreage_per_unit
 
-    # also check residential capacity values here
+    # also check capacity values here
     if product_type_labels.is_residential():
         remaining_capacity = candidates[product_type_labels.capacity] - \
             candidates[product_type_labels.total_units]
+        units_available = units_available[
+            units_available > remaining_capacity] = remaining_capacity
+    else:
+        remaining_capacity = candidates[
+            mgra_labels.CIVILIAN_EMPLOYMENT_CAPACITY
+        ] - candidates[mgra_labels.TOTAL_JOB_SPACES]
         units_available = units_available[
             units_available > remaining_capacity] = remaining_capacity
     candidates['units_available'] = units_available

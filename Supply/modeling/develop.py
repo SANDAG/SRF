@@ -1,6 +1,5 @@
 import logging
 import numpy
-# from tqdm import tqdm
 import random
 from multiprocessing import Pool, cpu_count
 import copy
@@ -64,10 +63,12 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
     filtered = apply_filters(
         candidates, product_type_labels)
     if len(filtered) < 1:
-        logging.error('out of suitable mgra candidates for product type {}'.format(
-            product_type_labels.product_type))
+        logging.error(
+            'out of suitable mgra candidates for product type {}'.format(
+                product_type_labels.product_type))
         logging.error('evaluate input data and/or filtering methods...')
-        logging.error('setting remaining demand for {} to zero'.format(product_type_labels.product_type))
+        logging.error('setting remaining demand for {} to zero'.format(
+            product_type_labels.product_type))
         return None, None
 
     # !
@@ -110,7 +111,7 @@ def sum_demand(labels_demands):
 
 def update_labels_demand(labels, demand, difference):
     if difference is None:
-        # we ran out of suitable candidates, stop trying to allocate by 
+        # we ran out of suitable candidates, stop trying to allocate by
         # setting demand to the amount built.
         return (labels, (demand[0], demand[0]))
     return (
