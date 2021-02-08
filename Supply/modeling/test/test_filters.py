@@ -16,6 +16,7 @@ class TestFilters(unittest.TestCase):
         self.combined_frame = pandas.DataFrame(
             {
                 "MGRA": [1, 2, 3, 4, 5, 6, 7],
+                'vac': [2.0, 0, 0, 0, 0, 0, 0],
                 "vac_sf": [2.0, None,  None, None, None, None, None],
                 "redev_mh_s": [None,  None, None, None, None, None, 2.0],
                 "redev_ag_s": [None,  None, None, None, None, 2.0, None],
@@ -115,7 +116,7 @@ class TestFilters(unittest.TestCase):
     def test_acreage_available(self):
         # adding coverage
         self.assertIsNotNone(acreage_available(
-            self.profitability_frame, self.product_type_labels))
+            self.combined_frame, self.product_type_labels))
 
     def test_filter_product_type(self):
         self.assertIsNotNone(filter_product_type(
@@ -185,6 +186,9 @@ class TestFilters(unittest.TestCase):
             "infill_emp": [None, None, None],
             commercial_labels.vacant_acres: [
                 10, 10, 10],
+            mgra_labels.VACANT_ACRES: [
+                10, 10, 10
+            ],
             mgra_labels.LAND_COST_PER_ACRE: [
                 200, 200, 200],
             mgra_labels.CIVILIAN_EMPLOYMENT_CAPACITY: [

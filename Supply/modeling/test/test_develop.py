@@ -1,9 +1,9 @@
 import unittest
 import pandas
 
-from modeling.develop import buildable_units, normalize, combine_weights, \
-    develop, choose_candidate
-from modeling.candidates import create_candidate_set
+from modeling.develop import buildable_units, normalize, combine_weights
+# develop, choose_candidate
+# from modeling.candidates import create_candidate_set
 from utils.access_labels import ProductTypeLabels
 
 
@@ -11,6 +11,7 @@ class TestDevelop(unittest.TestCase):
     def setUp(self):
         self.candidate = pandas.DataFrame({
             "vacancy_cap": [20],
+            "vac": [6.0],
             "vac_sf": [6.0],
             "redev_mh_s": [None],
             "redev_ag_s": [None],
@@ -52,7 +53,8 @@ class TestDevelop(unittest.TestCase):
     #     candidates = create_candidate_set(self.short_mgras)
     #     max_units = 10
     #     result = choose_candidate(
-    #         candidates, self.short_mgras, self.product_type_labels, max_units)
+    #         candidates, self.short_mgras,
+    #         self.product_type_labels, max_units)
     #     self.assertIsNotNone(result)
 
     # def test_develop(self):

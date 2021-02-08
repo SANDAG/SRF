@@ -10,10 +10,10 @@ aa_crosswalk_table: "_supply_aa_crosswalk"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # set to true for verbose output
-debug: false
+debug: true
 #debug: true
 # save debug output to file
-to_file: false
+to_file: true
 #to_file: true
 
 # Simulation
@@ -22,7 +22,7 @@ simulation_year: 2013
 use_choice_model: true
 scale: 1.0
 # number of runs
-runs: 15
+runs: 1
 
 # Filtering
 minimum_units: 5
@@ -92,6 +92,15 @@ units_per_year:
   # from population projection of ~ 30,000 per year (62.6% single family)
   single_family: 6636
   multi_family: 3965
+
+# Demand - this is the increase between 2012 and 2013 from an SR_13 regional totals interpolation
+# units_per_year:
+#   office: 3636
+#   commercial: 16278
+#   industrial: 5168
+#   # from population projection of ~ 30,000 per year (62.6% single family)
+#   single_family: 3469
+#   multi_family: 6768
 
 # housing age
 # the number of years that a building is considered new

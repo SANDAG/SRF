@@ -39,6 +39,10 @@ def update_acreage(mgras, selected_ID, new_acreage,
                          product_type_developed_key,
                          mgra_labels.DEVELOPED_ACRES
                      ])
+    if mgras.loc[mgras[mgra_labels.MGRA] == selected_ID,
+                 mgra_labels.VACANT_ACRES].item() < 0:
+        logging.error('removed too much vacant land')
+        logging.error(mgras.loc[mgras[mgra_labels.MGRA] == selected_ID])
 
 
 def candidate_development_type(candidate, product_type_labels):
@@ -48,6 +52,8 @@ def candidate_development_type(candidate, product_type_labels):
     '''
     possible_labels = land_origin_labels.applicable_labels_for(
         product_type_labels)
+    logging.debug('candidate check type: {}'.format(
+        candidate[possible_labels]))
     for label in possible_labels:
         if pandas.notnull(candidate[label]).item():
             return label
@@ -205,6 +211,9 @@ def update_mgra(mgras, selected_candidate,
     # Update acreages
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
     new_acreage = acreage_per_unit * units_to_build
+    logging.debug('acreage we are about to add: {}'.format(new_acreage))
+    # FIXME: all candidates from this mgra with matching origin type should
+    # also be updated to reflect the changes, especially acreage available.
     if origin_type.vacant:
         update_acreage(mgras, selected_ID,
                        new_acreage,
