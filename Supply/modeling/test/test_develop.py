@@ -1,7 +1,7 @@
 import unittest
 import pandas
 
-from modeling.develop import buildable_units, normalize, combine_weights
+from modeling.develop import buildable_units
 # develop, choose_candidate
 # from modeling.candidates import create_candidate_set
 from utils.access_labels import ProductTypeLabels
@@ -35,19 +35,6 @@ class TestDevelop(unittest.TestCase):
                 self.product_type_labels,
                 100)
         )
-
-    def test_normalize(self):
-        collection = pandas.Series([10, 20, 30, 40])
-        expected_result = pandas.Series([0.1, 0.2, 0.3, 0.4])
-        self.assertTrue(expected_result.equals(normalize(collection)))
-
-    def test_combine_weights(self):
-        profitability = pandas.Series([0.9, 0.6, 1.0, 1.1])
-        vacancy = pandas.Series([10, 100, 5, 30])
-        # coverage
-        result = combine_weights(profitability, vacancy)
-        # print(result)
-        self.assertIsNotNone(result)
 
     # def test_choose_candidate(self):
     #     candidates = create_candidate_set(self.short_mgras)

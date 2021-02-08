@@ -74,7 +74,7 @@ class TestDataframeUpdates(unittest.TestCase):
         # begin_departure = 12
         # begin_arrival = 9
         transfer_count = 3
-        reallocate_units(mgras, 1, transfer_count, [
+        reallocate_units(mgras, None, 1, transfer_count, [
                          'departures'], ['arrivals'])
         self.assertEqual(9, mgras['departures'].values[0])
         self.assertEqual(12, mgras['arrivals'].values[0])

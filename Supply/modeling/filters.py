@@ -29,7 +29,7 @@ def apply_filters(candidates, product_type_labels):
         selection weights and/or for capping development
     '''
     filtered = filter_product_type(
-        candidates, product_type_labels)
+        candidates.copy(), product_type_labels)
     available_count = len(filtered)
 
     filtered = filter_by_vacancy(

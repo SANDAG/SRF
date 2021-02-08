@@ -10,10 +10,10 @@ aa_crosswalk_table: "_supply_aa_crosswalk"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # set to true for verbose output
-debug: true
+debug: false
 #debug: true
 # save debug output to file
-to_file: true
+to_file: false
 #to_file: true
 
 # Simulation
@@ -22,7 +22,7 @@ simulation_year: 2013
 use_choice_model: true
 scale: 1.0
 # number of runs
-runs: 1
+runs: 15
 
 # Filtering
 minimum_units: 5
