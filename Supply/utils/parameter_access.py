@@ -1,7 +1,9 @@
 from utils.interface import load_yaml, empty_folder, save_to_file
 import argparse
 import logging
-import os, sys
+import os
+import sys
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -26,7 +28,7 @@ def configure():
         parameters = None
 
     if parameters is not None:
-        parameters['input_filename']=None
+        parameters['input_filename'] = None
         parameters['include_integration_tests'] = args.include
         if args.filename is not None:
             parameters['input_filename'] = args.filename
@@ -38,7 +40,7 @@ def configure():
         output_dir = parameters['output_directory']
         empty_folder(output_dir)
         save_to_file(parameters, output_dir,
-                    'parameters_used.yaml', as_yaml=True, output_status=False)
+                     'parameters_used.yaml', as_yaml=True, output_status=False)
         # configure logging level
         if parameters['debug']:
             if parameters['to_file']:
@@ -48,9 +50,9 @@ def configure():
                 )
             logging.basicConfig(level=logging.DEBUG)
 
-
     else:
         print('could not load parameters, exiting')
     return parameters
+
 
 parameters = configure()

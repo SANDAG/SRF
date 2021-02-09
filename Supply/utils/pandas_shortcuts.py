@@ -1,4 +1,9 @@
 
+def normalize(collection):
+    # works with pandas Series and numpy arrays
+    return collection / collection.sum()
+
+
 def get_item(frame, index_label, row_index, column):
     # use the index label and row index to find the row, and column to find
     # the column

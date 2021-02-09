@@ -4,7 +4,7 @@ import pandas
 from modeling.filters import filter_by_vacancy, generic_filter, \
     construction_multiplier, filter_by_profitability, acreage_available, \
     filter_product_type, apply_filters
-from modeling.candidates import create_candidate_set
+# from modeling.candidates import create_candidate_set
 from utils.access_labels import ProductTypeLabels, mgra_labels
 
 
@@ -16,6 +16,7 @@ class TestFilters(unittest.TestCase):
         self.combined_frame = pandas.DataFrame(
             {
                 "MGRA": [1, 2, 3, 4, 5, 6, 7],
+                'vac': [2.0, 0, 0, 0, 0, 0, 0],
                 "vac_sf": [2.0, None,  None, None, None, None, None],
                 "redev_mh_s": [None,  None, None, None, None, None, 2.0],
                 "redev_ag_s": [None,  None, None, None, None, 2.0, None],
@@ -115,7 +116,7 @@ class TestFilters(unittest.TestCase):
     def test_acreage_available(self):
         # adding coverage
         self.assertIsNotNone(acreage_available(
-            self.profitability_frame, self.product_type_labels))
+            self.combined_frame, self.product_type_labels))
 
     def test_filter_product_type(self):
         self.assertIsNotNone(filter_product_type(
@@ -166,3 +167,46 @@ class TestFilters(unittest.TestCase):
             self.product_type_labels
         )
         self.assertTrue(expected_output.equals(output))
+
+    def test_non_residential_capacity_limiting(self):
+        commercial_labels = ProductTypeLabels(product_type='commercial')
+        # mgra 1 should be filtered out, 2 should find 50 available units,
+        # reduced from 100 by the capacity value. 3's available units should
+        # not be reduced
+        capacity_test_frame = pandas.DataFrame({
+            'MGRA': [1, 2, 3],
+            "redev_mf_e": [None, None, None],
+            "redev_mh_e": [None, None, None],
+            "redev_sf_e": [None, None, None],
+            "redev_emp1": [None, None, None],
+            "redev_emp_": [None, None, None],
+            "redev_ag_r": [None, None, None],
+            "redev_ag_l": [None, None, None],
+            'redev_ag_c': [None, None, None],
+            "infill_emp": [None, None, None],
+            commercial_labels.vacant_acres: [
+                10, 10, 10],
+            mgra_labels.VACANT_ACRES: [
+                10, 10, 10
+            ],
+            mgra_labels.LAND_COST_PER_ACRE: [
+                200, 200, 200],
+            mgra_labels.CIVILIAN_EMPLOYMENT_CAPACITY: [
+                50, 100, 150],
+            commercial_labels.price: [
+                200, 200, 200],
+            mgra_labels.TOTAL_JOB_SPACES: [
+                50, 50, 50
+            ],
+            commercial_labels.total_units: [
+                50, 50, 50
+            ],
+            commercial_labels.occupied_units: [
+                50, 50, 50
+            ],
+            "units_available": [
+                100, 100, 100]
+        })
+        output = filter_product_type(capacity_test_frame, commercial_labels)
+        self.assertEqual(50, output.iloc[0, -1])
+        self.assertEqual(100, output.iloc[1, -1])

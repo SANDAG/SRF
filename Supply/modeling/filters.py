@@ -23,13 +23,13 @@ def generic_filter(dataframe, columns, filter_nans=True, filter_zeros=True):
 
 def apply_filters(candidates, product_type_labels):
     '''
-    applies each filtering method on the data frame
-    logs the number of mgra's left after removing poor candidates
+    applies each filtering method on the candidates
+    logs the number of options left after removing poor candidates
     returns: the filtered frame, as well as series/frames for use as
         selection weights and/or for capping development
     '''
     filtered = filter_product_type(
-        candidates, product_type_labels)
+        candidates.copy(), product_type_labels)
     available_count = len(filtered)
 
     filtered = filter_by_vacancy(
@@ -61,8 +61,13 @@ def acreage_available(candidates, product_type_labels):
         if acres_available is None:
             acres_available = candidates[label].copy()
         else:
+            if label == product_type_labels.vacant_acres:
+                other = candidates[[mgra_labels.VACANT_ACRES, label]].min(
+                    axis=1)
+            else:
+                other = candidates[label]
             acres_available.where(pandas.notnull(
-                acres_available), other=candidates[label], inplace=True)
+                acres_available), other=other, inplace=True)
     return acres_available.copy()
 
 
@@ -77,10 +82,16 @@ def filter_product_type(candidates, product_type_labels):
     vacant_land = acreage_available(candidates, product_type_labels)
     units_available = vacant_land // acreage_per_unit
 
-    # also check residential capacity values here
+    # also check capacity values here
     if product_type_labels.is_residential():
         remaining_capacity = candidates[product_type_labels.capacity] - \
             candidates[product_type_labels.total_units]
+        units_available = units_available[
+            units_available > remaining_capacity] = remaining_capacity
+    else:
+        remaining_capacity = candidates[
+            mgra_labels.CIVILIAN_EMPLOYMENT_CAPACITY
+        ] - candidates[mgra_labels.TOTAL_JOB_SPACES]
         units_available = units_available[
             units_available > remaining_capacity] = remaining_capacity
     candidates['units_available'] = units_available

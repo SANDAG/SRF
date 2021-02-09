@@ -84,14 +84,22 @@ construction_cost:
   single_family: 388
 
 # Demand
+# units_per_year:
+#   # placeholders derived from total jobs * growth of 0.96% per year:
+#   office: 2384
+#   commercial: 5372
+#   industrial: 3256
+#   # from population projection of ~ 30,000 per year (62.6% single family)
+#   single_family: 6636
+#   multi_family: 3965
+
+# Demand - this is the increase between 2012 and 2013 from an SR_13 regional totals interpolation
 units_per_year:
-  # placeholders derived from total jobs * growth of 0.96% per year:
-  office: 2384
-  commercial: 5372
-  industrial: 3256
-  # from population projection of ~ 30,000 per year (62.6% single family)
-  single_family: 6636
-  multi_family: 3965
+  office: 3636
+  commercial: 16278
+  industrial: 5168
+  single_family: 3469
+  multi_family: 6768
 
 # housing age
 # the number of years that a building is considered new

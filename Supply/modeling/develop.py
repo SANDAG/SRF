@@ -1,14 +1,13 @@
 import logging
-import numpy
-# from tqdm import tqdm
 import random
 from multiprocessing import Pool, cpu_count
 import copy
 import math
 import time
+from tqdm import tqdm
 
-from modeling.candidates import create_candidate_set
-from modeling.filters import apply_filters, acreage_available
+from modeling.candidates import Candidates
+from modeling.filters import acreage_available
 from modeling.dataframe_updates import update_mgra, increment_building_ages
 
 from utils.access_labels import all_product_type_labels
@@ -28,64 +27,32 @@ def buildable_units(candidate, product_type_labels, max_units):
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
     available_units_by_land = acreage.values.item() * \
         0.95 // acreage_per_unit
-
+    logging.debug('expected acreage available: {}'.format(acreage))
     logging.debug('max: {}, vacancy: {}, by land: {}'.format(
         max_units, vacancy_cap, available_units_by_land))
     return int(min(max_units,
                    vacancy_cap, available_units_by_land))
 
 
-def normalize(collection):
-    # works with pandas Series and numpy arrays
-    return collection / collection.sum()
-
-
-def combine_weights(profitability, vacancy):
-    '''
-        Uses profitability and total units allowed by vacancy to make
-        normalized weights,
-        deference for vacancy, as modified by parameter scale multiplier.
-    '''
-    mnl_choice = parameters['use_choice_model']
-    scale = parameters['scale']
-
-    if mnl_choice:
-        exponent_profitability = numpy.exp(scale*profitability)
-        weights = vacancy * exponent_profitability
-    else:
-        # Simple weighting
-        weights = vacancy + (scale * profitability)
-
-    return normalize(weights)
-
-
 def choose_candidate(candidates, mgras, product_type_labels, max_units):
-    # Filter
-    filtered = apply_filters(
-        candidates, product_type_labels)
-    if len(filtered) < 1:
-        logging.error('out of suitable mgra candidates for product type {}'.format(
-            product_type_labels.product_type))
+    selected_candidate = candidates.select_candidate_for_product_type(
+        product_type_labels.product_type)
+    if selected_candidate is None:
+        logging.error(
+            'out of suitable mgra candidates for product type {}'.format(
+                product_type_labels.product_type))
         logging.error('evaluate input data and/or filtering methods...')
-        logging.error('setting remaining demand for {} to zero'.format(product_type_labels.product_type))
+        logging.error('setting remaining demand for {} to zero'.format(
+            product_type_labels.product_type))
         return None, None
-
-    # !
-    # save_to_file(filtered, 'data/output', 'filtered_candidates.csv')
-    # return
-
-    # Sample
-    weights = combine_weights(filtered.profit_margin, filtered.vacancy_cap)
-    selected_candidate = filtered.sample(n=1, weights=weights)
-
     buildable_count = buildable_units(
         selected_candidate, product_type_labels, max_units)
-
-    # develop buildable_count units by updating the MGRA in the original
-    # dataframe
-    removed_units_reference = update_mgra(mgras, selected_candidate,
-                                          buildable_count, product_type_labels,
-                                          scheduled_development=False)
+    # develop buildable_count units on the selected MGRA by updating it in the
+    # original dataframe
+    removed_units_reference = update_mgra(
+        mgras, selected_candidate,
+        buildable_count, product_type_labels,
+        scheduled_development=False, candidates=candidates.candidates)
 
     return buildable_count, removed_units_reference
 
@@ -110,7 +77,7 @@ def sum_demand(labels_demands):
 
 def update_labels_demand(labels, demand, difference):
     if difference is None:
-        # we ran out of suitable candidates, stop trying to allocate by 
+        # we ran out of suitable candidates, stop trying to allocate by
         # setting demand to the amount built.
         return (labels, (demand[0], demand[0]))
     return (
@@ -157,10 +124,11 @@ def prep_demand():
     return labels_demands
 
 
-def simulation_process(mgras, candidates, labels_demands):
-    # progress_bar = tqdm(total=sum_demand(labels_demands))
-    # progress_bar.set_description(
-    # 'allocating units by alternating through each product type')
+def simulation_process(mgras, candidates, labels_demands, show_progress=False):
+    if show_progress:
+        progress_bar = tqdm(total=sum_demand(labels_demands))
+        progress_bar.set_description(
+            'allocating units by alternating through each product type')
     # select one build candidate at a time for each product type
     while demands_unsatisfied(labels_demands):
         random.shuffle(labels_demands)
@@ -176,13 +144,16 @@ def simulation_process(mgras, candidates, labels_demands):
                     # the appropriate demand progress
                     labels_demands = subtract_from_fulfilled_demand(
                         labels_demands, removed_units_reference)
-                    # progress_bar.update(removed_units_reference[1])
+                    if show_progress:
+                        progress_bar.update(removed_units_reference[1])
 
                 labels_demands[index] = update_labels_demand(
                     labels, demand, built_demand)
-                # progress_bar.update(built_demand)
+                if show_progress:
+                    progress_bar.update(built_demand)
+    if show_progress:
+        progress_bar.close()
     return mgras
-    # progress_bar.close()
 
 
 def guesstimate_simulation_runtime(normal_runtime, runs, expected_threads):
@@ -194,27 +165,12 @@ def guesstimate_simulation_runtime(normal_runtime, runs, expected_threads):
     return estimated_runtime * multiplier
 
 
-def develop(mgras, runs=1):
-    """
-    Arguments
-        mgras:
-            A pandas dataframe of mgra's that will be allocated new units
-            based on demand inputs found in parameters.yaml
-    Returns:
-        a pandas dataframe with selected MGRA's updated
-    """
-    runs = parameters['runs']
-    current_results = None
-    shared_candidates = create_candidate_set(mgras)
-
-    arg_lists = []
-    for i in range(runs):
-        arg_lists.append(
-            (
-                mgras.copy(), shared_candidates.copy(),
-                copy.deepcopy(prep_demand())
-            )
-        )
+def perform_multiple_runs(mgras, current_results, shared_candidates, runs):
+    arg_lists = [(
+        mgras.copy(), copy.deepcopy(shared_candidates),
+        copy.deepcopy(prep_demand())
+    ) for _ in range(runs)
+    ]
     normal_runtime = 60  # seconds
     eta = guesstimate_simulation_runtime(normal_runtime, runs, cpu_count())
     print(
@@ -233,10 +189,8 @@ def develop(mgras, runs=1):
 
         pool.close()
         pool.join()
-
     i = 0
     for result in results:
-
         if current_results is None:
             current_results = result.copy()
             i = 1
@@ -244,9 +198,31 @@ def develop(mgras, runs=1):
             current_results, _ = running_average(
                 current_results.copy(), i, result)
             i += 1
-
     # make mgra and luz ids integers again
     current_results = current_results.astype({'MGRA': 'int32', 'LUZ': 'int32'})
+    return current_results
+
+
+def develop(mgras, runs=None):
+    """
+    Arguments
+        mgras:
+            A pandas dataframe of mgra's that will be allocated new units
+            based on demand inputs found in parameters.yaml
+    Returns:
+        a pandas dataframe with selected MGRA's updated
+    """
+    if runs is None:
+        runs = parameters['runs']
+    current_results = None
+    shared_candidates = Candidates(mgras)
+
+    if runs == 1:
+        current_results = simulation_process(
+            mgras, shared_candidates, prep_demand(), show_progress=True)
+    else:
+        current_results = perform_multiple_runs(
+            mgras, current_results, shared_candidates, runs)
     # add to housing age
     increment_building_ages(current_results)
 
