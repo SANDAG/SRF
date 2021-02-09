@@ -3,6 +3,7 @@ import argparse
 import logging
 import os
 import sys
+import pandas
 
 
 def get_args():
@@ -14,6 +15,28 @@ def get_args():
     parser.add_argument('-i', '--include-integration', dest='include',
                         default=False, action='store_true')
     return parser.parse_args()
+
+
+def use_control_totals(parameters):
+    '''
+    change the demand parameters to match the difference between this
+    year and the previous year.
+    '''
+    parameter_to_input_labels = {'office': 'ws_ofc',
+                                 'commercial': 'ws_com',
+                                 'industrial': 'ws_ind',
+                                 'single_family': 'hs_sf',
+                                 'multi_family': 'hs_mf'}
+
+    current_year = parameters['simulation_year']
+
+    control_totals = pandas.read_csv(
+        'data/SR13_Regional_Totals_interpolated.csv')
+    control_totals = control_totals.set_index('year')
+    demands = control_totals.loc[current_year] - \
+        control_totals.loc[current_year-1]
+    for key, value in parameter_to_input_labels.items():
+        parameters['units_per_year'][key] = demands[value].item()
 
 
 def configure():
@@ -37,7 +60,7 @@ def configure():
             parameters['simulation_year'] = args.year
 
         # TODO: add the control totals here
-
+        use_control_totals(parameters)
         # prep output directory
         output_dir = parameters['output_directory']
         empty_folder(output_dir)
