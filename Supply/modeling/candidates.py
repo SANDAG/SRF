@@ -7,6 +7,7 @@ from utils.access_labels import all_product_type_labels, mgra_labels, \
     RedevelopmentLabels, product_types, ProductTypeLabels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import normalize
+from utils.profitability_adjust import adjust_profitability
 
 
 def combine_weights(profitability, vacancy):
@@ -30,10 +31,11 @@ def combine_weights(profitability, vacancy):
 
 class Candidates(object):
     def __init__(self, mgras):
-        self.mgras = mgras
+        self.mgras = mgras.copy()
+        adjust_profitability(self.mgras)
         self.candidates = self.create_candidate_set()
         self.product_types = product_types()
-        print(self.product_types)
+        # print(self.product_types)
         # self.product_type_tables = {
         #     product_type: apply_filters(
         #         self.candidates, ProductTypeLabels(product_type)
@@ -80,7 +82,7 @@ class Candidates(object):
     def create_candidate_set(self):
         # remove candidates with no vacant land (filters from 23002 to 8802)
         mgras_with_vacant_land = generic_filter(
-            self.mgras.copy(), [mgra_labels.VACANT_ACRES])
+            self.mgras, [mgra_labels.VACANT_ACRES])
 
         candidate_list = []
         redevelopment_labels = RedevelopmentLabels().list_labels()
