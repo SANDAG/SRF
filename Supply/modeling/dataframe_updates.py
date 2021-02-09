@@ -28,6 +28,24 @@ def add_to_columns_with_tracking(
     add_to_columns(candidates, selected_ID, value, columns)
 
 
+def safely_subtract_from_columns(
+        mgras, candidates, selected_ID, count, from_columns):
+    '''
+        subtracts count from columns, but also checks that each column
+        remained above zero. (candidates are allowed to stay negative)
+    '''
+    add_to_columns_with_tracking(
+        mgras, candidates, selected_ID, -1 * count, from_columns)
+    for column in from_columns:
+        if mgras.loc[
+                mgras[mgra_labels.MGRA] == selected_ID, column
+        ].item() < 0:
+            logging.warning(
+                'Attempted to make {} negative on MGRA {} '.format(
+                    column, int(selected_ID)), + 'setting it to zero instead')
+            mgras.loc[mgras[mgra_labels.MGRA] == selected_ID, column] = 0
+
+
 def reallocate_units(mgras, candidates, selected_ID,
                      count, from_columns, to_columns):
     '''
@@ -38,8 +56,8 @@ def reallocate_units(mgras, candidates, selected_ID,
     add_to_columns_with_tracking(
         mgras, candidates, selected_ID, count, to_columns)
     # subtract from these columns
-    add_to_columns_with_tracking(
-        mgras, candidates, selected_ID, -1 * count, from_columns)
+    safely_subtract_from_columns(
+        mgras, candidates, selected_ID, count, from_columns)
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
@@ -260,9 +278,9 @@ def update_mgra(mgras, selected_candidate,
     if origin_type.redev and origin_labels is not None:
         # redevelopment should also subtract square footage from its origin
         # if it is being tracked
-        add_to_columns_with_tracking(
-            mgras, candidates, selected_ID, -1 *
-            square_feet_to_build, origin_labels.square_footage)
+        safely_subtract_from_columns(
+            mgras, candidates, selected_ID, square_feet_to_build,
+            [origin_labels.square_footage])
 
     # Update unit counts
     update_units(mgras, selected_ID, units_to_build,
