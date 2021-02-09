@@ -36,6 +36,8 @@ def configure():
         if args.year is not None:
             parameters['simulation_year'] = args.year
 
+        # TODO: add the control totals here
+
         # prep output directory
         output_dir = parameters['output_directory']
         empty_folder(output_dir)
