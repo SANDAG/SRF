@@ -3,10 +3,6 @@ import pandas
 from utils.interface import save_to_file
 from utils.access_labels import mgra_labels, residential_types, \
     non_residential_types, ProductTypeLabels, all_columns
-'''
-    Accepts the v4 input file and the interpolated variables from manhan group
-    creates a new input file with just the Supply applicable columns
-'''
 
 
 def sort_by_column(frame, column):
@@ -66,7 +62,17 @@ def fix_capacity(dataframe):
     return dataframe
 
 
+def fix_non_residential_capacity(dataframe):
+    dataframe[mgra_labels.CIVILIAN_EMPLOYMENT_CAPACITY] += dataframe[
+        mgra_labels.TOTAL_JOB_SPACES]
+    return dataframe
+
+
 def create_version_4point1():
+    '''
+    Accepts the v4 input file and the interpolated variables from manhan group
+    creates a new input file with just the Supply applicable columns
+    '''
     original_frame = pandas.read_csv("data/SRF_Input_Base_V4.csv")
     # add interpolated variables
     interpolated_frame = load_interpolated().drop([mgra_labels.LUZ], axis=1)
@@ -82,5 +88,12 @@ def create_version_4point1():
     return
 
 
+def create_version_4point2():
+    starting_frame = pandas.read_csv('data/SRF_Input_Base_V4.1.csv')
+    ending_frame = fix_non_residential_capacity(starting_frame)
+    save_to_file(ending_frame, 'data', 'SRF_Input_Base_V4.2.csv')
+
+
 if __name__ == "__main__":
-    create_version_4point1()
+    # note: run as module
+    create_version_4point2()
