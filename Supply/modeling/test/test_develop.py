@@ -13,6 +13,8 @@ class TestDevelop(unittest.TestCase):
             "vacancy_cap": [20],
             "vac": [6.0],
             "vac_sf": [6.0],
+            "dev_sf": [1],
+            "hs_sf": [5],
             "redev_mh_s": [None],
             "redev_ag_s": [None],
             "redev_emp1": [None],
@@ -21,10 +23,8 @@ class TestDevelop(unittest.TestCase):
             "infill_sf": [None],
         })
         self.product_type_labels = ProductTypeLabels('single_family')
-
         self.short_mgras = pandas.read_csv('test_data/random_MGRA.csv')
         # self.test_mgras = pandas.read_csv('data/SRF_Input_Base_V4.1.csv')
-
         return super().setUp()
 
     def test_buildable_units(self):

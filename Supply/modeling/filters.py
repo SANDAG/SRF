@@ -74,6 +74,8 @@ def acreage_available(candidates, product_type_labels):
 def filter_product_type(candidates, product_type_labels):
     # filter for MGRA's that have land available (vacant, redev or infill)
     # for building more units of that product type
+    # using the parameter here is close enough, we use mgra level data in
+    # develop.buildable_count
     acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
 
     # remove each candidate that doesn't have land allocated for the

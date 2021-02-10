@@ -210,10 +210,10 @@ class RedevelopmentLabels(object):
 
     def get_origin(self, label):
         '''
-        returns the label corresponding to the original land use
+        returns the labels corresponding to the original land use
         type for the redevelopment `label` argument
         '''
-        # just do it by hand
+        # just hardcoding the options
         # single family origins
         if label == "redev_sf_m" or label == "redev_sf_e":
             return ProductTypeLabels('single_family')
