@@ -8,7 +8,7 @@ import os
 import pandas
 import csv
 
-from utils.interface import save_to_file, extract_csv_from_database
+from utils.interface import extract_csv_from_database
 from utils.parameter_access import parameters
 from utils.access_labels import mgra_labels, ProductTypeLabels
 
@@ -45,10 +45,13 @@ codes_labels = {
     79: "Military Residential(Non GQ)",
 }
 
+compatible_row_id_label = 'LUZ'
+
 
 def create_row(luz, commodity, quantity):
     # needs to be labeled 'TAZ' for compatibility
-    return {"TAZ": luz,
+    # changed to LUZ
+    return {compatible_row_id_label: luz,
             "Commodity": commodity,
             "Quantity": quantity}
 
@@ -131,8 +134,10 @@ def export_luz_data(frame):
                             luz_commodity_tuple
                         ]['Quantity'] += quantity
     output_frame = pandas.DataFrame(output_dict.values())
-    output_frame.sort_values(by=['Commodity', 'TAZ'], inplace=True)
-    save_to_file(output_frame, 'data/output', 'aa_export.csv')
+    # output_frame.sort_values(
+    #     by=['Commodity', compatible_row_id_label], inplace=True)
+    return output_frame
+    # save_to_file(output_frame, 'data/output', 'aa_export.csv')
 
 
 if __name__ == "__main__":
