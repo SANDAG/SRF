@@ -31,7 +31,7 @@ def use_control_totals(parameters):
     current_year = parameters['simulation_year']
 
     control_totals = pandas.read_csv(
-        'data/SR13_Regional_Totals_interpolated.csv')
+        'SR13_Regional_Totals_interpolated.csv')
     control_totals = control_totals.set_index('year')
     demands = control_totals.loc[current_year] - \
         control_totals.loc[current_year-1]
