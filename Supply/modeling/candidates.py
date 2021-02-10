@@ -1,10 +1,11 @@
 import pandas
 import numpy
+# import logging
 from tqdm import tqdm
 
 from modeling.filters import generic_filter, apply_filters
 from utils.access_labels import all_product_type_labels, mgra_labels, \
-    RedevelopmentLabels, product_types, ProductTypeLabels
+    RedevelopmentLabels, product_types, ProductTypeLabels, land_origin_labels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import normalize
 from utils.profitability_adjust import adjust_profitability
@@ -18,15 +19,54 @@ def combine_weights(profitability, vacancy):
     '''
     mnl_choice = parameters['use_choice_model']
     scale = parameters['scale']
-
     if mnl_choice:
         exponent_profitability = numpy.exp(scale*profitability)
         weights = vacancy * exponent_profitability
     else:
         # Simple weighting
         weights = vacancy + (scale * profitability)
-
     return normalize(weights)
+
+
+def candidate_development_type(candidate, product_type_labels):
+    '''
+        find the land development label that corresponds to a non-NaN value.
+        each candidate is created with only one non-NaN land origin value.
+    '''
+    possible_labels = land_origin_labels.applicable_labels_for(
+        product_type_labels)
+    # logging.debug('candidate check type: {}'.format(
+    #     candidate[possible_labels]))
+    for label in possible_labels:
+        if pandas.notnull(candidate[label]).item():
+            return label
+    return None  # reaching this would signify a bug
+
+
+def get_square_footage_per_unit(candidate, product_type_labels):
+    '''
+        attempts to calculate the square footage per unit on the mgra
+        if either entry seems invalid, returns the average value from
+        the region
+    '''
+    square_footage = candidate[product_type_labels.square_footage].item()
+    total_units = candidate[product_type_labels.total_units].item()
+    if square_footage < 1 or total_units < 1:
+        return product_type_labels.unit_sqft_parameter()
+    else:
+        return square_footage / total_units
+
+
+def get_acreage_per_unit(candidate, product_type_labels):
+    '''
+        same as get_square_footage_per_unit, but with developed acres
+    '''
+    acreage = candidate[product_type_labels.developed_acres].item()
+    total_units = candidate[product_type_labels.total_units].item()
+    if acreage < 1 or total_units < 1:
+        return product_type_labels.land_use_per_unit_parameter()
+    else:
+        return acreage / total_units
 
 
 class Candidates(object):
@@ -35,7 +75,6 @@ class Candidates(object):
         adjust_profitability(self.mgras)
         self.candidates = self.create_candidate_set()
         self.product_types = product_types()
-        # print(self.product_types)
         # self.product_type_tables = {
         #     product_type: apply_filters(
         #         self.candidates, ProductTypeLabels(product_type)
@@ -120,8 +159,6 @@ class Candidates(object):
                     )
                     candidate_list.append(new_candidate)
             progress_bar.update()
-
         progress_bar.close()
-
         # save_to_file(candidates, 'data/output', 'candidates.csv')
         return pandas.DataFrame(candidate_list).copy()

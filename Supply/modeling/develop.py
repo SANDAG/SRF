@@ -6,13 +6,48 @@ import math
 import time
 from tqdm import tqdm
 
-from modeling.candidates import Candidates
+from modeling.candidates import Candidates, candidate_development_type, \
+    get_square_footage_per_unit, get_acreage_per_unit
 from modeling.filters import acreage_available
 from modeling.dataframe_updates import update_mgra, increment_building_ages
 
-from utils.access_labels import all_product_type_labels
+from utils.access_labels import all_product_type_labels, land_origin_labels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import running_average
+
+
+def redevelopment_check(candidate, product_type_labels):
+    '''
+    ensure that there are enough of the source fields for redevelopment
+    to take place.
+    returns: the maximum number of new destination units allowed by this check
+    '''
+    # find the source type
+    development_label = candidate_development_type(
+        candidate, product_type_labels)
+    dev_type = land_origin_labels.label_type(development_label)
+    if dev_type.redev:
+        logging.debug('redev check: dev label: {}'.format(development_label))
+        source_labels = land_origin_labels.get_origin(development_label)
+        if source_labels is None:
+            return None
+        # start with just the source units count, others ~should~ be irrelevant
+        maximum_source_units = candidate[source_labels.total_units].item()
+        logging.debug('source units count: {}'.format(maximum_source_units))
+        # # find the max source units allowed to be removed by square footage,
+        # total acreage,
+        # # product type acreage and units
+
+        # translate the maximum amount of source units allowed to be
+        # removed to the maximum number of units of destination to be built
+        # by converting to squarefeet.
+        current_square_footage = candidate[source_labels.square_footage].item()
+        destination_sqft_per_unit = get_square_footage_per_unit(
+            candidate, product_type_labels)
+        available_units = current_square_footage / destination_sqft_per_unit
+        return min(available_units, maximum_source_units)
+    else:
+        return None
 
 
 def buildable_units(candidate, product_type_labels, max_units):
@@ -24,14 +59,23 @@ def buildable_units(candidate, product_type_labels, max_units):
 
     # only build up to 95% of the vacant space
     acreage = acreage_available(candidate, product_type_labels)
-    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
+    acreage_per_unit = get_acreage_per_unit(candidate, product_type_labels)
     available_units_by_land = acreage.values.item() * \
         0.95 // acreage_per_unit
+
     logging.debug('expected acreage available: {}'.format(acreage))
     logging.debug('max: {}, vacancy: {}, by land: {}'.format(
         max_units, vacancy_cap, available_units_by_land))
-    return int(min(max_units,
-                   vacancy_cap, available_units_by_land))
+    maximums = [max_units, vacancy_cap, available_units_by_land]
+    # also limit by redevelopment source available
+    max_redevelopment_available = redevelopment_check(
+        candidate, product_type_labels)
+    if max_redevelopment_available is not None:
+        logging.debug('redevelopment limited to {} units'.format(
+            max_redevelopment_available))
+        maximums.append(max_redevelopment_available)
+    # return the lowest of all limits
+    return int(min(maximums))
 
 
 def choose_candidate(candidates, mgras, product_type_labels, max_units):
@@ -45,8 +89,11 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
         logging.error('setting remaining demand for {} to zero'.format(
             product_type_labels.product_type))
         return None, None
+    logging.debug('selected candidate: {}'.format(selected_candidate))
     buildable_count = buildable_units(
         selected_candidate, product_type_labels, max_units)
+    if buildable_count < 1:
+        return 0, None
     # develop buildable_count units on the selected MGRA by updating it in the
     # original dataframe
     removed_units_reference = update_mgra(
