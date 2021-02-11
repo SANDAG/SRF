@@ -153,7 +153,7 @@ popsyndir = join(scendir, "AllYears", "Working", "PopulationSynthesis")
 
 # The maximum number of iterations to run in AA; usually several hundred at least, but may be set to zero for certain
 # applications to see the distribution of activities at predetermined prices.
-aa_max_iterations = 1500
+aa_max_iterations = 3000
 # Initial step size in AA. Increasing this makes AA begin with more aggressive steps, so it wastes less time at the
 # beginning but has a greater risk of overflowing.
 aa_initial_step_size = 0.01
@@ -187,7 +187,7 @@ aa_group_bounds = False
 stop_on_constraint_mismatch = True
 # This is whether to use LUZs (false) or TAZs (set to true) in FloorspaceI and ActivityConstraintsI,
 # and also whether to produce an ActivityLocations2.csv output file which has activity by TAZ
-use_floorspace_zones = True
+use_floorspace_zones = False
 # Whether to update size terms for imports and exports every year
 calculate_import_export_size = False
 
@@ -212,7 +212,7 @@ popsyn_samples_file = "samples_sandag.csv"
 # Set these to True to turn the features on in the run script, False to turn them off.
 
 # Whether to maintain separate space inventories for AA and SD
-floorspace_calc_delta = True
+floorspace_calc_delta = False
 # Whether to maintain separate prices for AA and SD
 #use_aa_to_sd_price_ratio = False
 # Whether to update construction activity size terms based on SD construction
@@ -279,8 +279,8 @@ flItaz = "TAZ"
 flIcommodity = "Commodity"
 flIquantity = "Quantity"
 
-run_supply = False
-run_demand = False
+run_supply = True
+run_demand = True
 
 update_techopt = True
 update_inputs = True
