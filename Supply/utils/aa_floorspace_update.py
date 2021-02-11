@@ -130,7 +130,7 @@ def calculate_residential_floorspace(mgra_frame, floorspace_input):
 
 def update_floorspace(mgra_frame, forecast_year):
     # get the original input frame and add to it if it exists
-    floorspace_directory = '../PECAS/S28_aa/{}'.format(forecast_year)
+    floorspace_directory = '../PECAS/S28_aa/{}'.format(forecast_year-1)
     floorspace_filename = 'FloorspaceI.csv'
     floorspace_path = os.path.join(floorspace_directory, floorspace_filename)
     if os.path.isfile(floorspace_path):
@@ -147,7 +147,9 @@ def update_floorspace(mgra_frame, forecast_year):
         floorspace_frame = export_luz_data(mgra_frame)
     floorspace_frame.sort_values(
         by=[output_row_id_label, 'Commodity'], inplace=True)
+    
+    floorspace_frame_nodumpspace=floorspace_frame[floorspace_frame.Commodity!='Dump Space']
 
-    save_to_file(floorspace_frame, 'data/output',
+    save_to_file(floorspace_frame_nodumpspace, 'data/output',
                  floorspace_filename, force=True)
     return
