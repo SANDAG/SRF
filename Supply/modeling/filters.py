@@ -194,6 +194,16 @@ def filter_by_profitability(candidates, product_type_labels):
         land_cost_per_acre)
     expected_costs = construction_cost + land_cost_per_square_foot
 
+    # also add adjustment if found
+    if product_type_labels.profitability_adjust in candidates.columns:
+        adjustment_per_unit = candidates[
+            product_type_labels.profitability_adjust]
+        # this could be problematic for tiny or zero square footages
+        adjustment_per_sqft = adjustment_per_unit * \
+            candidates[product_type_labels.total_units] / \
+            candidates[product_type_labels.square_footage]
+        expected_costs += adjustment_per_sqft
+
     # find minimum returns for viable MGRA's
     profit_multiplier = parameters['profit_multiplier']
     minimum_revenue = expected_costs * profit_multiplier

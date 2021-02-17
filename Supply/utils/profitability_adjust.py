@@ -3,24 +3,26 @@ import logging
 import pandas
 
 from utils.interface import save_to_file
-from utils.access_labels import mgra_labels
+from utils.access_labels import mgra_labels, product_types, ProductTypeLabels
 
 MGRA_COUNT = 23002
 
 
 def make_profitability_file():
-    frame = pandas.DataFrame({
-        'mgra': [i+1 for i in range(MGRA_COUNT)],
-        'adjustment': [0 for _ in range(MGRA_COUNT)]
-    })
+    frame_dict = {mgra_labels.MGRA: [i + 1 for i in range(MGRA_COUNT)]}
+    for product_type in product_types():
+        frame_dict[
+            ProductTypeLabels(product_type).profitability_adjust
+        ] = [0]*MGRA_COUNT
+    frame = pandas.DataFrame(frame_dict)
     save_to_file(frame, 'data', 'profitability.csv', force=True)
 
 
 def adjust_profitability(mgra_frame):
     profitability_adjustment_frame = load_profitability_adjust()
-    mgra_frame[
-        mgra_labels.LAND_COST_PER_ACRE
-    ] += profitability_adjustment_frame['adjustment']
+    combined_frame = pandas.merge(
+        mgra_frame, profitability_adjustment_frame, on=mgra_labels.MGRA)
+    return combined_frame
 
 
 def load_profitability_adjust():

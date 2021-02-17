@@ -29,9 +29,12 @@ def use_control_totals(parameters):
                                  'multi_family': 'hs_mf'}
 
     current_year = parameters['simulation_year']
-
-    control_totals = pandas.read_csv(
-        'data/SR13_Regional_Totals_interpolated.csv')
+    control_totals_file = 'data/SR13_Regional_Totals_interpolated.csv'
+    if not os.path.isfile(control_totals_file):
+        print('could not find control totals file, ' +
+              'using default demand (2012)')
+        return
+    control_totals = pandas.read_csv(control_totals_file)
     control_totals = control_totals.set_index('year')
     demands = control_totals.loc[current_year] - \
         control_totals.loc[current_year-1]

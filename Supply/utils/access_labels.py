@@ -82,6 +82,7 @@ class ProductTypeLabels(object):
         self.developed_acres = product_type_dict['DEVELOPED_ACRES']
         self.vacant_acres = product_type_dict['VACANT_ACRES']
         self.price = product_type_dict['MEAN_PRICE']
+        self.profitability_adjust = self.product_type + '_profit_adjust'
 
     def list_labels(self):
         result = [self.occupied_units, self.total_units, self.square_footage,

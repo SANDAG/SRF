@@ -72,7 +72,7 @@ def get_acreage_per_unit(candidate, product_type_labels):
 class Candidates(object):
     def __init__(self, mgras):
         self.mgras = mgras.copy()
-        adjust_profitability(self.mgras)
+        self.mgras = adjust_profitability(self.mgras)
         self.candidates = self.create_candidate_set()
         self.product_types = product_types()
         # self.product_type_tables = {
@@ -83,6 +83,8 @@ class Candidates(object):
 
     # don't recalculate filters each time a candidate is selected... only
     # update the affected candidates each iteration?
+    # we still have to re-weight every candidate, it might not make sense to
+    # separate that out
     # def filter_by_product_types()
 
     def mgra_updated(self, mgra_id, product_type, units):
