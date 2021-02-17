@@ -29,7 +29,7 @@ def use_control_totals(parameters):
                                  'multi_family': 'hs_mf'}
 
     current_year = parameters['simulation_year']
-    control_totals_file = 'data/SR13_Regional_Totals_interpolated.csv'
+    control_totals_file = 'SR13_Regional_Totals_interpolated.csv'
     if not os.path.isfile(control_totals_file):
         print('could not find control totals file, ' +
               'using default demand (2012)')
