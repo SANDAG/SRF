@@ -30,11 +30,11 @@ def importRents(combined_rent,old_supply_input,new_supply_input=None):
 
     min_sdf = s_df[['valueSFmea','valueMFmea','valueINDme','valueCOMme','valueOFCme']].min()
     max_sdf = s_df[['valueSFmea','valueMFmea','valueINDme','valueCOMme','valueOFCme']].max()
-    s_df['valueSFmea'] = r_df.xs(1)['Value'].fillna(s_df['valueSFmea']).clip(lower=0.8*min_sdf['valueSFmea']).clip(lower=1.2*max_sdf['valueSFmea'])
-    s_df['valueMFmea'] = r_df.xs(2)['Value'].fillna(s_df['valueMFmea']).clip(lower=0.8*min_sdf['valueMFmea']).clip(lower=1.2*max_sdf['valueSFmea'])
-    s_df['valueINDme'] = r_df.xs(4)['Value'].fillna(s_df['valueINDme']).clip(lower=0.8*min_sdf['valueINDme']).clip(lower=1.2*max_sdf['valueSFmea'])
-    s_df['valueCOMme'] = r_df.xs(5)['Value'].fillna(s_df['valueCOMme']).clip(lower=0.8*min_sdf['valueCOMme']).clip(lower=1.2*max_sdf['valueSFmea'])
-    s_df['valueOFCme'] = r_df.xs(6)['Value'].fillna(s_df['valueOFCme']).clip(lower=0.8*min_sdf['valueOFCme']).clip(lower=1.2*max_sdf['valueSFmea'])
+    s_df['valueSFmea'] = r_df.xs(1)['Value'].fillna(s_df['valueSFmea']).clip(lower=0.8*min_sdf['valueSFmea']).clip(upper=1.2*max_sdf['valueSFmea'])
+    s_df['valueMFmea'] = r_df.xs(2)['Value'].fillna(s_df['valueMFmea']).clip(lower=0.8*min_sdf['valueMFmea']).clip(upper=1.2*max_sdf['valueSFmea'])
+    s_df['valueINDme'] = r_df.xs(4)['Value'].fillna(s_df['valueINDme']).clip(lower=0.8*min_sdf['valueINDme']).clip(upper=1.2*max_sdf['valueSFmea'])
+    s_df['valueCOMme'] = r_df.xs(5)['Value'].fillna(s_df['valueCOMme']).clip(lower=0.8*min_sdf['valueCOMme']).clip(upper=1.2*max_sdf['valueSFmea'])
+    s_df['valueOFCme'] = r_df.xs(6)['Value'].fillna(s_df['valueOFCme']).clip(lower=0.8*min_sdf['valueOFCme']).clip(upper=1.2*max_sdf['valueSFmea'])
 
 # =============================================================================
 #     s_df['valueSFmea'] = np.maximum(0.8*s_df['valueSFmea'],np.minimum(s_df['valueSFmea']*1.2,r_df.xs(1)['Value'].fillna(s_df['valueSFmea'])))
@@ -55,9 +55,9 @@ if __name__ == "__main__":
     import time
     import sys
     start_time = time.time()
-    combined_rent = r"D:\MG_SRF\SRF\Demand\2013\combined_rents.csv"
-    old_supply_input = r"D:\MG_SRF\SRF\Supply\data\forecasted_year_2013.csv"
-    new_supply_input = r"D:\MG_SRF\SRF\Supply\data\supply_input_2014.csv"
+    combined_rent = r"D:\PECAS\SRF.git\branches\Supply\profitability-adjusters\Demand\2012\combined_rents.csv"
+    old_supply_input = r"D:\PECAS\SRF.git\branches\Supply\profitability-adjusters\Supply\data\supply_input_2013.csv"
+    new_supply_input = r"D:\PECAS\SRF.git\branches\Supply\profitability-adjusters\Supply\data\supply_input_2013n.csv"
 
     importRents(combined_rent,old_supply_input,new_supply_input)
     print("---%s seconds ---" % (time.time() - start_time))
