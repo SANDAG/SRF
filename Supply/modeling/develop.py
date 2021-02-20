@@ -196,7 +196,7 @@ def simulation_process(mgras, candidates, labels_demands, show_progress=False):
 
                 labels_demands[index] = update_labels_demand(
                     labels, demand, built_demand)
-                if show_progress:
+                if show_progress and built_demand is not None:
                     progress_bar.update(built_demand)
     if show_progress:
         progress_bar.close()

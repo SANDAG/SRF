@@ -1,11 +1,11 @@
 import pandas
 import numpy
-# import logging
+import logging
 from tqdm import tqdm
 
 from modeling.filters import generic_filter, apply_filters
 from utils.access_labels import all_product_type_labels, mgra_labels, \
-    RedevelopmentLabels, product_types, ProductTypeLabels, land_origin_labels
+    RedevelopmentLabels, ProductTypeLabels, land_origin_labels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import normalize
 from utils.profitability_adjust import adjust_profitability
@@ -74,7 +74,8 @@ class Candidates(object):
         self.mgras = mgras.copy()
         self.mgras = adjust_profitability(self.mgras)
         self.candidates = self.create_candidate_set()
-        self.product_types = product_types()
+        self.candidates.reset_index(drop=True, inplace=True)
+        # self.product_types = product_types()
         # self.product_type_tables = {
         #     product_type: apply_filters(
         #         self.candidates, ProductTypeLabels(product_type)
@@ -107,7 +108,13 @@ class Candidates(object):
             filtered.profit_margin, filtered.vacancy_cap)
         # DataFrame.sample replace argument is False by default, so the
         # selected candidate will not be considered again.
-        return filtered.sample(n=1, weights=weights)
+        logging.debug('{} candidates left for product type {}'.format(
+            len(filtered), product_type))
+        selected = filtered.sample(n=1, weights=weights)
+        # .sample only removed the candidate from the filtered copy, also
+        # remove it from the original candidates
+        self.candidates.drop([selected.index.array[0]], inplace=True)
+        return selected
 
     def __trim_columns(self, frame, include_columns=[], remove_columns=[]):
         # drops all redev and infill columns if include_columns is not set
