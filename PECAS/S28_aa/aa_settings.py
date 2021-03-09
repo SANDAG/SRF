@@ -105,7 +105,8 @@ xvector_constants = False
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Simulation base year; usually shouldn't change for a given project.
-baseyear = 2012
+#baseyear = 2012
+baseyear = 2013
 
 # Simulation end year; usually shouldn't change for a given project.
 endyear = 2050
@@ -241,7 +242,8 @@ use_activities_zonal_values_i = False
 #allocate_tm_totals = False
 # The years in which to produce inputs for the travel model.
 # Travel model inputs are automatically produced in any years where the travel model runs according to tmyears.
-travel_model_input_years = range(2012,2026) # Enter a list of years (e.g. [2015, 2025, 2035]) or leave empty to turn off
+#travel_model_input_years = range(2012,2026) # Enter a list of years (e.g. [2015, 2025, 2035]) or leave empty to turn off
+travel_model_input_years = []
 # Whether to produce employment counts
 #employment = False
 # The base year employment to use in future employment allocation
