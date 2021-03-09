@@ -133,8 +133,9 @@ class TestAAFloorspaceUpdate(unittest.TestCase):
 # 10013,Spaced Rural Residential Luxury,2121.01975
 #         })
 
-    def test_update_floorspace(self):
-        update_floorspace(pandas.read_csv('test_data/random_MGRA.csv'), 2013)
+# uncomment for integration testing (uses database)
+    # def test_update_floorspace(self):
+    #     update_floorspace(pandas.read_csv('test_data/random_MGRA.csv'), 2013)
 
 # TODO:
 # add the cases where:
