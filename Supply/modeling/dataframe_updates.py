@@ -1,10 +1,11 @@
 import logging
-import pandas
 
 from utils.access_labels import mgra_labels, land_origin_labels, \
     residential_labels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import get_item
+from modeling.candidates import candidate_development_type, \
+    get_square_footage_per_unit, get_acreage_per_unit
 
 
 def add_to_columns(mgras, selected_ID, value, columns):
@@ -12,25 +13,59 @@ def add_to_columns(mgras, selected_ID, value, columns):
         value: number to add to the current values of columns
         columns: list of column labels
     '''
-    if columns:
+    if columns and mgras is not None:
         mgras.loc[mgras[mgra_labels.MGRA] == selected_ID, columns] += value
 
 
-def reallocate_units(mgras, selected_ID, count, from_columns, to_columns):
+def add_to_columns_with_tracking(
+        mgras, candidates, selected_ID, value, columns):
+    '''
+        a wrapper method for add_to_columns that calls add_to_columns twice,
+        once for the mgra in mgras, and once for all of the candidates with
+        the same mgra id, so that they can keep track of the changes that
+        other candidates make on their mgra
+    '''
+    add_to_columns(mgras, selected_ID, value, columns)
+    add_to_columns(candidates, selected_ID, value, columns)
+
+
+def safely_subtract_from_columns(
+        mgras, candidates, selected_ID, count, from_columns):
+    '''
+        subtracts count from columns, but also checks that each column
+        remained above zero. (candidates are allowed to stay negative)
+    '''
+    add_to_columns_with_tracking(
+        mgras, candidates, selected_ID, -1 * count, from_columns)
+    for column in from_columns:
+        if mgras.loc[
+                mgras[mgra_labels.MGRA] == selected_ID, column
+        ].item() < 0:
+            logging.warning(
+                'Attempted to make {} negative on MGRA {}, '.format(
+                    column, int(selected_ID)) + 'setting it to zero instead')
+            mgras.loc[mgras[mgra_labels.MGRA] == selected_ID, column] = 0
+
+
+def reallocate_units(mgras, candidates, selected_ID,
+                     count, from_columns, to_columns):
     '''
         moves `count` units from `from_columns` to `to_columns` at the row in
         `mgras` corresponding to the mgra id `selected_ID`
         updates the `mgras` dataframe in place
     '''
-    add_to_columns(mgras, selected_ID, count, to_columns)
+    add_to_columns_with_tracking(
+        mgras, candidates, selected_ID, count, to_columns)
     # subtract from these columns
-    add_to_columns(mgras, selected_ID, -1 * count, from_columns)
+    safely_subtract_from_columns(
+        mgras, candidates, selected_ID, count, from_columns)
 
 
 def update_acreage(mgras, selected_ID, new_acreage,
-                   product_type_developed_key, product_type_vacant_key):
+                   product_type_developed_key, product_type_vacant_key,
+                   candidates=None):
     # used for development on vacant land only
-    reallocate_units(mgras, selected_ID, new_acreage,
+    reallocate_units(mgras, candidates, selected_ID, new_acreage,
                      from_columns=[
                          product_type_vacant_key,
                          mgra_labels.VACANT_ACRES
@@ -39,19 +74,10 @@ def update_acreage(mgras, selected_ID, new_acreage,
                          product_type_developed_key,
                          mgra_labels.DEVELOPED_ACRES
                      ])
-
-
-def candidate_development_type(candidate, product_type_labels):
-    '''
-        find the land development label that corresponds to a non-NaN value
-        each candidate is created with only one non-NaN land origin value
-    '''
-    possible_labels = land_origin_labels.applicable_labels_for(
-        product_type_labels)
-    for label in possible_labels:
-        if pandas.notnull(candidate[label]).item():
-            return label
-    return None  # reaching this would signify a bug
+    if mgras.loc[mgras[mgra_labels.MGRA] == selected_ID,
+                 mgra_labels.VACANT_ACRES].item() < 0:
+        logging.error('removed too much vacant land')
+        logging.error(mgras.loc[mgras[mgra_labels.MGRA] == selected_ID])
 
 
 def previous_proportion_in_units(
@@ -113,7 +139,8 @@ def update_housing_ages(mgras, selected_ID, units_to_build,
                       old_units, total_units_after_update)
 
 
-def update_units(mgras, selected_ID, units_to_build, product_type_labels):
+def update_units(mgras, selected_ID, units_to_build, product_type_labels,
+                 candidates=None):
     columns_expecting_units = []
     columns_expecting_units.append(product_type_labels.total_units)
     if product_type_labels.is_residential():
@@ -122,8 +149,23 @@ def update_units(mgras, selected_ID, units_to_build, product_type_labels):
                             units_to_build, product_type_labels)
     else:  # product type is non-residential
         columns_expecting_units.append(mgra_labels.TOTAL_JOB_SPACES)
-    add_to_columns(mgras, selected_ID, units_to_build,
-                   columns_expecting_units)
+    add_to_columns_with_tracking(
+        mgras, candidates, selected_ID, units_to_build,
+        columns_expecting_units)
+
+
+def remove_units(mgras, selected_ID, units_to_remove, product_type_labels,
+                 candidates=None):
+    # like update units, but called when removing units through redevelopment
+    columns_expecting_units = []
+    columns_expecting_units.append(product_type_labels.total_units)
+    if product_type_labels.is_residential():
+        columns_expecting_units.append(mgra_labels.HOUSING_UNITS)
+    else:  # product type is non-residential
+        columns_expecting_units.append(mgra_labels.TOTAL_JOB_SPACES)
+    safely_subtract_from_columns(
+        mgras, candidates, selected_ID, units_to_remove,
+        columns_expecting_units)
 
 
 def __change_in_proportion(current_proportion, proportion_range):
@@ -166,16 +208,21 @@ def increment_building_ages(mgras):
 
 
 def simple_update(mgras, selected_ID, units_to_build, product_type_labels):
-    # used to maintain compatibility with the scheduled development module
-    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
+    # used by the scheduled development module
+    acreage_per_unit = get_acreage_per_unit(
+        mgras.loc[mgras[mgra_labels.MGRA] == selected_ID],
+        product_type_labels
+    )
     new_acreage = acreage_per_unit * units_to_build
     update_acreage(mgras, selected_ID,
                    new_acreage,
                    product_type_labels.developed_acres,
                    product_type_labels.vacant_acres)
 
-    square_feet_to_build = product_type_labels.unit_sqft_parameter() * \
-        units_to_build
+    square_feet_to_build = get_square_footage_per_unit(
+        mgras.loc[mgras[mgra_labels.MGRA] == selected_ID],
+        product_type_labels
+    ) * units_to_build
     add_to_columns(mgras, selected_ID, square_feet_to_build,
                    product_type_labels.square_footage)
 
@@ -184,7 +231,7 @@ def simple_update(mgras, selected_ID, units_to_build, product_type_labels):
 
 def update_mgra(mgras, selected_candidate,
                 units_to_build, product_type_labels,
-                scheduled_development=True):
+                scheduled_development=True, candidates=None):
     # let scheduled development pass through
     if scheduled_development:
         simple_update(mgras, selected_candidate,
@@ -195,51 +242,66 @@ def update_mgra(mgras, selected_candidate,
 
     development_label = candidate_development_type(
         selected_candidate, product_type_labels)
-    logging.debug('building {} {} units as {} on MGRA #{}'.format(
+    logging.debug('attempting to build {} {} units as {} on MGRA #{}'.format(
         units_to_build, product_type_labels.product_type,
         development_label, selected_ID))
 
-    origin_type = land_origin_labels.label_type(development_label)
+    development_type = land_origin_labels.label_type(development_label)
     origin_labels = land_origin_labels.get_origin(development_label)
 
     # Update acreages
-    acreage_per_unit = product_type_labels.land_use_per_unit_parameter()
+    acreage_per_unit = get_acreage_per_unit(
+        mgras.loc[mgras[mgra_labels.MGRA] == selected_ID],
+        product_type_labels
+    )
     new_acreage = acreage_per_unit * units_to_build
-    if origin_type.vacant:
+    logging.debug('acreage we are about to add: {}'.format(new_acreage))
+    if development_type.vacant:
         update_acreage(mgras, selected_ID,
                        new_acreage,
                        product_type_labels.developed_acres,
-                       product_type_labels.vacant_acres)
-    elif origin_type.redev:
+                       product_type_labels.vacant_acres, candidates=candidates)
+    elif development_type.redev:
         # redevelopment should reallocate from the actual origin
         if origin_labels is None:
             origin_column_input = []
         else:
             origin_column_input = [origin_labels.developed_acres]
-        reallocate_units(mgras, selected_ID, new_acreage,
+        reallocate_units(mgras, candidates, selected_ID, new_acreage,
                          from_columns=origin_column_input, to_columns=[
                              product_type_labels.developed_acres])
     # infill should only subtract from itself, redev also subtracts from itself
-    if origin_type.redev or origin_type.infill:
-        add_to_columns(mgras, selected_ID, -1 * new_acreage, development_label)
+    if development_type.redev or development_type.infill:
+        safely_subtract_from_columns(
+            mgras, candidates, selected_ID, new_acreage, [development_label])
 
     # Update square footages
     # all three origin types increase square footage
-    square_feet_to_build = product_type_labels.unit_sqft_parameter() * \
-        units_to_build
-    add_to_columns(mgras, selected_ID, square_feet_to_build,
-                   product_type_labels.square_footage)
-    if origin_type.redev and origin_labels is not None:
+    square_feet_to_build = get_square_footage_per_unit(
+        mgras.loc[mgras[mgra_labels.MGRA] == selected_ID],
+        product_type_labels
+    ) * units_to_build
+    add_to_columns_with_tracking(
+        mgras, candidates, selected_ID, square_feet_to_build,
+        product_type_labels.square_footage)
+    if development_type.redev and origin_labels is not None:
         # redevelopment should also subtract square footage from its origin
         # if it is being tracked
-        add_to_columns(mgras, selected_ID, -1 *
-                       square_feet_to_build, origin_labels.square_footage)
+        safely_subtract_from_columns(
+            mgras, candidates, selected_ID, square_feet_to_build,
+            [origin_labels.square_footage])
 
     # Update unit counts
-    update_units(mgras, selected_ID, units_to_build, product_type_labels)
+    update_units(mgras, selected_ID, units_to_build,
+                 product_type_labels, candidates=candidates)
     # redeveloping should also subtract units from the original land use
-    if origin_type.redev and origin_labels is not None:
-        units_to_subtract = -1 * units_to_build
-        update_units(mgras, selected_ID, units_to_subtract, origin_labels)
-        return (origin_labels, units_to_subtract)
+    if development_type.redev and origin_labels is not None:
+        logging.debug(
+            'redevelopment will attempt to remove' +
+            ' {} units from {}'.format(
+                units_to_build, origin_labels.product_type)
+        )
+        remove_units(mgras, selected_ID, units_to_build,
+                     origin_labels, candidates=candidates)
+        return (origin_labels, -1 * units_to_build)
     return None

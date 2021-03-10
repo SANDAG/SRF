@@ -82,6 +82,7 @@ class ProductTypeLabels(object):
         self.developed_acres = product_type_dict['DEVELOPED_ACRES']
         self.vacant_acres = product_type_dict['VACANT_ACRES']
         self.price = product_type_dict['MEAN_PRICE']
+        self.profitability_adjust = self.product_type + '_cost_adjust'
 
     def list_labels(self):
         result = [self.occupied_units, self.total_units, self.square_footage,
@@ -210,10 +211,10 @@ class RedevelopmentLabels(object):
 
     def get_origin(self, label):
         '''
-        returns the label corresponding to the original land use
+        returns the labels corresponding to the original land use
         type for the redevelopment `label` argument
         '''
-        # just do it by hand
+        # just hardcoding the options
         # single family origins
         if label == "redev_sf_m" or label == "redev_sf_e":
             return ProductTypeLabels('single_family')

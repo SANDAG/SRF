@@ -60,7 +60,8 @@ class StandardAARunner(pr.AARunner):
         retcode = subprocess.call(*args, **kwargs)
         pr.move_replace(ps.scendir + "/event.log", ps.scendir + "/" + str(year) + "/aa-event.log")
         # If this is a zero-iteration run, we're not expecting AA to converge, so don't crash when it doesn't!
-        allowed_retcodes = [0, 2] if ps.aa_max_iterations == 0 else [0]
+        #allowed_retcodes = [0, 2] if ps.aa_max_iterations == 0 else [0]
+        allowed_retcodes = [0, 2] #Don't crash even if AA doesn't converge
         pr.log_results_from_external_program(
             "AA model finished for year {}".format(year),
             "AA model did not run successfully in year {}".format(year),
