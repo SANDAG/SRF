@@ -1,9 +1,13 @@
+import os
+import logging
+
 from scheduled_development import run as add_scheduled_development
 from modeling.develop import develop
-from utils.interface import save_to_file, open_mgra_io_file, open_sites_file
+from utils.interface import save_to_file, empty_folder, open_mgra_io_file, \
+    open_sites_file
 from utils.parameter_access import parameters
 from utils.aa_floorspace_update import update_floorspace
-import os
+
 
 def exception_handler(exception_type, exception, traceback):
     print('%s: %s' % (exception_type.__name__, exception))
@@ -41,6 +45,20 @@ if __name__ == "__main__":
     sys.excepthook = exception_handler
 
     if parameters is not None:
+        # prep output directory
+        output_dir = parameters['output_directory']
+        empty_folder(output_dir)
+        save_to_file(parameters, output_dir,
+                     'parameters_used.yaml', as_yaml=True, output_status=False)
+        # configure logging level
+        if parameters['debug']:
+            if parameters['to_file']:
+                sys.stderr = open(
+                    os.path.join(output_dir, 'debug_output'),
+                    mode='x'
+                )
+            logging.basicConfig(level=logging.DEBUG)
+
         # load dataframe(s)
         use_database = parameters['use_database']
         mgra_dataframe = open_mgra_io_file(
