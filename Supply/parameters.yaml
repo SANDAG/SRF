@@ -23,7 +23,7 @@ simulation_year: 2013
 use_choice_model: true
 scale: 1.0
 # number of runs
-runs: 15
+runs: 64
 
 # Filtering
 minimum_units: 5

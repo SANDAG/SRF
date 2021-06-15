@@ -102,9 +102,14 @@ writeaa2demandoutputs <- function(configDir,tname, mydf) {
   on.exit(dbDisconnect(conn))
   inputs_schema <- config$mu_schema
   mytbl <- c(inputs_schema, tname)
-  #if(dbExistsTable(conn, mytbl)){ dbRemoveTable(conn, mytbl)} 
-  sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROM…
-  dbSendQuery(conn, statement=sql_truncate)
+  # #if(dbExistsTable(conn, mytbl)){ dbRemoveTable(conn, mytbl)} 
+  # sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROM…
+  # dbSendQuery(conn, statement=sql_truncate)
+  # dbWriteTable(conn, mytbl,mydf, row.names=FALSE, append=TRUE)
+  if(dbExistsTable(conn, mytbl)){
+    sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROM…
+    dbSendQuery(conn, statement=sql_truncate)
+    }
   dbWriteTable(conn, mytbl,mydf, row.names=FALSE, append=TRUE)
   }
 
@@ -139,4 +144,104 @@ agentCheck <- function(location,targets) {
            adj = log(TARGET/sumAgents)
     )
   return(checkAgents)
+}
+
+# function to produce data for updating summary file
+getSummary <- function(inputList,outputList) {
+  agent_data <- inputList[["agents"]]
+  # supply_data <- inputList[["supply"]]
+  loc_output <- outputList[["location"]]
+  summary_data <- summarise(group_by(mutate(loc_output,
+                                            hh = H_Type.1. + H_Type.2. + H_Type.3. + H_Type.4. + H_Type.5. +
+                                              H_Type.6. + H_Type.7. + H_Type.8. + H_Type.9. + H_Type.10. +
+                                              H_Type.11. + H_Type.12. + H_Type.13. + H_Type.14. + H_Type.15. +
+                                              H_Type.16. + H_Type.17. + H_Type.18. + H_Type.19. + H_Type.20.,
+                                            hh_sf = ifelse(Realestate==1,hh,0),
+                                            hh_mf = ifelse(Realestate==2,hh,0),
+                                            hh_mh = ifelse(Realestate==3,hh,0)),Zone),
+                            hh = sum(hh),
+                            hh_sf = sum(hh_sf),
+                            hh_mf = sum(hh_mf),
+                            hh_mh = sum(hh_mh),
+                            hhinc1s1 = sum(H_Type.1.),
+                            hhinc1s2 = sum(H_Type.2.),
+                            hhinc2s1 = sum(H_Type.3.),
+                            hhinc2s2 = sum(H_Type.4.),
+                            hhinc3s1 = sum(H_Type.5.),
+                            hhinc3s2 = sum(H_Type.6.),
+                            hhinc4s1 = sum(H_Type.7.),
+                            hhinc4s2 = sum(H_Type.8.),
+                            hhinc5s1 = sum(H_Type.9.),
+                            hhinc5s2 = sum(H_Type.10.),
+                            hhinc6s1 = sum(H_Type.11.),
+                            hhinc6s2 = sum(H_Type.12.),
+                            hhinc7s1 = sum(H_Type.13.),
+                            hhinc7s2 = sum(H_Type.14.),
+                            hhinc8s1 = sum(H_Type.15.),
+                            hhinc8s2 = sum(H_Type.16.),
+                            hhinc9s1 = sum(H_Type.17.),
+                            hhinc9s2 = sum(H_Type.18.),
+                            hhinc10s1 = sum(H_Type.19.),
+                            hhinc10s2 = sum(H_Type.20.),
+                            emp_ag = sum(H_Type.21.),
+                            emp_const_non_bldg_prod = sum(H_Type.22.),
+                            emp_const_non_bldg_office = sum(H_Type.23.),
+                            emp_utilities_prod = sum(H_Type.24.),
+                            emp_utilities_office = sum(H_Type.25.),
+                            emp_const_bldg_prod = sum(H_Type.26.),
+                            emp_const_bldg_office = sum(H_Type.27.),
+                            emp_mfg_prod = sum(H_Type.28.),
+                            emp_mfg_office = sum(H_Type.29.),
+                            emp_whsle_whs = sum(H_Type.30.),
+                            emp_trans = sum(H_Type.31.),
+                            emp_retail = sum(H_Type.32.),
+                            emp_prof_bus_svcs = sum(H_Type.33.),
+                            emp_prof_bus_svcs_bldg_maint = sum(H_Type.34.),
+                            emp_pvt_ed_k12 = sum(H_Type.35.),
+                            emp_pvt_ed_post_k12_oth = sum(H_Type.36.),
+                            emp_health = sum(H_Type.37.),
+                            emp_personal_svcs_office = sum(H_Type.38.),
+                            emp_amusement = sum(H_Type.39.),
+                            emp_hotel = sum(H_Type.40.),
+                            emp_restaurant_bar = sum(H_Type.41.),
+                            emp_personal_svcs_retail = sum(H_Type.42.),
+                            emp_religious = sum(H_Type.43.),
+                            emp_pvt_hh = sum(H_Type.44.),
+                            emp_state_local_gov_ent = sum(H_Type.45.),
+                            emp_fed_non_mil = sum(H_Type.46.),
+                            emp_fed_mil = sum(H_Type.47.),
+                            emp_state_local_gov_blue = sum(H_Type.48.),
+                            emp_state_local_gov_white = sum(H_Type.49.),
+                            emp_public_ed = sum(H_Type.50.)) %>%
+    mutate(i1 = hhinc1s1 + hhinc1s2,
+           i2 = hhinc2s1 + hhinc2s2,
+           i3 = hhinc3s1 + hhinc3s2,
+           i4 = hhinc4s1 + hhinc4s2,
+           i5 = hhinc5s1 + hhinc5s2,
+           i6 = hhinc6s1 + hhinc6s2,
+           i7 = hhinc7s1 + hhinc7s2,
+           i8 = hhinc8s1 + hhinc8s2,
+           i9 = hhinc9s1 + hhinc9s2,
+           i10 = hhinc10s1 + hhinc10s2,
+           hhp = hhinc1s1*agent_data$hhsize[1] + 
+             hhinc1s2*agent_data$hhsize[2] + 
+             hhinc2s1*agent_data$hhsize[3] + 
+             hhinc2s2*agent_data$hhsize[4] + 
+             hhinc3s1*agent_data$hhsize[5] + 
+             hhinc3s2*agent_data$hhsize[6] + 
+             hhinc4s1*agent_data$hhsize[7] + 
+             hhinc4s2*agent_data$hhsize[8] + 
+             hhinc5s1*agent_data$hhsize[9] + 
+             hhinc5s2*agent_data$hhsize[10] + 
+             hhinc6s1*agent_data$hhsize[11] + 
+             hhinc6s2*agent_data$hhsize[12] + 
+             hhinc7s1*agent_data$hhsize[13] + 
+             hhinc7s2*agent_data$hhsize[14] + 
+             hhinc8s1*agent_data$hhsize[15] + 
+             hhinc8s2*agent_data$hhsize[16] + 
+             hhinc9s1*agent_data$hhsize[17] + 
+             hhinc9s2*agent_data$hhsize[18] + 
+             hhinc10s1*agent_data$hhsize[19] + 
+             hhinc10s2*agent_data$hhsize[20])
+  return(summary_data)
 }

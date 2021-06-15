@@ -61,17 +61,17 @@ resume_run = False
 # as AA results are not pre-populated when setting up a scenario to run.
 # This is frequently used when the inputs for a future year have been updated. For instance,
 # if new skims from the travel model are provided for year 2029, you could set the start year to 2030 and
-# rerun your scenario. 
+# rerun your scenario.
 aa_startyear = 2012
 
 # --- END OF REPLAY FUNCTIONALITY ---
 
-# The last year in which AA is run. SD stops one year before this. 
+# The last year in which AA is run. SD stops one year before this.
 # You can use this to stop the run early, to save electricity costs while you
-# are waiting to update some input files on a future year.  
+# are waiting to update some input files on a future year.
 # You do not need to use this to stop the run early.  Instead, you can stop it interactively with
 # MrsGui once it has progressed past the point where you want to update some inputs
-stopyear = 2025
+stopyear = 2030
 
 # Whether to scale the total amounts of activity (ActivityTotalsI) and the technology vectors
 # (TechnologyOptionsI) as the model runs through time, in response to the model results.
@@ -86,13 +86,13 @@ scale_technology_options = False
 # scenario (e.g. because the scenario has already been run up to that point),
 # to prevent the model from re-squeezing them.
 #earliest_squeeze_year = 9999
-earliest_squeeze_year = 2012
+earliest_squeeze_year = 2020
 
 # XVectorConstants are used to adjust the AA constants over time based on changing values
 # in XVector.csv in each year.  The constrained constants from the base year are
 # reinterpreted by subtracting out the base year XVector effects, and then in future
 # years the updated XVector effects are added back in.
-# You need code in project_code.py to generate the file XVector.csv before you can  
+# You need code in project_code.py to generate the file XVector.csv before you can
 # use the XVector functionality.
 xvector_constants = False
 
@@ -109,10 +109,10 @@ xvector_constants = False
 baseyear = 2013
 
 # Simulation end year; usually shouldn't change for a given project.
-endyear = 2050
+endyear = 2020
 
 # Years in which new skims are available
-skimyears = [2012,2016]
+skimyears = [2012,2016,2020]
 
 # Years in which AA should run
 aayears = irange(baseyear, endyear)
@@ -203,7 +203,7 @@ calculate_import_export_size = False
 # A common approach is to put a Seed file in the base year directory, in which case future year population
 # synthesis will continue to evolve the Output from previous years, but the base year will have a fixed
 # starting point that you've defined.  Another common approach is to put a Seed file in the AllYears/Inputs folder,
-# so that all population synthesis runs, regardless of year, start with the same seed.  
+# so that all population synthesis runs, regardless of year, start with the same seed.
 popsyn_samples_file = "samples_sandag.csv"
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ emme_format_trips = False
 
 
 # Whether to squeeze skims by TAZ from the travel model up to the LUZ level
-squeeze_skims = False
+squeeze_skims = True
 # The name of the TAZ skim file (if squeeze_skims is True); any copies of "{yr}" will be replaced by the skim year
 taz_skims_fname = "TMSkims"
 
@@ -286,4 +286,3 @@ run_demand = True
 
 update_techopt = True
 update_inputs = True
-
