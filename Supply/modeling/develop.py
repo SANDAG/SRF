@@ -1,5 +1,4 @@
 import logging
-import random
 from multiprocessing import Pool, cpu_count
 import copy
 import math
@@ -10,8 +9,9 @@ from modeling.candidates import Candidates, candidate_development_type, \
     get_square_footage_per_unit, get_acreage_per_unit
 from modeling.filters import acreage_available
 from modeling.dataframe_updates import update_mgra, increment_building_ages
+from modeling.demand_manager import DemandManager
 
-from utils.access_labels import all_product_type_labels, land_origin_labels
+from utils.access_labels import land_origin_labels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import running_average
 
@@ -104,16 +104,15 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
     return buildable_count, removed_units_reference
 
 
-def simulation_process(mgras, candidates, labels_demands, show_progress=False):
+def simulation_process(mgras, candidates, demand_manager, show_progress=False):
     if show_progress:
-        progress_bar = tqdm(total=sum_demand(labels_demands))
+        progress_bar = tqdm(total=demand_manager.sum_demand())
         progress_bar.set_description(
             'allocating units by alternating through each product type')
     # select one build candidate at a time for each product type
-    while demands_unsatisfied(labels_demands):
-        random.shuffle(labels_demands)
-        for index, (labels, demand) in enumerate(labels_demands):
-            if demand_unsatisfied(demand):
+    while demand_manager.demands_unsatisfied():
+        for labels, demand in demand_manager.random_order_items():
+            if demand.demand_unsatisfied():
                 built_demand, removed_units_reference = \
                     choose_candidate(
                         candidates,
@@ -122,19 +121,16 @@ def simulation_process(mgras, candidates, labels_demands, show_progress=False):
                 if removed_units_reference is not None:
                     # redevelopment removed units, subtract from
                     # the appropriate demand progress
-                    labels_demands = subtract_from_fulfilled_demand(
-                        labels_demands, removed_units_reference)
+                    demand_manager.subtract_from_fulfilled_demand(
+                        removed_units_reference[0], removed_units_reference[1]
+                    )
                     if show_progress:
                         progress_bar.update(removed_units_reference[1])
 
-                labels_demands[index],
-                label_for_removing_redev_candidates = update_labels_demand(
-                    labels, demand, built_demand
-                )
-                if label_for_removing_redev_candidates is not None:
-                    candidates.remove_redev_from(
-                        label_for_removing_redev_candidates
-                    )
+                demand_manager.update_labels_demand(labels, built_demand)
+                if built_demand is None:
+                    candidates.remove_redev_from(labels)
+
                 if show_progress and built_demand is not None:
                     progress_bar.update(built_demand)
     if show_progress:
@@ -154,7 +150,7 @@ def guesstimate_simulation_runtime(normal_runtime, runs, expected_threads):
 def perform_multiple_runs(mgras, current_results, shared_candidates, runs):
     arg_lists = [(
         mgras.copy(), copy.deepcopy(shared_candidates),
-        copy.deepcopy(prep_demand())
+        copy.deepcopy(DemandManager())
     ) for _ in range(runs)
     ]
     normal_runtime = 60  # seconds
@@ -205,7 +201,7 @@ def develop(mgras, runs=None):
 
     if runs == 1:
         current_results = simulation_process(
-            mgras, shared_candidates, prep_demand(), show_progress=True)
+            mgras, shared_candidates, DemandManager(), show_progress=True)
     else:
         current_results = perform_multiple_runs(
             mgras, current_results, shared_candidates, runs)
