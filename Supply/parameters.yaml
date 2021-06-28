@@ -1,7 +1,7 @@
 ---
 # I/O
 
-use_database: false
+use_database: true
 input_filename: "data/Supply_v41a_input.csv"
 
 schema: "srf"
@@ -12,7 +12,7 @@ output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL 
 
 # set to true for verbose output
 #debug: false
-debug: false
+debug: true
 # save debug output to file
 #to_file: false
 to_file: false
@@ -23,7 +23,7 @@ simulation_year: 2013
 use_choice_model: true
 scale: 1.0
 # number of runs
-runs: 64
+runs: 16
 
 # Filtering
 minimum_units: 5

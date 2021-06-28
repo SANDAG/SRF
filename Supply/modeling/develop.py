@@ -104,73 +104,6 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
     return buildable_count, removed_units_reference
 
 
-def demand_unsatisfied(demand):
-    return demand[0] < demand[1]
-
-
-def demands_unsatisfied(labels_demands):
-    for _, demand in labels_demands:
-        if demand_unsatisfied(demand):
-            return True
-    return False
-
-
-def sum_demand(labels_demands):
-    total = 0
-    for _, demand in labels_demands:
-        total += demand[1]
-    return total
-
-
-def update_labels_demand(labels, demand, difference):
-    if difference is None:
-        # we ran out of suitable candidates, stop trying to allocate by
-        # setting demand to the amount built.
-        return (labels, (demand[0], demand[0]))
-    return (
-        labels, (demand[0] + difference, demand[1])
-    )
-
-
-def find_product_type_in_labels_demand(labels_demand_list, product_type):
-    for index, (labels, _) in enumerate(labels_demand_list):
-        if labels.product_type == product_type:
-            return index
-    print('could not find product type: {}'.format(product_type))
-    return None
-
-
-def subtract_from_fulfilled_demand(labels_demands, removed_units_reference):
-    index_to_subtract_from = \
-        find_product_type_in_labels_demand(
-            labels_demands,
-            removed_units_reference[0].product_type
-        )
-    labels_demands[index_to_subtract_from] = \
-        update_labels_demand(
-        labels_demands[index_to_subtract_from][0],
-        labels_demands[index_to_subtract_from][1],
-        removed_units_reference[1]
-    )
-    return labels_demands
-
-
-def prep_demand():
-    labels_demands = []
-    for product_type_labels in all_product_type_labels():
-        units_required = product_type_labels.units_per_year_parameter()
-        if units_required < 0:
-            units_required = 0
-        # nested tuple with (appropriate labels for the product type,
-        # (amount of demand fulfilled,
-        # number of units needed total to fulfill demand))
-        labels_demands.append((
-            product_type_labels,
-            (0, units_required)
-        ))
-    return labels_demands
-
-
 def simulation_process(mgras, candidates, labels_demands, show_progress=False):
     if show_progress:
         progress_bar = tqdm(total=sum_demand(labels_demands))
@@ -194,8 +127,14 @@ def simulation_process(mgras, candidates, labels_demands, show_progress=False):
                     if show_progress:
                         progress_bar.update(removed_units_reference[1])
 
-                labels_demands[index] = update_labels_demand(
-                    labels, demand, built_demand)
+                labels_demands[index],
+                label_for_removing_redev_candidates = update_labels_demand(
+                    labels, demand, built_demand
+                )
+                if label_for_removing_redev_candidates is not None:
+                    candidates.remove_redev_from(
+                        label_for_removing_redev_candidates
+                    )
                 if show_progress and built_demand is not None:
                     progress_bar.update(built_demand)
     if show_progress:

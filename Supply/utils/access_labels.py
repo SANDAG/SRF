@@ -236,6 +236,15 @@ class RedevelopmentLabels(object):
 
         return None
 
+    def all_labels_for_origin(self, product_type):
+        # returns a list of all of the labels that would subtract from
+        # a product type
+        applicable_labels = []
+        for label in self.list_labels():
+            if self.get_origin(label) == product_type:
+                applicable_labels.append(label)
+        return applicable_labels
+
 
 land_origin_labels = RedevelopmentLabels()
 

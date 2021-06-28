@@ -171,3 +171,13 @@ class Candidates(object):
         progress_bar.close()
         # save_to_file(candidates, 'data/output', 'candidates.csv')
         return pandas.DataFrame(candidate_list).copy()
+
+    def remove_redev_from(self, product_type):
+        # remove any candidates whose selection would reduce the built supply
+        # of the product type corresponding to label
+        applicable_labels = RedevelopmentLabels().all_labels_for_origin(
+            product_type
+        )
+        self.candidates.loc[:, applicable_labels] = None
+        logging.debug("killed candidates for product type {}".format(
+            product_type.product_type))
