@@ -116,7 +116,7 @@ def simulation_process(mgras, candidates, demand_manager, show_progress=False):
                 built_demand, removed_units_reference = \
                     choose_candidate(
                         candidates,
-                        mgras, labels, demand[1] - demand[0]
+                        mgras, labels, demand.remaining_demand()
                     )
                 if removed_units_reference is not None:
                     # redevelopment removed units, subtract from

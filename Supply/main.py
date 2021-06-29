@@ -5,6 +5,7 @@ from utils.parameter_access import parameters
 from utils.aa_floorspace_update import update_floorspace
 import os
 
+
 def exception_handler(exception_type, exception, traceback):
     print('%s: %s' % (exception_type.__name__, exception))
 
@@ -27,7 +28,7 @@ def run(mgra_dataframe, planned_sites):
         print('program terminated early')
         return
     # save output file
-    save_to_file(mgra_dataframe, os.path.dirname(output_dir),
+    save_to_file(mgra_dataframe, output_dir,
                  'forecasted_year_{}.csv'.format(forecast_year))
     # create aa export if crosswalk is available
     print('updating AA floorspace file ...')

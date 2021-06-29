@@ -178,6 +178,9 @@ class Candidates(object):
         applicable_labels = RedevelopmentLabels().all_labels_for_origin(
             product_type
         )
+        logging.debug(
+            "removing candidates that would use product type {}".format(
+                product_type.product_type
+            )
+        )
         self.candidates.loc[:, applicable_labels] = None
-        logging.debug("killed candidates for product type {}".format(
-            product_type.product_type))

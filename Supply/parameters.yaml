@@ -15,7 +15,7 @@ output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL 
 debug: true
 # save debug output to file
 #to_file: false
-to_file: false
+to_file: true
 
 # Simulation
 simulation_year: 2013
@@ -23,7 +23,7 @@ simulation_year: 2013
 use_choice_model: true
 scale: 1.0
 # number of runs
-runs: 16
+runs: 1
 
 # Filtering
 minimum_units: 5
