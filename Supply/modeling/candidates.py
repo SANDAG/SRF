@@ -183,4 +183,7 @@ class Candidates(object):
                 product_type.product_type
             )
         )
-        self.candidates.loc[:, applicable_labels] = None
+        logging.debug(
+            "labels were: {}".format(applicable_labels)
+        )
+        self.candidates.loc[:, applicable_labels] = numpy.nan

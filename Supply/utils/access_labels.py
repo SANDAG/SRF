@@ -241,8 +241,10 @@ class RedevelopmentLabels(object):
         # a product type
         applicable_labels = []
         for label in self.list_labels():
-            if self.get_origin(label) == product_type:
-                applicable_labels.append(label)
+            origin_label = self.get_origin(label)
+            if origin_label is not None:
+                if origin_label.product_type == product_type.product_type:
+                    applicable_labels.append(label)
         return applicable_labels
 
 
