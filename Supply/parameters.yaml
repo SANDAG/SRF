@@ -1,7 +1,7 @@
 ---
 # I/O
 
-use_database: false
+use_database: true
 input_filename: "data/Supply_v41a_input.csv"
 
 schema: "srf"
@@ -11,10 +11,8 @@ aa_crosswalk_table: "_supply_aa_crosswalk"
 output_directory: "data/output" # THIS DIRECTORY IS EMPTIED EACH TIME THE MODEL IS RUN
 
 # set to true for verbose output
-#debug: false
 debug: false
 # save debug output to file
-#to_file: false
 to_file: false
 
 # Simulation

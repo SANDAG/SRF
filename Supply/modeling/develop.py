@@ -1,5 +1,4 @@
 import logging
-import random
 from multiprocessing import Pool, cpu_count
 import copy
 import math
@@ -10,8 +9,9 @@ from modeling.candidates import Candidates, candidate_development_type, \
     get_square_footage_per_unit, get_acreage_per_unit
 from modeling.filters import acreage_available
 from modeling.dataframe_updates import update_mgra, increment_building_ages
+from modeling.demand_manager import DemandManager
 
-from utils.access_labels import all_product_type_labels, land_origin_labels
+from utils.access_labels import land_origin_labels
 from utils.parameter_access import parameters
 from utils.pandas_shortcuts import running_average
 
@@ -104,98 +104,33 @@ def choose_candidate(candidates, mgras, product_type_labels, max_units):
     return buildable_count, removed_units_reference
 
 
-def demand_unsatisfied(demand):
-    return demand[0] < demand[1]
-
-
-def demands_unsatisfied(labels_demands):
-    for _, demand in labels_demands:
-        if demand_unsatisfied(demand):
-            return True
-    return False
-
-
-def sum_demand(labels_demands):
-    total = 0
-    for _, demand in labels_demands:
-        total += demand[1]
-    return total
-
-
-def update_labels_demand(labels, demand, difference):
-    if difference is None:
-        # we ran out of suitable candidates, stop trying to allocate by
-        # setting demand to the amount built.
-        return (labels, (demand[0], demand[0]))
-    return (
-        labels, (demand[0] + difference, demand[1])
-    )
-
-
-def find_product_type_in_labels_demand(labels_demand_list, product_type):
-    for index, (labels, _) in enumerate(labels_demand_list):
-        if labels.product_type == product_type:
-            return index
-    print('could not find product type: {}'.format(product_type))
-    return None
-
-
-def subtract_from_fulfilled_demand(labels_demands, removed_units_reference):
-    index_to_subtract_from = \
-        find_product_type_in_labels_demand(
-            labels_demands,
-            removed_units_reference[0].product_type
-        )
-    labels_demands[index_to_subtract_from] = \
-        update_labels_demand(
-        labels_demands[index_to_subtract_from][0],
-        labels_demands[index_to_subtract_from][1],
-        removed_units_reference[1]
-    )
-    return labels_demands
-
-
-def prep_demand():
-    labels_demands = []
-    for product_type_labels in all_product_type_labels():
-        units_required = product_type_labels.units_per_year_parameter()
-        if units_required < 0:
-            units_required = 0
-        # nested tuple with (appropriate labels for the product type,
-        # (amount of demand fulfilled,
-        # number of units needed total to fulfill demand))
-        labels_demands.append((
-            product_type_labels,
-            (0, units_required)
-        ))
-    return labels_demands
-
-
-def simulation_process(mgras, candidates, labels_demands, show_progress=False):
+def simulation_process(mgras, candidates, demand_manager, show_progress=False):
     if show_progress:
-        progress_bar = tqdm(total=sum_demand(labels_demands))
+        progress_bar = tqdm(total=demand_manager.sum_demand())
         progress_bar.set_description(
             'allocating units by alternating through each product type')
     # select one build candidate at a time for each product type
-    while demands_unsatisfied(labels_demands):
-        random.shuffle(labels_demands)
-        for index, (labels, demand) in enumerate(labels_demands):
-            if demand_unsatisfied(demand):
+    while demand_manager.demands_unsatisfied():
+        for labels, demand in demand_manager.random_order_items():
+            if demand.demand_unsatisfied():
                 built_demand, removed_units_reference = \
                     choose_candidate(
                         candidates,
-                        mgras, labels, demand[1] - demand[0]
+                        mgras, labels, demand.remaining_demand()
                     )
                 if removed_units_reference is not None:
                     # redevelopment removed units, subtract from
                     # the appropriate demand progress
-                    labels_demands = subtract_from_fulfilled_demand(
-                        labels_demands, removed_units_reference)
+                    demand_manager.subtract_from_fulfilled_demand(
+                        removed_units_reference[0], removed_units_reference[1]
+                    )
                     if show_progress:
                         progress_bar.update(removed_units_reference[1])
 
-                labels_demands[index] = update_labels_demand(
-                    labels, demand, built_demand)
+                demand_manager.update_labels_demand(labels, built_demand)
+                if built_demand is None:
+                    candidates.remove_redev_from(labels)
+
                 if show_progress and built_demand is not None:
                     progress_bar.update(built_demand)
     if show_progress:
@@ -215,7 +150,7 @@ def guesstimate_simulation_runtime(normal_runtime, runs, expected_threads):
 def perform_multiple_runs(mgras, current_results, shared_candidates, runs):
     arg_lists = [(
         mgras.copy(), copy.deepcopy(shared_candidates),
-        copy.deepcopy(prep_demand())
+        copy.deepcopy(DemandManager())
     ) for _ in range(runs)
     ]
     normal_runtime = 60  # seconds
@@ -266,7 +201,7 @@ def develop(mgras, runs=None):
 
     if runs == 1:
         current_results = simulation_process(
-            mgras, shared_candidates, prep_demand(), show_progress=True)
+            mgras, shared_candidates, DemandManager(), show_progress=True)
     else:
         current_results = perform_multiple_runs(
             mgras, current_results, shared_candidates, runs)

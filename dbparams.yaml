@@ -1,6 +1,6 @@
 # I/O
 #input_filename: "data/preprocessed.csv"
-host: "34.195.124.204"
+host: "localhost"
 database: "sandag_db"
 user: "usrPostgres"
 password: $SRF_DB_PASSWORD
