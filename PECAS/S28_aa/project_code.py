@@ -33,36 +33,36 @@ def start_of_year(year,ps=_ps):
     if year==ps.baseyear:
         prev_year=year-1
         dc.dump_pg_tbls(lambda: pr.connect_to_aa(ps), ps.scendir, ps.aa_schema, '^'+str(prev_year))
-    
+
     if year==2013:
         y13_smain_input='..\\..\\Supply\\data\\supply_input_{}.csv'.format(year)
         dc.dump_a_table(lambda: pr.connect_to_aa(ps), 'srf', '_supply_input',y13_smain_input)
-    
- 
+
+
 def before_aa(year,ps=_ps):
     import sys
     os.chdir('..\\..\\Supply')
     sys.path.insert(0, '')
-    
+
     # load dataframe(s)
     combined_rent = '..\\Demand\\{}\\combined_rents.csv'.format(year-1)
     #old_supply_output = 'data\\output\\forecasted_year_{}.csv'.format(year-1)
-    old_supply_output = 'data\\forecasted_year_{}.csv'.format(year-1)
+    old_supply_output = 'data\\output\\forecasted_year_{}.csv'.format(year-1)
     new_supply_input = 'data\\supply_input_{}.csv'.format(year)
 
     if os.path.exists(combined_rent) and os.path.exists(old_supply_output) :
         from rents2supply import importRents
         importRents(combined_rent,old_supply_output, new_supply_input)
-        
+
     if os.path.exists(new_supply_input) :
         cmd='python main.py -f {} -y {}'.format(new_supply_input,year)
     else:
         #cmd='python main.py -y {}'.format(year)
         # CMB debug edit: force crash if supply/demand outputs not found
         raise SystemExit("Supply and/or demand outputs not found!")
-        
+
     print(cmd)
-    os.system(cmd)    
+    os.system(cmd)
 
     cmd = 'copy /Y data\\output\\FloorspaceI.csv ..\\PECAS\\S28_aa\\{}\\FloorspaceI.csv'.format(year)
     print(cmd)
