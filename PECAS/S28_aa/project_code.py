@@ -50,19 +50,18 @@ def before_aa(year,ps=_ps):
     old_supply_output = 'data\\output\\forecasted_year_{}.csv'.format(year-1)
     new_supply_input = 'data\\supply_input_{}.csv'.format(year)
 
-    if os.path.exists(combined_rent) and os.path.exists(old_supply_output) :
+    if os.path.exists(combined_rent) :
         from rents2supply import importRents
         importRents(combined_rent,old_supply_output, new_supply_input)
 
     if os.path.exists(new_supply_input) :
         cmd='python main.py -f {} -y {}'.format(new_supply_input,year)
+        print(cmd)
+        os.system(cmd)
     else:
         #cmd='python main.py -y {}'.format(year)
         # CMB debug edit: force crash if supply/demand outputs not found
         raise SystemExit("Supply and/or demand outputs not found!")
-
-    print(cmd)
-    os.system(cmd)
 
     cmd = 'copy /Y data\\output\\FloorspaceI.csv ..\\PECAS\\S28_aa\\{}\\FloorspaceI.csv'.format(year)
     print(cmd)
@@ -78,13 +77,21 @@ def after_aa(year, ps):
         cmd = 'rscript .\\R\\aa2demand.R ' + act_location_file + ' .. '+str(year-ps.baseyear+1)
     else:
         cmd = 'rscript .\\R\\aa2demand.R ..\\PECAS\\S28_aa\\2011\\ActivityLocations.csv  .. '+str(year-ps.baseyear+1)
-
     print(cmd)
     os.system(cmd)
-    cmd = 'rscript .\\R\\evalDemand.R .. '+str(year) + ' '+ str(year)
+    cmd = 'copy /Y ..\\Supply\\data\\output\\forecasted_year_{}.csv ..\\PostProcessor\\Data\\forecasted_year_{}.csv'.format(year,year)
     print(cmd)
     os.system(cmd)
-
+    cmd = 'rscript .\\R\\evalDemand.R .. '+str(year)
+    print(cmd)
+    os.system(cmd)
+    if (year>2012):
+        os.chdir('..\\PostProcessor')
+        cmd = 'python mergeOutputs.py {}'.format(year)
+        print(cmd)
+        os.system(cmd)
+        mgra13_based_update = os.path.join("Data","mgra13_based_input"+str(year)+".csv")
+        if not(os.path.exists(mgra13_based_update)): raise SystemExit("MGRA summry file update unsuccessful")
     os.chdir('..\\PECAS\\S28_aa')
 
 

@@ -1,8 +1,10 @@
+
+
 loadDemandInputs <- function(configDir,year,tables) {
   library(yaml)
   config_file = file.path(configDir, "dbparams.yaml")
   config <- yaml.load_file(config_file)
-
+  
   library(RPostgreSQL)
   m <- dbDriver('PostgreSQL')
   conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
@@ -10,49 +12,49 @@ loadDemandInputs <- function(configDir,year,tables) {
   inputs_schema <- config$mu_schema
   mysql <- paste0("select schema_name FROM information_schema.schemata WHERE schema_name = '", inputs_schema,"';")
   tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input schema doesn't exists!"))
-
+  
   # create vector of necessary tables
-   if (missing(tables)){
-  tables <- c("agents",
-             "agents_zones",
-             "bids_adjustments",
-             "bids_functions",
-             "demand",
-             "demand_exogenous_cutoff",
-             "real_estates_zones",
-             "rent_adjustments",
-             "rent_functions",
-             "subsidies",
-             "supply",
-             "zones")
+  if (missing(tables)){
+    tables <- c("agents",
+                "agents_zones",
+                "bids_adjustments",
+                "bids_functions",
+                "demand",
+                "demand_exogenous_cutoff",
+                "real_estates_zones",
+                "rent_adjustments",
+                "rent_functions",
+                "subsidies",
+                "supply",
+                "zones")
   }
-
+  
   # load csv files into inputList
   inputList <- list()
   for (table in tables) {
     if (table!="demand" || is.na(year)){
-         mysql <- paste0("select * from ",inputs_schema,".", table)
+      mysql <- paste0("select * from ",inputs_schema,".", table)
     } else {
-         mysql <- paste0('select * from ',inputs_schema,'.demand_', year,' d1 union select d.* from ',
-                         inputs_schema,'.demand d left join ',inputs_schema,'.demand_', year,
-                         ' d1 on d."LUZ"= d1."LUZ" and d."H_IDX"=d1."H_IDX" where d1."LUZ" is null order by "LUZ", "H_IDX";')
+      mysql <- paste0('select * from ',inputs_schema,'.demand_', year,' d1 union select d.* from ',
+                      inputs_schema,'.demand d left join ',inputs_schema,'.demand_', year,
+                      ' d1 on d."LUZ"= d1."LUZ" and d."H_IDX"=d1."H_IDX" where d1."LUZ" is null order by "LUZ", "H_IDX";')
     }
     #print(mysql)
     d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
     #print(dim(d))
     inputList[[table]] <- d
-
+    
   }
-
+  
   return(inputList)
-
+  
 }
 
 loadMGRA <- function(configDir,tname) {
   library(yaml)
   config_file = paste0(configDir, "/dbparams.yaml")
   config <- yaml.load_file(config_file)
-
+  
   library(RPostgreSQL)
   m <- dbDriver('PostgreSQL')
   conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
@@ -60,14 +62,14 @@ loadMGRA <- function(configDir,tname) {
   inputs_schema <- config$mu_schema
   mysql <- paste0("select table_name FROM information_schema.tables WHERE table_schema='", inputs_schema,"' and table_name = '", tname,"';")
   tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input Table doesn't exists!"))
-
+  
   # load data from pg
-  mysql <- paste0('select mgra as "MGRA", luz as "LUZ" from ',inputs_schema,'."', tname,'"')
+  mysql <- paste0('select mgra as "MGRA", luz as "LUZ", acres as ACRES from ',inputs_schema,'."', tname,'"')
   d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
-
-
+  
+  
   return(d)
-
+  
 }
 
 loadaa2demandinputs <- function(configDir,tname) {
@@ -102,16 +104,39 @@ writeaa2demandoutputs <- function(configDir,tname, mydf) {
   on.exit(dbDisconnect(conn))
   inputs_schema <- config$mu_schema
   mytbl <- c(inputs_schema, tname)
-  # #if(dbExistsTable(conn, mytbl)){ dbRemoveTable(conn, mytbl)} 
-  # sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROM…
+  # #if(dbExistsTable(conn, mytbl)){ dbRemoveTable(conn, mytbl)}
+  # sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROMï¿½
   # dbSendQuery(conn, statement=sql_truncate)
   # dbWriteTable(conn, mytbl,mydf, row.names=FALSE, append=TRUE)
   if(dbExistsTable(conn, mytbl)){
-    sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROM…
+    sql_truncate <- paste("TRUNCATE ", paste(inputs_schema,tname,sep=".")) ##unconditional DELETE FROMï¿½
     dbSendQuery(conn, statement=sql_truncate)
-    }
-  dbWriteTable(conn, mytbl,mydf, row.names=FALSE, append=TRUE)
   }
+  dbWriteTable(conn, mytbl,mydf, row.names=FALSE, append=TRUE)
+}
+
+## function to pull an arbitrary table
+loadPGTbl <- function(configDir,tname) {
+  library(yaml)
+  config_file = paste0(configDir, "/dbparams.yaml")
+  config <- yaml.load_file(config_file)
+  
+  library(RPostgreSQL)
+  m <- dbDriver('PostgreSQL')
+  conn <- dbConnect(m, host=config$host, dbname=config$database, user=config$user, password=config$password, port=config$port)
+  on.exit(dbDisconnect(conn))
+  inputs_schema <- config$mu_schema
+  mysql <- paste0("select table_name FROM information_schema.tables WHERE table_schema='", inputs_schema,"' and table_name = '", tname,"';")
+  tryCatch(dbSendQuery(conn,mysql), error=function(e) print("Input Table doesn't exists!"))
+  
+  # load data from pg
+  mysql <- paste0('select * from ',inputs_schema,'."', tname,'"')
+  d <- tryCatch(dbGetQuery(conn,mysql), error=function(e) print(paste0("Input table ",table," doesn't exists!")))
+  
+  
+  return(d)
+  
+}
 
 agentCheck <- function(location,targets) {
   require(dplyr)
@@ -119,10 +144,10 @@ agentCheck <- function(location,targets) {
   totalAgents <- transmute(melt(location,
                                 id.vars=c("Realestate","Zone"),
                                 measure.vars=3:52),
-                        V_IDX = Realestate,
-                        I_IDX = Zone,
-                        H_IDX = as.numeric(variable),
-                        agents = value) %>%
+                           V_IDX = Realestate,
+                           I_IDX = Zone,
+                           H_IDX = as.numeric(variable),
+                           agents = value) %>%
     group_by(I_IDX,H_IDX) %>%
     summarise(NLOC = sum(agents))
   checkAgents <- totalAgents %>%
@@ -223,25 +248,63 @@ getSummary <- function(inputList,outputList) {
            i8 = hhinc8s1 + hhinc8s2,
            i9 = hhinc9s1 + hhinc9s2,
            i10 = hhinc10s1 + hhinc10s2,
-           hhp = hhinc1s1*agent_data$hhsize[1] + 
-             hhinc1s2*agent_data$hhsize[2] + 
-             hhinc2s1*agent_data$hhsize[3] + 
-             hhinc2s2*agent_data$hhsize[4] + 
-             hhinc3s1*agent_data$hhsize[5] + 
-             hhinc3s2*agent_data$hhsize[6] + 
-             hhinc4s1*agent_data$hhsize[7] + 
-             hhinc4s2*agent_data$hhsize[8] + 
-             hhinc5s1*agent_data$hhsize[9] + 
-             hhinc5s2*agent_data$hhsize[10] + 
-             hhinc6s1*agent_data$hhsize[11] + 
-             hhinc6s2*agent_data$hhsize[12] + 
-             hhinc7s1*agent_data$hhsize[13] + 
-             hhinc7s2*agent_data$hhsize[14] + 
-             hhinc8s1*agent_data$hhsize[15] + 
-             hhinc8s2*agent_data$hhsize[16] + 
-             hhinc9s1*agent_data$hhsize[17] + 
-             hhinc9s2*agent_data$hhsize[18] + 
-             hhinc10s1*agent_data$hhsize[19] + 
+           hhp = hhinc1s1*agent_data$hhsize[1] +
+             hhinc1s2*agent_data$hhsize[2] +
+             hhinc2s1*agent_data$hhsize[3] +
+             hhinc2s2*agent_data$hhsize[4] +
+             hhinc3s1*agent_data$hhsize[5] +
+             hhinc3s2*agent_data$hhsize[6] +
+             hhinc4s1*agent_data$hhsize[7] +
+             hhinc4s2*agent_data$hhsize[8] +
+             hhinc5s1*agent_data$hhsize[9] +
+             hhinc5s2*agent_data$hhsize[10] +
+             hhinc6s1*agent_data$hhsize[11] +
+             hhinc6s2*agent_data$hhsize[12] +
+             hhinc7s1*agent_data$hhsize[13] +
+             hhinc7s2*agent_data$hhsize[14] +
+             hhinc8s1*agent_data$hhsize[15] +
+             hhinc8s2*agent_data$hhsize[16] +
+             hhinc9s1*agent_data$hhsize[17] +
+             hhinc9s2*agent_data$hhsize[18] +
+             hhinc10s1*agent_data$hhsize[19] +
              hhinc10s2*agent_data$hhsize[20])
+  emp_total <- rowSums(summaryData[26:55])
+  summaryData <- cbind(summaryData,emp_total)
   return(summary_data)
+}
+
+updateEndogVars_Fn <- function(inputList, outputList){
+  # this is like a sneak preview of the summary created at the end of the run
+  summaryData <- getSummary(inputList,outputList)
+  # MGRA-based input must be loaded before following line will work
+  # summaryData <- left_join(summaryData,select(mgra13_base,mgra,acres,gq_civ,gq_mil),by=c("Zone"="mgra")
+  # most of the variables we need to update are densities which can't be reproduced using available area data
+  # where possible, we'll incrementally adjust them using growth rates
+  compareData <- left_join(summaryData,mgra13_base,by=c("Zone"="mgra"),suffix=c(".endog",".prior")) %>%
+    mutate(highInc.prior = i7.prior + i8.prior + i9.prior + i10.prior,
+           highInc.endog = i7.endog + i8.endog + i9.endog + i10.endog,
+           pop.prior = pop,
+           pop.endog = gq_civ + gq_mil + hhp.endog) %>%
+    select(mgra=Zone,acres,
+           highInc.prior,highInc.endog,hs.prior,hs.endog,pop.prior,pop.endog,
+           emp_total.prior,emp_total.endog,emp_retail.prior,emp_retail.endog)
+  compareData[is.na(compareData)] <- 0
+  inputList[["zones"]] <- inputList[["zones"]] %>%
+    left_join(compareData,by=c("I_IDX"="mgra")) %>%
+    mutate(highIncAcre = ifelse(highInc.prior > 0, 
+                                highIncAcre*(highInc.endog/highInc.prior), 
+                                highInc.endog / acres),
+           emp_density = ifelse(emp_total.prior > 0, 
+                                emp_density*(emp_total.endog/emp_total.prior), 
+                                emp_total.endog / acres),
+           popden = ifelse(pop.prior > 0, 
+                           popden*(pop.endog/pop.prior), 
+                           pop.endog / acres),
+           retempden = ifelse(emp_retail.prior > 0, 
+                              retempden*(emp_retail.endog/emp_retaill.prior), 
+                              emp_retail.endog / acres)
+           ) %>%
+    select(-c(highInc.prior,highInc.endog,hs.prior,hs.endog,pop.prior,pop.endog,
+              emp_total.prior,emp_total.endog,emp_retail.prior,emp_retail.endog))
+  return(inputList)
 }
