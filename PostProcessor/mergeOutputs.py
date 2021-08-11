@@ -71,6 +71,9 @@ with open(oldMGRAs, 'r') as MGRA_template:
         row['hs_sf'] = supply_row['hs_sf']
         row['hs_mf'] = supply_row['hs_mf']
         row['hs_mh'] = supply_row['hs_mh']
+        for field in hhFields2copy:
+            if (demand_row[field]!='NA'):
+                row[field] = demand_row[field]
         emp_total = 0
         emp_prior = float(row['emp_total'])
         emp_retail_prior = float(row['emp_retail'])
