@@ -268,8 +268,8 @@ getSummary <- function(inputList,outputList) {
              hhinc9s2*agent_data$hhsize[18] +
              hhinc10s1*agent_data$hhsize[19] +
              hhinc10s2*agent_data$hhsize[20])
-  emp_total <- rowSums(summaryData[26:55])
-  summaryData <- cbind(summaryData,emp_total)
+  emp_total <- rowSums(summary_data[26:55])
+  summary_data <- cbind(summary_data,emp_total)
   return(summary_data)
 }
 
