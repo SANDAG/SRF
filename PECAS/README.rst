@@ -3,6 +3,12 @@
 S28_aa in github here contains the AA only module extracted from PECAS S28 model. 
 Refer to HBA PECAS webpage: http://hbaspecto.com/products/pecas/ for information regarding PECAS model.
 
+### System requirements notes
+============================
+- Anaconda distribution of Python 3 is recommended. 
+- Most Python packages used by the model are already included in the Anaconda default installation. You only need to install psycopg2 python package by running:
+  conda install psycopg2
+
 ### Data Folder
 ============================
 Up to date data files will be downloaded from the SANDAG database, alternatively you can provide the same files and copy those in the corresponding directory.
