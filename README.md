@@ -37,6 +37,9 @@ The default password encryption method is "scram-sha-256" which is not supported
 Change the password authentication method to "md5" for user: "usrPostgres"  in pg_hba.conf  as well.  
 In addition, if the user "usrPostgres" was created before the above change, make sure to reset the password for this user. Its password will now be hashed with md5.
 
+Since PECAS AA model java code was compiled with Java 10. Make sure your Java version is 10 or higher. 
+
+Check machine_settings.py to make sure correct paths are set for pgpath, javaRunCommand, pythonCommand.
 Each of the core sub-modules are coded in different languages and use different libraries.  A separate Readme file under the sub-folder for each module describes these pre-requisites.  Before attempting to run the system, please visit each of these sub-folders and follow the instructions to ensure all required libraries are installed.
 
 # Operation
