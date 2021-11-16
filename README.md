@@ -31,15 +31,13 @@ For best results it is reccomended to run the SRF system on a computer matching 
 
 Many of the inputs to the SRF System (e.g. base year input data) are currently stored in a PostgreSQL database with secure password-protected access to ensure data integrity.  Please contact Manhan Group, LLC (info@manhangroup.com) if you wish to replicate the contents of this database on another server.
 
-Most recent version of PostgreSQL is recommended. If you are using PostgreSQL 10 and above, make sure to edit postgresql.conf and change the password encription parameter to
-password_encryption = md5
-The default password encryption method is "scram-sha-256" which is not supported by RPostgresql module used in the SRF demand model and hence need to revert back to "md5". 
-Change the password authentication method to "md5" for user: "usrPostgres"  in pg_hba.conf  as well.  
+The most recent version of PostgreSQL is recommended. If you are using PostgreSQL 10 and above, make sure to edit postgresql.conf and change the password encription parameter to:
+`password_encryption = md5`
+
+The default password encryption method is "scram-sha-256", which is not supported by the RPostgresql module used in the SRF demand model and hence need to revert back to "md5". Change the password authentication method to "md5" for user: "usrPostgres"  in pg_hba.conf  as well. 
+ 
 In addition, if the user "usrPostgres" was created before the above change, make sure to reset the password for this user. Its password will now be hashed with md5.
 
-Since PECAS AA model java code was compiled with Java 10. Make sure your Java version is 10 or higher. 
-
-Check machine_settings.py to make sure correct paths are set for pgpath, javaRunCommand, pythonCommand.
 Each of the core sub-modules are coded in different languages and use different libraries.  A separate Readme file under the sub-folder for each module describes these pre-requisites.  Before attempting to run the system, please visit each of these sub-folders and follow the instructions to ensure all required libraries are installed.
 
 # Operation
