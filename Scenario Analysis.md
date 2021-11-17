@@ -3,18 +3,18 @@ Currently, the safest way to prepare a run of the SRF System using alternative a
 
 Similarly, if your scenario involves changes to data stored in the PostgreSQL database accompanying the SRF system, the easiest way to accomplish this at present is to make a complete copy of the database created for the base scenario and then edit/update the copy. For example, you can the following commands to dump the database to disk:
 
-`set PGUSER=postgres
-set PGPASSWORD=******
-pg_dumpall -g > d:/tmp/globals.sql
-pg_dump -Fd -j 4 -d sandag_db -f d:/tmp/sandagbackup`
+`set PGUSER=postgres`<br>
+`set PGPASSWORD=******`<br>
+`pg_dumpall -g > d:/tmp/globals.sql`<br>
+`pg_dump -Fd -j 4 -d sandag_db -f d:/tmp/sandagbackup`<br>
 
 Then, use the following commands to restore from the backup:
 
-`set PGUSER=postgres
-set PGPASSWORD=******
-psql -f  d:/tmp/globals.sql
-createdb sandag_db_copy
-pg_restore -Fd -j 4 -d sandag_db_copy d:/tmp/sandagbackup`
+`set PGUSER=postgres`<br>
+`set PGPASSWORD=******`<br>
+`psql -f  d:/tmp/globals.sql`<br>
+`createdb sandag_db_copy`<br>
+`pg_restore -Fd -j 4 -d sandag_db_copy d:/tmp/sandagbackup`<br>
 
 These same operations may also be performed using a graphical user interface, if preferred.  Refer to pgAdmin documentation for further details.
 
