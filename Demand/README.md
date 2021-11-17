@@ -22,10 +22,11 @@ The following libraries are also required:
 - reshape2
 - foreach
 - doParallel
+- mipfp
 
 To install these, type "R" at the command line. Then, type:
 
-<code>install.packages(c("yaml","RPostgreSQL","dplyr","reshape2","foreach","doParallel"))</code>
+<code>install.packages(c("yaml","RPostgreSQL","dplyr","reshape2","foreach","doParallel","mipfp"))</code>
 
 To exit the R prompt, type "q()" and press Enter.
 
