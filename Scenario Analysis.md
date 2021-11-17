@@ -1,7 +1,7 @@
 # Scenario Analysis
 Currently, the safest way to prepare a run of the SRF System using alternative assumptions is to first make a copy of the system.  Use Windows Explorer or the `XCOPY` DOS command to copy the entire SRF directory on disk, including all sub-folders and files.   You may wish to rename the copy with a descriptive suffix, e.g. "SRF-SCS".
 
-Similarly, if your scenario involves changes to data stored in the PostgreSQL database accompanying the SRF system, the easiest way to accomplish this at present is to make a complete copy of the database created for the base scenario and then edit/update the copy. For example, you can the following commands to dump the database to disk:
+Similarly, if your scenario involves changes to data stored in the PostgreSQL database accompanying the SRF system, the easiest way to accomplish this at present is to make a complete copy of the database created for the base scenario and then edit/update the copy. For example, you can use the following commands to dump the database to disk:
 
 `set PGUSER=postgres`<br>
 `set PGPASSWORD=******`<br>
