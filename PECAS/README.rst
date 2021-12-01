@@ -26,7 +26,7 @@ Hence, in order for a fresh copy of data to be downloaded, delete the pre-existi
 Inputs used for the AA module for a selected year are distributed in four folders: the skim year folder,  the previous year's folder, the current year's folder and the AllYears/Inputs folder. 
 
 #### Skim year folder
-"Skimsl.csv" is located here. Check the "skimyears" defined aa_setting.py to find out the corresponding skim year folder for the current selected year for an AA model run.
+"SkimsI.csv" is located here. Check the "skimyears" defined aa_setting.py to find out the corresponding skim year folder for the current selected year for an AA model run.
 
 #### Current year folder
 "ActivityTotalsI.csv" and "FloorspaceO.csv" are required inputs.
@@ -54,8 +54,7 @@ if the file doesn't exist there yet before starting an AA model run.
 ============================
 Change program inputs parameters e.g., `aa_startyear`, `stopyear`, in "aa_settings.py" accordingly.
 
-If you need to download inputs data in the AllYears/Inputs diretory, 
-remove the all CSV files (except "TechnologyOptionsI_header.csv") in the Inputs folder.
+If you need to download inputs data in the AllYears/Inputs diretory, remove the all CSV files (except "TechnologyOptionsI_header.csv") in the Inputs folder.
 Then, set the following parameters in aa_settings.py to True:
 
 `update_techopt = True`
@@ -83,10 +82,10 @@ The squeeze skim process can also be run for an individual year, e.g., 2016,  wi
 
 To run the squeeze skims process, those *.omx input files listed before need to be copied into the corresponding skim year folder first. In addition, the schema for the storage of intermedite squeeze skim results needs to exist in the postgreSQL database and the user specified in "dbparams.yaml" needs to have written permission to the database schema specified as `sd_schema` in "aa_settings.py". 
 
-This process is time consuming and only need to be rerun when there are new input files, 
+This process is time consuming and only needs to be rerun when there are new input files, 
 i.e. "traffic_skims_AM.omx", "traffic_skims_MD.omx", and "transit_skims.omx".
  
-Hence, you may want to keep the parameter `squeeze_skims` to `False` and run the squeeze skim process for individual year.
+Hence, you may want to keep the parameter `squeeze_skims` to `False` and run the squeeze skim process for individual years.
  
 
 
