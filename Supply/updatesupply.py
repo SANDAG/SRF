@@ -14,7 +14,7 @@ from utils.interface import save_to_file
 #     agentXtype.columns = ['mgra','hh_sf','hh_mf','hh_mh','emp_ind','emp_com','emp_ofc','emp_oth']
 #     return agentXtype
 
-def updateSupply(combined_location,combined_rent,old_supply_input,new_supply_input=None):
+def updateSupply(combined_location,combined_rent,old_supply_output,new_supply_input=None):
     print("update supply input data")
     r_df = pandas.read_csv(combined_rent, dtype={'Value': np.float64}, na_values = np.NaN, index_col=['Realestate','Zone'])
     r_df = r_df.replace([np.inf, -np.inf], np.nan)
@@ -23,16 +23,17 @@ def updateSupply(combined_location,combined_rent,old_supply_input,new_supply_inp
     #r_df = r_df.clip(lower=0.1)
     #r_df = r_df.clip(upper=50000)
 
-    s_df = pandas.read_csv(old_supply_input,dtype={'valueSFmea': np.float64, 'valueMFmea': np.float64,
+    s_df = pandas.read_csv(old_supply_output,dtype={'valueSFmea': np.float64, 'valueMFmea': np.float64,
                                                    'valueINDme': np.float64, 'valueCOMme': np.float64,
                                                    'valueOFCme': np.float64}, index_col='MGRA')
 
     cl_df_wide = pandas.read_csv(combined_location, dtype=np.float64)
     cl_df_long = pandas.melt(cl_df_wide, id_vars=['Realestate','Zone'], var_name='AgentType', value_name='Value').set_index(['Realestate','Zone'])
     agentXtype = cl_df_long.agg(func=np.sum, axis='index').pivot(index='Zone', columns='Realestate', values='Value')
-    agentXtype.columns = ['mgra','hh_sf','hh_mf','hh_mh','emp_ind','emp_com','emp_ofc','emp_oth']                   
+    agentXtype.columns = ['mgra','hh_sf','hh_mf','hh_mh','emp_ind','emp_com','emp_ofc','emp_oth']
     agentXtype = agentXtype.replace([np.inf, -np.inf], np.nan)
-    s_df = s_df.join(agentXtype[['mgra','hh_sf','hh_mf','hh_mh','emp_ind','emp_ofc','emp_com','emp_oth']], rsuffix="_new", sort=True)
+    agentXtype.set_index('mgra')
+    s_df = s_df.join(agentXtype, on='MGRA', rsuffix="_new", sort=True)
     s_df['hh_sf'] = s_df['hh_sf_new']
     s_df['hh_mf'] = s_df['hh_mf_new']
     s_df['hh_mh'] = s_df['hh_mh_new']
@@ -76,13 +77,16 @@ def updateSupply(combined_location,combined_rent,old_supply_input,new_supply_inp
         save_to_file(s_df, outdir, fname)
     return s_df
 
-# if __name__ == "__main__":
-#     import time
-#     import sys
-#     start_time = time.time()
-#     combined_rent = r"D:\PECAS\SRF.git\branches\Supply\profitability-adjusters\Demand\2012\combined_rents.csv"
-#     old_supply_input = r"D:\PECAS\SRF.git\branches\Supply\profitability-adjusters\Supply\data\supply_input_2013.csv"
-#     new_supply_input = r"D:\PECAS\SRF.git\branches\Supply\profitability-adjusters\Supply\data\supply_input_2013n.csv"
-#
-#     importRents(combined_rent,old_supply_input,new_supply_input)
-#     print("---%s seconds ---" % (time.time() - start_time))
+if __name__ == "__main__":
+    import time
+    import sys
+    start_time = time.time()
+    year = int(sys.argv[1])
+    # should be executed from Supply directory
+    combined_rent = '..\\Demand\\{}\\combined_rents.csv'.format(year-1)
+    combined_location = '..\\Demand\\{}\\combined_location.csv'.format(year-1)
+    old_supply_output = 'data\\output\\forecasted_year_{}.csv'.format(year-1)
+    new_supply_input = 'data\\supply_input_{}.csv'.format(year)
+
+    updateSupply(combined_location,combined_rent,old_supply_output,new_supply_input)
+    print("---%s seconds ---" % (time.time() - start_time))
