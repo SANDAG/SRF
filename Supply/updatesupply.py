@@ -29,11 +29,12 @@ def updateSupply(combined_location,combined_rent,old_supply_output,new_supply_in
 
     cl_df_wide = pandas.read_csv(combined_location, dtype=np.float64)
     cl_df_long = pandas.melt(cl_df_wide, id_vars=['Realestate','Zone'], var_name='AgentType', value_name='Value').set_index(['Realestate','Zone'])
-    agentXtype = cl_df_long.agg(func=np.sum, axis='index').pivot(index='Zone', columns='Realestate', values='Value')
-    agentXtype.columns = ['mgra','hh_sf','hh_mf','hh_mh','emp_ind','emp_com','emp_ofc','emp_oth']
+    #agentXtype = cl_df_long.agg(func=np.sum, axis='index').pivot(index='Zone', columns='Realestate', values='Value')
+    agentXtype = cl_df_long.groupby(["Realestate","Zone"]).agg({"Value": np.sum}).unstack(level="Realestate").fillna(0)
+    agentXtype.columns = ['hh_sf','hh_mf','hh_mh','emp_ind','emp_com','emp_ofc','emp_oth']
     agentXtype = agentXtype.replace([np.inf, -np.inf], np.nan)
-    agentXtype.set_index('mgra')
-    s_df = s_df.join(agentXtype, on='MGRA', rsuffix="_new", sort=True)
+    #agentXtype.set_index('mgra')
+    s_df = s_df.join(agentXtype, rsuffix="_new", sort=True)
     s_df['hh_sf'] = s_df['hh_sf_new']
     s_df['hh_mf'] = s_df['hh_mf_new']
     s_df['hh_mh'] = s_df['hh_mh_new']
@@ -42,7 +43,7 @@ def updateSupply(combined_location,combined_rent,old_supply_output,new_supply_in
     s_df['emp_office'] = s_df['emp_ofc']
     s_df['emp_comm_l'] = s_df['emp_com']
     s_df['emp_other_'] = s_df['emp_oth']
-    s_df.drop(['mgra','hh_sf_new','hh_mf_new','hh_mh_new','emp_ind','emp_ofc','emp_com','emp_oth'])
+    s_df.drop(['hh_sf_new','hh_mf_new','hh_mh_new','emp_ind','emp_ofc','emp_com','emp_oth'])
 
     ## TODO: Update employment by real estate type as well
 
