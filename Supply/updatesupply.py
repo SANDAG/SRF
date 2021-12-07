@@ -43,7 +43,7 @@ def updateSupply(combined_location,combined_rent,old_supply_output,new_supply_in
     s_df['emp_office'] = s_df['emp_ofc']
     s_df['emp_comm_l'] = s_df['emp_com']
     s_df['emp_other_'] = s_df['emp_oth']
-    s_df.drop(['hh_sf_new','hh_mf_new','hh_mh_new','emp_ind','emp_ofc','emp_com','emp_oth'])
+    s_df.drop(['hh_sf_new','hh_mf_new','hh_mh_new','emp_ind','emp_ofc','emp_com','emp_oth'], axis=1)
 
     ## TODO: Update employment by real estate type as well
 
