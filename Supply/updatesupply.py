@@ -75,7 +75,7 @@ def updateSupply(combined_location,combined_rent,old_supply_output,new_supply_in
     s_df = s_df.reset_index()
     if (new_supply_input is not None):
         outdir, fname = os.path.split(new_supply_input)
-        save_to_file(s_df, outdir, fname)
+        save_to_file(s_df, outdir, fname, force=True)
     return s_df
 
 if __name__ == "__main__":
