@@ -48,7 +48,7 @@ def before_aa(year,ps=_ps):
     combined_rent = '..\\Demand\\{}\\combined_rents.csv'.format(year-1)
     combined_location = '..\\Demand\\{}\\combined_location.csv'.format(year-1)
     #old_supply_output = 'data\\output\\forecasted_year_{}.csv'.format(year-1)
-    old_supply_output = 'data\\output\\forecasted_year_{}.csv'.format(year-1)
+    old_supply_output = '..\\PostProcessor\\data\\forecasted_year_{}.csv'.format(year-1)
     new_supply_input = 'data\\supply_input_{}.csv'.format(year)
 
     if os.path.exists(combined_rent) :
