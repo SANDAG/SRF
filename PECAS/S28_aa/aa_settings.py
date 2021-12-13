@@ -112,7 +112,7 @@ baseyear = 2013
 endyear = 2020
 
 # Years in which new skims are available
-skimyears = [2012,2016,2020]
+skimyears = [2012,2016]
 
 # Years in which AA should run
 aayears = irange(baseyear, endyear)
