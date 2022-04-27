@@ -1,8 +1,0 @@
-# I/O
-#input_filename: "data/preprocessed.csv"
-host: "localhost"
-database: "sandag_db"
-user: "usrPostgres"
-password: $SRF_DB_PASSWORD
-port: 5432
-mu_schema: "mu_demand"
