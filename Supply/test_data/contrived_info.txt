@@ -1,7 +1,0 @@
-information about each mocked mgra in contrived_MGRA.csv
-
-1. an mgra with single family housing only
-2. similar to 1, but with much lower vacancy 
-3. an mgra with single and multi family housing
-4. an industrial mgra with developed and vacant space
-5. an mgra with plenty of office and retail space, vacant and developed
